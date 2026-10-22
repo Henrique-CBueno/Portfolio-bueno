@@ -33,7 +33,8 @@ O jeito mais simples de ter tudo junto (API, MinIO, Keycloak e site) é o `docke
 | `PORTA` | `8080` | Porta HTTP. |
 | `DADOS` | `./dados` | Onde fica o `snapshot.json` (vídeos, contagens, repositórios). |
 | `ORIGENS` | localhost:4321 e henriquebueno.com | Origens liberadas no CORS (o site, que chama a API de outro domínio). |
-| `MINIO_URL`, `MINIO_USUARIO`, `MINIO_SENHA` | `http://localhost:9000`, … | MinIO das capas (bucket `capas`, criado sozinho). |
+| `MINIO_URL`, `MINIO_USUARIO`, `MINIO_SENHA` | `http://localhost:9000`, … | MinIO das capas: endereço, access key e secret key. |
+| `MINIO_BUCKET` | `capas` | Bucket das capas (criado sozinho se não existir). |
 | `KEYCLOAK_URL` | `http://localhost:8180/realms/portfolio` | Realm do Keycloak, pelo endereço interno. |
 | `KEYCLOAK_EMISSOR` | `any` | Emissor dos tokens como o navegador vê (ex.: `https://auth.henriquebueno.com/realms/portfolio`). |
 | `YOUTUBE_CHAVE` | — | Chave da YouTube Data API v3. Sem ela, o site mostra só o @. |

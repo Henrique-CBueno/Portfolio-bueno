@@ -5,6 +5,10 @@ interface ImportMetaEnv {
 	readonly PUBLIC_API_URL?: string;
 	/** Keycloak público (login do painel /admin), ex. https://auth.henriquebueno.com. */
 	readonly PUBLIC_KEYCLOAK_URL?: string;
+	/** Realm do Keycloak (padrão: portfolio). */
+	readonly PUBLIC_KEYCLOAK_REALM?: string;
+	/** Client público do painel, com PKCE (padrão: portfolio-admin). */
+	readonly PUBLIC_KEYCLOAK_CLIENT?: string;
 }
 
 interface ImportMeta {

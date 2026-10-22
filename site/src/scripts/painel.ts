@@ -7,8 +7,8 @@ import type { Contagem, Video } from '../lib/tipos';
 const api = import.meta.env.PUBLIC_API_URL ?? '';
 const keycloak = new Keycloak({
 	url: import.meta.env.PUBLIC_KEYCLOAK_URL ?? 'http://localhost:8180',
-	realm: 'portfolio',
-	clientId: 'portfolio-admin',
+	realm: import.meta.env.PUBLIC_KEYCLOAK_REALM ?? 'portfolio',
+	clientId: import.meta.env.PUBLIC_KEYCLOAK_CLIENT ?? 'portfolio-admin',
 });
 
 const $ = <T extends HTMLElement = HTMLElement>(seletor: string) => document.querySelector<T>(seletor)!;
