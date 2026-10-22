@@ -89,6 +89,8 @@ if (form) {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ nome: dados.nome, email: dados.email, assunto: dados.assunto, mensagem: dados.mensagem }),
 			});
+			if (resposta.status === 429) { pill('amarelo', 'muitas mensagens seguidas · tente daqui a pouco'); return; }
+			if (resposta.status === 400) { pill('vermelho', 'confira os campos'); return; }
 			if (!resposta.ok) throw new Error(String(resposta.status));
 			pill('verde', 'mensagem enviada ✓');
 			form.reset();

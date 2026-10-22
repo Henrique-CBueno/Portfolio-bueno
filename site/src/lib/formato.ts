@@ -23,6 +23,12 @@ export function tempoRelativo(data: Date, agora = new Date()): string {
 	return 'agora';
 }
 
+/** "1.284 seguidores", com "~" quando o número é aproximado (YouTube). */
+export function textoContagem(c: { valor: number | null; aproximado?: boolean }, unidade: string): string | null {
+	if (c.valor === null) return null;
+	return `${c.aproximado ? '~' : ''}${formatarNumero(c.valor)} ${unidade}`;
+}
+
 /** Anos completos desde uma data "AAAA-MM". */
 export function anosDesde(inicio: string, agora = new Date()): number {
 	const [ano, mes] = inicio.split('-').map(Number);

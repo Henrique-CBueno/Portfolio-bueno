@@ -1,0 +1,42 @@
+{
+  "realm": "portfolio",
+  "displayName": "bueno_dev · painel",
+  "enabled": true,
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": true,
+  "loginWithEmailAllowed": true,
+  "bruteForceProtected": true,
+  "sslRequired": "external",
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Pode usar o painel /admin do portfólio"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "portfolio-admin",
+      "name": "Painel do portfólio",
+      "description": "Página /admin do site (login com PKCE, sem segredo)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "${SITE_URL}/admin*",
+        "http://localhost:4321/admin*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "${SITE_URL}/*##http://localhost:4321/*"
+      }
+    }
+  ]
+}

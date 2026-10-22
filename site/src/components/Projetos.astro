@@ -7,10 +7,12 @@ import Titulo from './Titulo.astro';
 import Diagrama from './Diagrama.astro';
 import Indicador from './Indicador.astro';
 import { destaques, fixados } from '../dados/projetos';
+import type { Repositorio } from '../lib/tipos';
 import { redes } from '../dados/perfil';
 
 const emDestaque = new Set(destaques.flatMap((d) => d.links.map((l) => l.href.toLowerCase())));
-const outros = fixados.filter((r) => !emDestaque.has(r.url.toLowerCase()));
+interface Props { repositorios?: Repositorio[] }
+const outros = (Astro.props.repositorios ?? fixados).filter((r) => !emDestaque.has(r.url.toLowerCase()));
 ---
 <section class="secao" id="projetos">
 	<div class="cab">

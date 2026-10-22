@@ -6,7 +6,7 @@ import Marca from './Marca.astro';
 import Titulo from './Titulo.astro';
 import { perfil, redes } from '../dados/perfil';
 import { premios } from '../dados/premios';
-import { anosDesde, formatarNumero } from '../lib/formato';
+import { anosDesde, textoContagem } from '../lib/formato';
 import type { Contagem, Rede } from '../lib/tipos';
 
 interface Props { contagens: Contagem[]; lidoEm: string }
@@ -24,8 +24,8 @@ const ordem: Rede[] = ['instagram', 'tiktok', 'youtube', 'github'];
 function legenda(rede: Rede) {
 	const c = contagens.find((x) => x.rede === rede);
 	const info = redes[rede];
-	if (!c || c.valor === null || !info.unidade) return info.usuario;
-	return `${c.aproximado ? '~' : ''}${formatarNumero(c.valor)} ${info.unidade}`;
+	if (!c || !info.unidade) return info.usuario;
+	return textoContagem(c, info.unidade) ?? info.usuario;
 }
 ---
 <div class="abertura" id="inicio">

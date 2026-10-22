@@ -44,6 +44,8 @@ body {
 ::selection { background: var(--amarelo); color: var(--fundo); }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
+/* hidden vence qualquer display definido por classe (.botao, img…) */
+[hidden] { display: none !important; }
 :focus-visible { outline: 2px solid var(--amarelo); outline-offset: 3px; border-radius: 8px; }
 svg.lucide { width: 16px; height: 16px; flex: none; }
 

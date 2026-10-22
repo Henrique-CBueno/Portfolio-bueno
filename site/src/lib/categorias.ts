@@ -1,6 +1,6 @@
 import type { Cor } from './tipos';
 
-/** Hashtag de categoria na legenda do Instagram → cor da pill. Categoria nova sem cor fica neutra. */
+/** Categoria do vídeo (escolhida no painel) → cor da pill. Categoria nova sem cor fica neutra. */
 const cores: Record<string, Cor> = {
 	resiliencia: 'vermelho',
 	concorrencia: 'verde',
@@ -17,8 +17,8 @@ const nomes: Record<string, string> = {
 	arquitetura: 'arquitetura',
 };
 
-export function categoria(hashtag?: string): { nome: string; cor: Cor } | undefined {
-	if (!hashtag) return undefined;
-	const chave = hashtag.replace(/^#/, '').toLowerCase();
+export function categoria(chaveOuHashtag?: string | null): { nome: string; cor: Cor } | undefined {
+	if (!chaveOuHashtag) return undefined;
+	const chave = chaveOuHashtag.replace(/^#/, '').toLowerCase();
 	return { nome: nomes[chave] ?? chave, cor: cores[chave] ?? 'neutro' };
 }

@@ -1,0 +1,107 @@
+# Site estático, API, MinIO (capas) e Keycloak (login do painel /admin), cada um no seu domínio.
+# Pensado pro Coolify (deploy pelo Git). Em "Domains", um domínio por serviço:
+#   web      → https://henriquebueno.com        (porta 80)
+#   api      → https://api.henriquebueno.com    (porta 8080)
+#   keycloak → https://auth.henriquebueno.com   (porta 8080)
+# As variáveis aparecem na tela do Coolify; rodando local, vêm do .env (veja docker-compose.local.yml).
+services:
+  web:
+    build:
+      context: ./site
+      dockerfile: docker/Dockerfile.web
+    restart: unless-stopped
+    expose:
+      - "80"
+    volumes:
+      - site:/site:ro
+
+  construtor:
+    build: ./site
+    restart: unless-stopped
+    environment:
+      # no build, o site lê a API pela rede interna...
+      API_URL: http://api:8080
+      # ...e no navegador, pelos endereços públicos
+      PUBLIC_API_URL: ${API_URL_PUBLICA:?endereço público da API, ex. https://api.henriquebueno.com}
+      PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL_PUBLICA:?endereço público do Keycloak, ex. https://auth.henriquebueno.com}
+    volumes:
+      - site:/site
+      - dados:/dados:ro
+    depends_on:
+      api:
+        condition: service_healthy
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      DADOS: /dados
+      # a API avisa o construtor tocando este arquivo quando o painel muda algo
+      REBUILD_COMANDO: touch /dados/rebuild-pedido
+      ORIGENS: ${ORIGENS:-${SITE_URL}}
+      MINIO_URL: http://minio:9000
+      MINIO_USUARIO: ${MINIO_USUARIO:-portfolio}
+      MINIO_SENHA: ${MINIO_SENHA:?senha do MinIO (invente uma longa)}
+      KEYCLOAK_URL: http://keycloak:8080/realms/portfolio
+      KEYCLOAK_EMISSOR: ${KEYCLOAK_URL_PUBLICA}/realms/portfolio
+      YOUTUBE_CHAVE: ${YOUTUBE_CHAVE:-}
+      YOUTUBE_CANAL: ${YOUTUBE_CANAL:-@bueno_dev}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_USUARIO: ${GITHUB_USUARIO:-Henrique-CBueno}
+      MAIL_MOCK: ${MAIL_MOCK:-true}
+      MAIL_HOST: ${MAIL_HOST:-smtp.hostinger.com}
+      MAIL_PORTA: ${MAIL_PORTA:-465}
+      MAIL_USUARIO: ${MAIL_USUARIO:-}
+      MAIL_SENHA: ${MAIL_SENHA:-}
+      CONTATO_PARA: ${CONTATO_PARA:-contato@henriquebueno.com}
+      CONTATO_DE: ${CONTATO_DE:-contato@henriquebueno.com}
+    volumes:
+      - dados:/dados
+    depends_on:
+      - minio
+      - keycloak
+
+  minio:
+    image: ghcr.io/coollabsio/minio:2025-10-15T17-29-55Z
+    restart: unless-stopped
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USUARIO:-portfolio}
+      MINIO_ROOT_PASSWORD: ${MINIO_SENHA:?senha do MinIO (invente uma longa)}
+    volumes:
+      - minio:/data
+
+  keycloak:
+    build: ./keycloak
+    restart: unless-stopped
+    # start-dev guarda os dados num H2 dentro do volume; trocar por "start" + Postgres em produção
+    command: start-dev --import-realm
+    expose:
+      - "8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_SENHA:?senha do admin do Keycloak}
+      KC_HOSTNAME: ${KEYCLOAK_URL_PUBLICA:?endereço público do Keycloak, ex. https://auth.henriquebueno.com}
+      # a API fala com o Keycloak pela rede interna; o navegador, pelo endereço público
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      # usado no realm importado: o painel em ${SITE_URL}/admin pode voltar do login
+      SITE_URL: ${SITE_URL:?endereço público do site, ex. https://henriquebueno.com}
+    volumes:
+      - keycloak:/opt/keycloak/data/h2
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q 'UP' <&3"]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 10
+
+volumes:
+  dados:
+  site:
+  minio:
+  keycloak:

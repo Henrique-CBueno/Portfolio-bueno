@@ -17,14 +17,24 @@ const videos = Astro.props.videos.slice(0, 8);
 		<Titulo antes="Últimos" destaque="vídeos" />
 		<a href={redes.instagram.url} target="_blank" rel="noopener noreferrer" data-revela>ver todos no Instagram <ArrowUpRight /></a>
 	</div>
+	{videos.length === 0 && (
+		<div class="painel vazio" data-revela>
+			<p>Os vídeos novos aparecem aqui. Enquanto isso, assista nas redes:</p>
+			<div class="redes-vazio">
+				<a class="pill roxo" href={redes.instagram.url} target="_blank" rel="noopener noreferrer">instagram</a>
+				<a class="pill azul" href={redes.tiktok.url} target="_blank" rel="noopener noreferrer">tiktok</a>
+				<a class="pill vermelho" href={redes.youtube.url} target="_blank" rel="noopener noreferrer">youtube</a>
+			</div>
+		</div>
+	)}
 	<div class="videos carrossel" id="lista-videos" data-carrossel data-grupo>
 		{videos.map((v) => {
-			const cat = categoria(v.hashtag);
+			const cat = categoria(v.categoria);
 			return (
 				<a class="video" href={v.link} target="_blank" rel="noopener noreferrer" data-cursor="assistir">
 					<div class="capa">
 						{typeof v.capa === 'string'
-							? <img src={v.capa} alt="" loading="lazy" decoding="async" />
+							? <Image src={v.capa} alt="" width={540} height={960} widths={[300, 540]} sizes="(max-width: 960px) 45vw, 290px" />
 							: <Image src={v.capa} alt="" widths={[300, 540]} sizes="(max-width: 960px) 45vw, 290px" />}
 					</div>
 					<h3>{v.titulo}</h3>
@@ -36,10 +46,13 @@ const videos = Astro.props.videos.slice(0, 8);
 			);
 		})}
 	</div>
-	<Indicador de="lista-videos" total={videos.length} />
+	{videos.length > 0 && <Indicador de="lista-videos" total={videos.length} />}
 </section>
 
 <style>
+	.vazio { padding: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+	.vazio p { color: var(--texto-suave); }
+	.redes-vazio { display: flex; gap: 8px; flex-wrap: wrap; }
 	.videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 	.video { text-decoration: none; display: block; }
 	.capa { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 9 / 16; transition: border-color .25s, transform .35s var(--sobe); background: var(--painel); }

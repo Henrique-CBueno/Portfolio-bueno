@@ -35,8 +35,7 @@ export const destaques: Destaque[] = [
 ];
 
 /**
- * Repositórios fixados no perfil. No build com GITHUB_TOKEN eles virão da API GraphQL;
- * por enquanto, a última leitura feita à mão. Os que já estão em destaque ficam de fora.
+ * Repositórios fixados no perfil, usados quando o build roda sem a API (a API lê do GitHub). Os que já estão em destaque ficam de fora.
  */
 export const fixados: Repositorio[] = [
 	{ nome: 'sharding-orchestrator', linguagens: ['Java', 'PL/pgSQL'], url: 'https://github.com/Henrique-CBueno/sharding-orchestrator', descricao: 'Sharding sobre PostgreSQL com consistent hashing e virtual nodes; entrada e saída de shards e rebalanceamento acionados via CDC (Debezium + Kafka), sem coordenador central.' },

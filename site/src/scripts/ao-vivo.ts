@@ -1,7 +1,7 @@
 // Contagens ao vivo: a API empurra os números por SSE. Se ela cair, o site
 // continua com os números do build e avisa há quanto tempo eles foram lidos.
 import { animate } from 'motion';
-import { formatarNumero, tempoRelativo } from '../lib/formato';
+import { tempoRelativo, textoContagem } from '../lib/formato';
 import type { Contagem } from '../lib/tipos';
 
 const api = import.meta.env.PUBLIC_API_URL;
@@ -16,8 +16,9 @@ if (api && caixa) {
 		lidoEm = new Date();
 		for (const c of contagens) {
 			const el = caixa.querySelector<HTMLElement>(`[data-contagem="${c.rede}"]`);
-			if (!el || c.valor === null || !el.dataset.unidade) continue;
-			const texto = `${c.aproximado ? '~' : ''}${formatarNumero(c.valor)} ${el.dataset.unidade}`;
+			if (!el || !el.dataset.unidade) continue;
+			const texto = textoContagem(c, el.dataset.unidade);
+			if (texto === null) continue;
 			if (el.textContent === texto) continue;
 			el.textContent = texto;
 			el.classList.add('mudou');
