@@ -1,0 +1,12 @@
+---
+import { perfil } from '../dados/perfil';
+const ano = new Date().getFullYear();
+---
+<footer>
+	<span>{perfil.nome} · {perfil.handle}</span>
+	<span>© {ano} · feito com Astro, no mesmo visual dos vídeos</span>
+</footer>
+
+<style>
+	footer { max-width: var(--largura); margin: 0 auto; padding: 28px var(--margem) 40px; border-top: 1.5px solid var(--borda); display: flex; justify-content: space-between; font: 500 12px var(--mono); color: var(--apagado); gap: 16px; flex-wrap: wrap; }
+</style>

@@ -4,7 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Portfolio project in its initial stage: there is no source code, build system, or tests yet. The only content so far is `exemplos/`, which holds reference videos (`urna.mp4`, `virtual-threads.mp4`, `circuit-breaker.mp4`, `fencing.mp4`) for the topics the portfolio is expected to cover. Update this file with commands and architecture once code exists.
+Portfolio and video showcase for Henrique Bueno (bueno_dev). Product decisions live in `PRODUCT.md`, the visual system in `DESIGN.md` (tokens are normative; `.impeccable/design.json` is its sidecar). `mocks/b-diagrama.html` is the approved static mock; the other mocks are rejected directions. `exemplos/` holds the reference videos and social links.
+
+## Site (`site/`)
+
+Astro (static) + Motion for animations. Needs Node ≥ 22.23.4; the system Node may be older, so use `~/.nvm/versions/node/v24.20.0/bin` (`.nvmrc` says 24).
+
+```sh
+cd site
+npm run dev        # dev server on :4321 (or: npx astro dev --background)
+npm run build      # static output in site/dist
+npx astro check    # type check
+```
+
+- `src/pages/index.astro` composes the single page from `src/components/*` (one component per section).
+- `src/dados/` holds curated content; `src/lib/snapshot.ts` loads videos and follower counts from the API (`API_URL` at build) or from `src/dados/exemplo.ts`.
+- `src/scripts/movimento.ts` holds every animation; hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
+- The Spring Boot API (`api/`, not started yet) will serve `GET /snapshot`, SSE `/stream` and `POST /contato`.
 
 ## Prompt log
 

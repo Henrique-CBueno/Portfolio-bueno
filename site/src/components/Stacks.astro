@@ -1,0 +1,62 @@
+---
+import Pill from './Pill.astro';
+import Titulo from './Titulo.astro';
+import { camadas, arquitetura, ia } from '../dados/stacks';
+---
+<section class="secao" id="stacks">
+	<div class="cab">
+		<Titulo antes="Minhas" destaque="stacks" />
+		<p data-revela>Do código à nuvem, camada por camada.</p>
+	</div>
+	<div class="grade">
+		<ol class="cadeia" data-cadeia>
+			{camadas.map((c) => (
+				<li class="painel camada" data-elo>
+					<span class="fio" aria-hidden="true" data-fio></span>
+					<Pill cor={c.cor}>{c.nome}</Pill>
+					<div class="itens">{c.itens.map((i) => <span class="chip">{i}</span>)}</div>
+				</li>
+			))}
+		</ol>
+		<div class="lado acompanha">
+			<div class="painel bloco arquitetura" data-revela>
+				<h3>Arquitetura</h3>
+				<p>O que mais aparece nos meus vídeos e nos sistemas em que trabalhei.</p>
+				<div class="padroes" data-grupo>{arquitetura.map((a) => <Pill cor="amarelo">{a}</Pill>)}</div>
+			</div>
+			<div class="painel bloco" data-revela>
+				<h3>IA no dia a dia</h3>
+				<p>Desenvolvimento assistido por IA pra acelerar entrega e revisar código.</p>
+				<div class="padroes" data-grupo>{ia.map((a) => <Pill cor="roxo">{a}</Pill>)}</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.grade { display: grid; grid-template-columns: 7fr 5fr; gap: 28px; align-items: start; }
+	.cadeia { list-style: none; }
+	.camada { display: grid; grid-template-columns: 170px 1fr; gap: 20px; align-items: center; padding: 16px 20px; position: relative; }
+	.camada + .camada { margin-top: 18px; }
+	.camada :global(.pill) { justify-self: start; }
+	.fio { position: absolute; left: 50px; top: -19.5px; height: 18px; border-left: 2px solid var(--borda); transform-origin: top; }
+	.camada:first-child .fio { display: none; }
+	.itens { display: flex; gap: 8px; flex-wrap: wrap; }
+	.lado { display: grid; gap: 20px; }
+	.bloco { padding: 24px; }
+	.arquitetura { border-color: var(--amarelo); }
+	h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+	.bloco p { color: var(--apagado); font-size: 14.5px; margin-bottom: 16px; }
+	.padroes { display: flex; flex-wrap: wrap; gap: 8px; }
+	@media (max-width: 960px) {
+		.grade { grid-template-columns: 1fr; gap: 24px; }
+		/* pill e itens na mesma linha, quebrando quando precisar */
+		.camada { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 14px; }
+		.camada + .camada { margin-top: 12px; }
+		.camada :global(.pill) { margin-right: 4px; }
+		.itens { display: contents; }
+		.itens .chip { font-size: 12px; padding: 4px 7px; }
+		.fio { left: 30px; top: -13.5px; height: 12px; }
+		.bloco { padding: 18px; }
+	}
+</style>

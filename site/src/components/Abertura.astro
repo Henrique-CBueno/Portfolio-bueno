@@ -1,0 +1,119 @@
+---
+import { Image } from 'astro:assets';
+import { Coffee, Cloud, AtSign, ArrowDown, Send, MapPin } from '@lucide/astro';
+import foto from '../assets/foto.jpg';
+import Marca from './Marca.astro';
+import Titulo from './Titulo.astro';
+import { perfil, redes } from '../dados/perfil';
+import { premios } from '../dados/premios';
+import { anosDesde, formatarNumero } from '../lib/formato';
+import type { Contagem, Rede } from '../lib/tipos';
+
+interface Props { contagens: Contagem[]; lidoEm: string }
+const { contagens, lidoEm } = Astro.props;
+
+const anos = Math.max(1, anosDesde(perfil.inicioCarreira));
+const vitorias = premios.filter((p) => p.colocacao.startsWith('1')).length;
+const numeros = [
+	{ valor: anos, sufixo: '+', rotulo: anos === 1 ? 'ano de experiência' : 'anos de experiência' },
+	{ valor: perfil.projetosEntregues, sufixo: '+', rotulo: 'projetos entregues' },
+	{ valor: vitorias, sufixo: '×', rotulo: '1º lugar em hackathon' },
+];
+
+const ordem: Rede[] = ['instagram', 'tiktok', 'youtube', 'github'];
+function legenda(rede: Rede) {
+	const c = contagens.find((x) => x.rede === rede);
+	const info = redes[rede];
+	if (!c || c.valor === null || !info.unidade) return info.usuario;
+	return `${c.aproximado ? '~' : ''}${formatarNumero(c.valor)} ${info.unidade}`;
+}
+---
+<div class="abertura" id="inicio">
+	<div class="retrato" data-retrato>
+		<div class="foto" data-foto>
+			<Image src={foto} alt="Henrique Bueno sentado com o notebook cheio de adesivos" widths={[340, 460, 680, 920]} sizes="(max-width: 960px) 340px, 460px" loading="eager" fetchpriority="high" />
+		</div>
+		<div class="painel colado java" data-colado><span class="ic"><Coffee /></span><span><strong>Java</strong><small>Spring Boot</small></span></div>
+		<div class="painel colado aws" data-colado><span class="ic"><Cloud /></span><span><strong>AWS</strong><small>cloud</small></span></div>
+		<div class="carimbo" data-carimbo><AtSign />{perfil.handle}</div>
+	</div>
+
+	<div class="texto">
+		<Titulo tag="h1" antes={perfil.nome} />
+		<Titulo tag="p" class="papel" destaque={perfil.papel} />
+		<p class="bio" data-entra>Trabalho com <b>Java e AWS</b> e gravo vídeos de 90 segundos explicando <b>sistemas distribuídos</b> com exemplos do Brasil.</p>
+		<div class="acoes" data-entra>
+			<a class="botao primario" href="#projetos">ver projetos <ArrowDown /></a>
+			<a class="botao" href="#contato">falar comigo <Send /></a>
+		</div>
+		<div class="numeros" data-entra>
+			{numeros.map((n) => (
+				<div><strong><span data-conta={n.valor}>{n.valor}</span><em>{n.sufixo}</em></strong><span>{n.rotulo}</span></div>
+			))}
+		</div>
+		<div class="redes" data-entra data-lido-em={lidoEm}>
+			{ordem.map((rede) => (
+				<a class="painel rede" href={redes[rede].url} target="_blank" rel="me noopener noreferrer">
+					<span class="ic"><Marca rede={rede} /></span>
+					<span><strong>{redes[rede].nome}</strong><small data-contagem={rede} data-unidade={redes[rede].unidade}>{legenda(rede)}</small></span>
+				</a>
+			))}
+		</div>
+		<p class="local" data-entra><MapPin />{perfil.local}</p>
+	</div>
+</div>
+
+<style>
+	.abertura { max-width: var(--largura); margin: 0 auto; padding: 40px var(--margem) 96px; display: grid; grid-template-columns: 460px 1fr; gap: 72px; align-items: center; }
+	.retrato { position: relative; }
+	.foto { border-radius: 18px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 1; box-shadow: 0 30px 70px rgba(0, 0, 0, .5); }
+	.foto :global(img) { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.06) saturate(1.08); }
+	.colado { position: absolute; padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: color-mix(in srgb, var(--painel) 94%, transparent); box-shadow: 0 12px 30px rgba(0, 0, 0, .45); }
+	.colado .ic { width: 30px; height: 30px; border-radius: 8px; color: var(--amarelo); }
+	.colado strong { display: block; font: 700 14px var(--mono); }
+	.colado small { display: block; font: 500 11px var(--mono); color: var(--apagado); }
+	/* inclinação no `rotate`, separada do `transform` que o Motion anima */
+	/* --px/--py (-1 a 1) vêm do mouse sobre a foto: os cards mexem mais que a foto, como se estivessem colados por cima */
+	.retrato { transform-style: preserve-3d; will-change: transform; }
+	.colado, .carimbo { translate: calc(var(--px, 0) * 14px) calc(var(--py, 0) * 10px); }
+	.colado.java { top: 28px; left: -34px; rotate: -3deg; border-color: var(--amarelo); }
+	.colado.aws { bottom: 64px; right: -38px; rotate: 5deg; border-color: var(--ok); }
+	.colado.aws .ic { color: var(--ok); }
+	.carimbo { position: absolute; bottom: -22px; left: 40px; rotate: -2deg; background: var(--amarelo); color: var(--fundo); border-radius: 12px; padding: 8px 16px; font: 700 13px var(--mono); box-shadow: 0 10px 30px rgba(255, 194, 71, .25), 0 10px 24px rgba(0, 0, 0, .4); display: flex; align-items: center; gap: 8px; }
+
+	.texto :global(h1) { font-size: clamp(48px, 6vw, 84px); font-weight: 800; letter-spacing: -.035em; line-height: 1; }
+	.texto :global(.papel) { font-size: clamp(26px, 2.8vw, 38px); font-weight: 800; letter-spacing: -.025em; line-height: 1.15; margin-top: 14px; }
+	.texto :global(.papel em) { font-style: normal; color: var(--amarelo); }
+	.bio { font-size: 18px; color: var(--apagado); max-width: 46ch; margin-top: 24px; }
+	.bio b { color: var(--texto); font-weight: 700; }
+	.acoes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+	.numeros { display: flex; margin-top: 30px; border-top: 1.5px solid var(--borda); border-bottom: 1.5px solid var(--borda); }
+	.numeros > div { flex: 1; padding: 14px 18px 14px 0; }
+	.numeros > div + div { padding-left: 18px; border-left: 1.5px solid var(--borda); }
+	.numeros strong { display: block; font: 700 30px/1.1 var(--mono); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+	.numeros em { font-style: normal; color: var(--amarelo); }
+	.numeros > div > span { display: block; font: 500 12px var(--mono); color: var(--apagado); margin-top: 4px; }
+	.redes { display: grid; grid-template-columns: repeat(2, minmax(0, 260px)); gap: 10px; margin-top: 32px; }
+	.rede { display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; text-decoration: none; transition: border-color .25s, transform .3s var(--sobe); }
+	.rede:hover, .rede:focus-visible { border-color: var(--apagado); transform: translateY(-2px); }
+	.rede .ic { width: 32px; height: 32px; border-radius: 9px; }
+	.rede strong { display: block; font-size: 14px; line-height: 1.2; }
+	.rede small { display: block; font: 500 12px var(--mono); color: var(--apagado); font-variant-numeric: tabular-nums; }
+	.rede small.mudou { color: var(--ok); transition: color 1.2s; }
+	.local { display: flex; align-items: center; gap: 8px; margin-top: 22px; font: 500 13px var(--mono); color: var(--apagado); }
+
+	@media (max-width: 960px) {
+		.abertura { grid-template-columns: 1fr; gap: 48px; padding: 16px var(--margem) 64px; }
+		.retrato { max-width: 340px; margin: 0 18px; }
+		/* no celular o card do Java fica menor, no canto superior esquerdo do rosto, sem cobri-lo */
+		.colado.java { left: -14px; top: -12px; padding: 7px 10px; gap: 8px; }
+		.colado.java .ic { width: 24px; height: 24px; border-radius: 7px; }
+		.colado.java :global(svg) { width: 14px; height: 14px; }
+		.colado.java strong { font-size: 12.5px; }
+		.colado.java small { font-size: 10px; }
+		.colado.aws { right: -14px; bottom: 54px; }
+		.numeros strong { font-size: 24px; }
+		.numeros > div { padding-right: 10px; }
+		.numeros > div + div { padding-left: 12px; }
+	}
+</style>

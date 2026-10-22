@@ -1,0 +1,57 @@
+---
+import { Image } from 'astro:assets';
+import { ArrowUpRight } from '@lucide/astro';
+import Pill from './Pill.astro';
+import Titulo from './Titulo.astro';
+import Indicador from './Indicador.astro';
+import { redes } from '../dados/perfil';
+import { categoria } from '../lib/categorias';
+import { tempoRelativo } from '../lib/formato';
+import type { Video } from '../lib/tipos';
+
+interface Props { videos: Video[] }
+const videos = Astro.props.videos.slice(0, 8);
+---
+<section class="secao" id="videos">
+	<div class="cab">
+		<Titulo antes="Últimos" destaque="vídeos" />
+		<a href={redes.instagram.url} target="_blank" rel="noopener noreferrer" data-revela>ver todos no Instagram <ArrowUpRight /></a>
+	</div>
+	<div class="videos carrossel" id="lista-videos" data-carrossel data-grupo>
+		{videos.map((v) => {
+			const cat = categoria(v.hashtag);
+			return (
+				<a class="video" href={v.link} target="_blank" rel="noopener noreferrer" data-cursor="assistir">
+					<div class="capa">
+						{typeof v.capa === 'string'
+							? <img src={v.capa} alt="" loading="lazy" decoding="async" />
+							: <Image src={v.capa} alt="" widths={[300, 540]} sizes="(max-width: 960px) 45vw, 290px" />}
+					</div>
+					<h3>{v.titulo}</h3>
+					<div class="info">
+						{cat && <Pill cor={cat.cor}>{cat.nome}</Pill>}
+						<time datetime={v.publicadoEm} data-relativo>{tempoRelativo(new Date(v.publicadoEm))}</time>
+					</div>
+				</a>
+			);
+		})}
+	</div>
+	<Indicador de="lista-videos" total={videos.length} />
+</section>
+
+<style>
+	.videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+	.video { text-decoration: none; display: block; }
+	.capa { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 9 / 16; transition: border-color .25s, transform .35s var(--sobe); background: var(--painel); }
+	.capa :global(img) { width: 100%; height: 100%; object-fit: cover; transition: scale .6s var(--sobe); }
+	.video:hover .capa, .video:focus-visible .capa { border-color: var(--amarelo); transform: translateY(-4px); }
+	.video:hover .capa :global(img) { scale: 1.035; }
+	h3 { font-size: 16px; font-weight: 700; line-height: 1.3; margin: 14px 0 10px; text-wrap: balance; }
+	.info { display: flex; justify-content: space-between; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+	time { font: 500 12px var(--mono); color: var(--apagado); white-space: nowrap; }
+	@media (max-width: 960px) {
+		.videos { display: flex; --item: 46%; }
+		h3 { font-size: 14.5px; margin: 10px 0 8px; }
+		.info { flex-direction: column; align-items: flex-start; gap: 6px; }
+	}
+</style>

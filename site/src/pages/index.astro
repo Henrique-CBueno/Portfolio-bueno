@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import Topo from '../components/Topo.astro';
+import Abertura from '../components/Abertura.astro';
+import Sobre from '../components/Sobre.astro';
+import Videos from '../components/Videos.astro';
+import Projetos from '../components/Projetos.astro';
+import Stacks from '../components/Stacks.astro';
+import Premiacoes from '../components/Premiacoes.astro';
+import Contato from '../components/Contato.astro';
+import Rodape from '../components/Rodape.astro';
+import { carregarSnapshot } from '../lib/snapshot';
+
+const snapshot = await carregarSnapshot();
+---
+<Base
+	titulo="Henrique Bueno · bueno_dev"
+	descricao="Desenvolvedor backend (Java, Spring Boot, AWS). Vídeos de 90 segundos sobre sistemas distribuídos, com exemplos do Brasil."
+>
+	<Topo />
+	<main>
+		<Abertura contagens={snapshot.contagens} lidoEm={snapshot.lidoEm} />
+		<Sobre />
+		<Videos videos={snapshot.videos} />
+		<Projetos />
+		<Stacks />
+		<Premiacoes />
+		<Contato />
+	</main>
+	<Rodape />
+</Base>

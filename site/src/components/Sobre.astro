@@ -1,0 +1,58 @@
+---
+import Pill from './Pill.astro';
+import Titulo from './Titulo.astro';
+import { idiomas } from '../dados/perfil';
+import type { Cor } from '../lib/tipos';
+
+const passos: { rotulo: string; cor: Cor; texto: string }[] = [
+	{ rotulo: '1 · o problema', cor: 'vermelho', texto: 'Começo por uma situação que você já viveu, antes de qualquer termo técnico.' },
+	{ rotulo: '2 · o conceito', cor: 'amarelo', texto: 'O diagrama anima o sistema por dentro, peça por peça, até o problema fazer sentido.' },
+	{ rotulo: '3 · a frase', cor: 'verde', texto: 'Termino com uma linha só, pra você levar pro trabalho.' },
+];
+---
+<section class="secao" id="sobre">
+	<div class="sobre">
+		<div class="acompanha">
+			<Titulo antes="Sobre" class="titulo" />
+			<p data-revela>Sou <b>software engineer</b> focado em backend com <b>Java e Spring Boot</b>, system design e arquitetura distribuída.</p>
+			<p data-revela>Já construí microsserviços, sistemas orientados a eventos e soluções na <b>AWS</b>, e participei de decisões sobre sharding, replicação e consistência, que são justamente os assuntos dos meus vídeos.</p>
+			<div class="idiomas" data-grupo>{idiomas.map((i) => <Pill>{i}</Pill>)}</div>
+		</div>
+		<div class="painel metodo acompanha" data-revela>
+			<h3>Como eu explico um conceito</h3>
+			<ol data-cadeia>
+				{passos.map((p) => (
+					<li class="passo" data-elo>
+						<span class="fio" aria-hidden="true" data-fio></span>
+						<Pill cor={p.cor}>{p.rotulo}</Pill>
+						<p>{p.texto}</p>
+					</li>
+				))}
+			</ol>
+			<p class="rodape-metodo"><span>~90 s</span><span>·</span><span>PT-BR</span><span>·</span><span>Instagram, TikTok e YouTube</span></p>
+		</div>
+	</div>
+</section>
+
+<style>
+	.sobre { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+	.sobre :global(.titulo) { margin-bottom: 24px; }
+	.sobre > div:first-child > p { font-size: 18px; color: var(--texto-suave); margin-bottom: 18px; max-width: 58ch; }
+	.sobre b { color: var(--texto); }
+	.idiomas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+	.metodo { padding: 24px; }
+	.metodo h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 20px; }
+	ol { list-style: none; }
+	.passo { display: grid; grid-template-columns: 124px 1fr; gap: 18px; align-items: start; position: relative; }
+	.passo + .passo { margin-top: 22px; }
+	.passo :global(.pill) { justify-self: start; }
+	.passo p { font-size: 15px; color: var(--texto-suave); }
+	.fio { position: absolute; left: 30px; top: -21px; height: 20px; border-left: 2px solid var(--borda); transform-origin: top; }
+	.passo:first-child .fio { display: none; }
+	.rodape-metodo { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(42, 53, 73, .7); font: 500 12px var(--mono); color: var(--apagado); }
+	@media (max-width: 960px) {
+		.sobre { grid-template-columns: 1fr; gap: 28px; }
+		.passo { grid-template-columns: 1fr; gap: 8px; }
+		.fio { display: none; }
+	}
+</style>

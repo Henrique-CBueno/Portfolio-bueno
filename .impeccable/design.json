@@ -247,14 +247,64 @@
     ],
     "motion": [
       {
-        "name": "ease-lift",
-        "value": "cubic-bezier(.2,.8,.2,1)",
-        "purpose": "Hover lift of buttons, links and cards (0.3–0.35s)."
+        "name": "caption-rise",
+        "value": "translateY(105%)→0, 0.7s cubic-bezier(.2,.8,.2,1), stagger 0.07s",
+        "purpose": "Headings rise word by word from a clipped line, like the videos' captions."
       },
       {
-        "name": "fade-state",
-        "value": "0.2s–0.25s ease",
-        "purpose": "Border and color changes on hover/focus."
+        "name": "sticker-land",
+        "value": "spring, bounce 0.35, 0.8s; y -28→0, scale 1.18→1",
+        "purpose": "Photo overlay panels land on the photo."
+      },
+      {
+        "name": "stamp-slap",
+        "value": "spring, bounce 0.45–0.5; scale 2→1",
+        "purpose": "Yellow handle and award stamps."
+      },
+      {
+        "name": "chain-light",
+        "value": "wire scaleY 0→1 (0.25s), then panel x -14→0 (0.5s), 0.12s per link",
+        "purpose": "Stacks chain and 'como eu explico' steps."
+      },
+      {
+        "name": "packet-run",
+        "value": "x across the wire, 0.7s easeInOut, repeat while in view",
+        "purpose": "Packets on architecture diagrams; the only loop."
+      },
+      {
+        "name": "reveal",
+        "value": "opacity 0→1, y 16–24→0, 0.6–0.7s cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Everything else entering the viewport."
+      },
+      {
+        "name": "hover-lift",
+        "value": "translateY(-2px to -4px), 0.3–0.35s cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Buttons, links and cards."
+      },
+      {
+        "name": "sticker-float",
+        "value": "y 0→±7px→0, 4.2–6s easeInOut, infinite, paused off-screen",
+        "purpose": "Opening photo cards and stamp keep floating after landing."
+      },
+      {
+        "name": "photo-breathe",
+        "value": "scale 1→1.035→1, 9s easeInOut, infinite",
+        "purpose": "Opening photo."
+      },
+      {
+        "name": "portrait-tilt",
+        "value": "perspective(1000px) rotateY ≤7° rotateX ≤6°, lerp 0.08 per frame; cards translate 14px/10px extra",
+        "purpose": "Portrait follows the mouse (fine pointer only)."
+      },
+      {
+        "name": "packet-cursor",
+        "value": "8px yellow dot follows instantly; 34px ring lerps 0.2 per frame; grows to 54px on links, 88px yellow label on [data-cursor]",
+        "purpose": "Custom cursor (fine pointer only)."
+      },
+      {
+        "name": "grid-light",
+        "value": "brighter grid masked by radial-gradient(circle 240px at cursor)",
+        "purpose": "Background grid lights up around the cursor."
       }
     ],
     "breakpoints": [
@@ -330,17 +380,25 @@
       "description": "Section headline with one yellow word, and the uppercase caption claim.",
       "html": "<div class=\"ds-cab\"><h2>Últimos <em>vídeos</em></h2><p class=\"ds-legenda\">Primeiro lugar em <em>2 hackathons</em></p></div>",
       "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-cab{font-family:var(--sans);color:var(--texto)}.ds-cab h2{font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.1;margin:0 0 20px}.ds-cab em{font-style:normal;color:var(--amarelo)}.ds-legenda{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;text-transform:uppercase;margin:0;max-width:14ch}"
+    },
+    {
+      "name": "Carousel Indicator",
+      "kind": "custom",
+      "description": "Under a phone carousel: bars (active one yellow and longer) and a mono n / total.",
+      "html": "<div class=\"ds-ind\"><i class=\"on\"></i><i></i><i></i><i></i><span>1 / 4</span></div>",
+      "css": ":host{--amarelo:#FFC247;--borda:#2A3549;--apagado:#8A95A8}.ds-ind{display:flex;align-items:center;gap:6px;width:300px}.ds-ind i{height:4px;width:14px;border-radius:2px;background:var(--borda);transition:width .3s}.ds-ind i.on{width:28px;background:var(--amarelo)}.ds-ind span{margin-left:auto;font:500 12px 'JetBrains Mono',monospace;color:var(--apagado)}"
     }
   ],
   "narrative": {
     "northStar": "The Living Cover",
-    "overview": "**Creative North Star: \"The Living Cover\"**\n\nThe site is one of Henrique's video covers, extended into a page. The same night-blue ground with a faint diagram grid, the same system panels and mono pills, the same bold caption with one yellow word. Someone who saw a Reel should recognize the site before reading a word. The person comes first (photo, name, role), and the panels are stuck onto that person the way the videos stick diagram cards over his face.\n\nDensity is calm: few elements per viewport, big type for names and claims, small mono text for facts and data. Color is functional, never decorative. Yellow marks the one thing to read, green means ok, red means failure, blue and purple only appear as category or organizer colors inside pills and diagram nodes. Motion is small and physical: things lift 2–4px on hover, nothing loops or bounces.\n\nThe world was chosen on 2026-10-22 from three mocked directions (a thermal-receipt roll and a streaming title-card wall were rejected). Reference build: `mocks/b-diagrama.html`.",
+    "overview": "**Creative North Star: \"The Living Cover\"**\n\nThe site is one of Henrique's video covers, extended into a page. The same night-blue ground with a faint diagram grid, the same system panels and mono pills, the same bold caption with one yellow word. Someone who saw a Reel should recognize the site before reading a word. The person comes first (photo, name, role), and the panels are stuck onto that person the way the videos stick diagram cards over his face.\n\nDensity is calm: few elements per viewport, big type for names and claims, small mono text for facts and data. Color is functional, never decorative. Yellow marks the one thing to read, green means ok, red means failure, blue and purple only appear as category or organizer colors inside pills and diagram nodes.\n\nMotion comes from the videos, built with Motion (`site/src/scripts/movimento.ts`). Headings rise word by word from a clipped line, like the videos' captions (0.7s, `cubic-bezier(.2,.8,.2,1)`, 0.07s stagger). Stuck-on elements land with a spring: photo overlays drop in and settle, yellow stamps \"slap\" from 2× scale. Chains light up link by link, with the wire drawing before each panel. Diagrams build node by node, then small yellow packets run along the wires while the diagram is on screen. Counts tick up from zero once. Everything else fades up 16–24px when it enters the viewport, and hover lifts 2–4px. After landing, the opening photo stays alive: the stuck-on cards float on their own rhythms (4–6s), the stamp bobs, the photo breathes (scale 1→1.035 over 9s), and the whole portrait tilts in 3D toward the mouse (up to 7°) with the cards shifting more than the photo, as if they were stuck on top. The cursor is one of the diagrams' yellow packets with a trailing wire ring; the background grid lights up in a 240px circle around it; over links the ring grows yellow, and over video covers and repos it becomes a yellow label (\"assistir\", \"abrir\"). Cursor and tilt only run with a fine pointer (`site/src/scripts/cursor.ts`). With `prefers-reduced-motion: reduce` or without JS, nothing moves and the whole page is visible.\n\nThe world was chosen on 2026-10-22 from three mocked directions (a thermal-receipt roll and a streaming title-card wall were rejected). Reference build: `mocks/b-diagrama.html`.",
     "keyCharacteristics": [
       "Night-blue ground with a 48px diagram grid behind everything.",
       "Panels with 1.5px wire borders and 14px corners; no floating cards without a border.",
       "Inter 800 for names, headlines and captions; JetBrains Mono for every label, date, number, handle and tag.",
       "One yellow keyword per heading; meaning-bearing green/red.",
-      "Stuck-on elements (photo overlays, the yellow stamp, award stamps) are the only tilted things on the page."
+      "Stuck-on elements (photo overlays, the yellow stamp, award stamps) are the only tilted things on the page.",
+      "Motion tells the videos' story: captions rise, stickers land, chains light up, packets run."
     ],
     "rules": [
       {
@@ -372,6 +430,11 @@
         "name": "The Sticker Rule",
         "body": "Only stuck-on elements get a shadow, and only stuck-on elements may rotate (−3° to 5°). Cards, sections and buttons are flat and straight.",
         "section": "elevation"
+      },
+      {
+        "name": "The Follow-Along Rule",
+        "body": "In a two-column section, the shorter column is sticky (96px from the top, under the sticky header) and travels with the taller one until the section ends, so neither side leaves an empty gap while scrolling. Desktop only; on one column nothing sticks.",
+        "section": "layout"
       }
     ],
     "dos": [
@@ -380,12 +443,14 @@
       "**Do** set every count, date, handle and tech name in JetBrains Mono, with tabular numbers for counts.",
       "**Do** use green only for ok/success and red only for failure/problem.",
       "**Do** draw technical explanations as nodes and wires in the videos' style when an image is missing.",
-      "**Do** honor `prefers-reduced-motion`: all transitions off, smooth scroll off."
+      "**Do** honor `prefers-reduced-motion`: all transitions off, smooth scroll off.",
+      "**Do** keep looping motion to diagrams and the opening photo, and pause it when it leaves the screen."
     ],
     "donts": [
       "**Don't** use a light theme or the videos' paper color (`#F4F1EA`) as a page background; the site is the dark cover world.",
       "**Don't** add gradients, glows or colored section backgrounds; color lives in pills, stamps, borders and one word per heading.",
       "**Don't** rotate or shadow anything that is not stuck on top of something else.",
+      "**Don't** animate tilt with `transform`; tilt lives in the CSS `rotate` property so entrance animations (which use `transform`) keep it.",
       "**Don't** add a generic dev-portfolio hero (avatar circle, gradient name, \"Hi, I'm…\").",
       "**Don't** show API status, latency or circuit-breaker state on the page.",
       "**Don't** hardcode video topics, scenes or categories; category colors come from caption hashtags."

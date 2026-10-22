@@ -1,0 +1,8 @@
+---
+import type { Cor } from '../lib/tipos';
+
+interface Props { cor?: Cor; href?: string; class?: string }
+const { cor = 'neutro', href, class: classe } = Astro.props;
+const Tag = href ? 'a' : 'span';
+---
+<Tag class:list={['pill', cor, classe]} href={href}><slot /></Tag>

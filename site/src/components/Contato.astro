@@ -1,0 +1,70 @@
+---
+import { Copy, Check, Send } from '@lucide/astro';
+import Marca from './Marca.astro';
+import Titulo from './Titulo.astro';
+import { perfil, redes } from '../dados/perfil';
+import type { Cor, Rede } from '../lib/tipos';
+
+const cores: Record<Rede, Cor> = { instagram: 'roxo', tiktok: 'azul', youtube: 'vermelho', github: 'verde', linkedin: 'amarelo' };
+const api = import.meta.env.PUBLIC_API_URL ?? '';
+---
+<section class="secao contato" id="contato">
+	<div class="grade">
+		<div class="texto acompanha">
+			<Titulo antes="Contato" />
+			<p data-revela>Parcerias, convites, projetos ou só pra conversar sobre backend. Respondo pelo e-mail que você deixar.</p>
+			<p class="ou" data-revela>Ou escreva direto:</p>
+			<button class="email" type="button" data-copiar={perfil.email} data-revela>
+				<span class="sublinha">{perfil.email}</span>
+				<span class="pill neutro" data-copiar-estado><span data-icone-copiar><Copy /></span><span data-icone-ok hidden><Check /></span><span data-copiar-texto>copiar</span></span>
+			</button>
+			<div class="redes" data-grupo>
+				{(Object.keys(redes) as Rede[]).map((r) => <a class:list={['pill', cores[r]]} href={redes[r].url} target="_blank" rel="me noopener noreferrer"><Marca rede={r} />{r}</a>)}
+			</div>
+		</div>
+		<form class="painel formulario acompanha" data-formulario data-api={api} novalidate data-revela>
+			<div class="linha">
+				<div class="campo"><label for="nome">nome</label><input id="nome" name="nome" autocomplete="name" required maxlength="120" placeholder="Como posso te chamar?" /></div>
+				<div class="campo"><label for="email">e-mail</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="200" placeholder="voce@empresa.com" /></div>
+			</div>
+			<div class="campo"><label for="assunto">assunto</label><input id="assunto" name="assunto" maxlength="160" placeholder="Parceria, vaga, projeto, dúvida…" /></div>
+			<div class="campo"><label for="mensagem">mensagem</label><textarea id="mensagem" name="mensagem" required maxlength="5000" placeholder="Conta um pouco do que você precisa."></textarea></div>
+			<div class="armadilha" aria-hidden="true"><label for="site">site</label><input id="site" name="site" tabindex="-1" autocomplete="off" /></div>
+			<div class="enviar">
+				<small data-estado aria-live="polite">vai direto pro meu e-mail</small>
+				<button class="botao primario" type="submit">enviar mensagem <Send /></button>
+			</div>
+		</form>
+	</div>
+</section>
+
+<style>
+	.contato { padding-bottom: 96px; }
+	.grade { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; align-items: start; }
+	.texto > p { color: var(--apagado); margin: 12px 0 30px; font-size: 17px; }
+	.texto > p.ou { font: 500 12px var(--mono); margin: 0 0 10px; }
+	.email { display: inline-flex; align-items: center; gap: 14px; font: 700 clamp(18px, 2vw, 24px) var(--mono); letter-spacing: -.02em; color: var(--texto); background: none; border: 0; cursor: pointer; padding: 0; text-align: left; }
+	.sublinha { border-bottom: 3px solid var(--amarelo); padding-bottom: 4px; transition: border-color .2s; }
+	.email:hover .sublinha { border-color: var(--texto); }
+	[data-copiar-estado] > span { display: inline-flex; }
+	[data-copiar-estado] > span[hidden] { display: none; }
+	.redes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+	.formulario { padding: 28px; display: grid; gap: 18px; }
+	.linha { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.campo { display: grid; gap: 8px; }
+	label { font: 700 12px var(--mono); color: var(--apagado); }
+	input, textarea { font: 500 16px var(--sans); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 13px 14px; width: 100%; transition: border-color .2s; }
+	textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+	input::placeholder, textarea::placeholder { color: #566176; }
+	input:focus, textarea:focus { outline: none; border-color: var(--amarelo); }
+	input:user-invalid, textarea:user-invalid { border-color: var(--erro); }
+	.armadilha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+	.enviar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+	.enviar small { font: 500 12px var(--mono); color: var(--apagado); }
+	@media (max-width: 960px) {
+		.grade { grid-template-columns: 1fr; gap: 36px; }
+		.formulario { padding: 20px; }
+		.linha { grid-template-columns: 1fr; }
+		.email { flex-wrap: wrap; gap: 10px; word-break: break-all; }
+	}
+</style>

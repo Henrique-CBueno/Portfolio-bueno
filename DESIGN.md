@@ -130,7 +130,9 @@ components:
 
 The site is one of Henrique's video covers, extended into a page. The same night-blue ground with a faint diagram grid, the same system panels and mono pills, the same bold caption with one yellow word. Someone who saw a Reel should recognize the site before reading a word. The person comes first (photo, name, role), and the panels are stuck onto that person the way the videos stick diagram cards over his face.
 
-Density is calm: few elements per viewport, big type for names and claims, small mono text for facts and data. Color is functional, never decorative. Yellow marks the one thing to read, green means ok, red means failure, blue and purple only appear as category or organizer colors inside pills and diagram nodes. Motion is small and physical: things lift 2–4px on hover, nothing loops or bounces.
+Density is calm: few elements per viewport, big type for names and claims, small mono text for facts and data. Color is functional, never decorative. Yellow marks the one thing to read, green means ok, red means failure, blue and purple only appear as category or organizer colors inside pills and diagram nodes.
+
+Motion comes from the videos, built with Motion (`site/src/scripts/movimento.ts`). Headings rise word by word from a clipped line, like the videos' captions (0.7s, `cubic-bezier(.2,.8,.2,1)`, 0.07s stagger). Stuck-on elements land with a spring: photo overlays drop in and settle, yellow stamps "slap" from 2× scale. Chains light up link by link, with the wire drawing before each panel. Diagrams build node by node, then small yellow packets run along the wires while the diagram is on screen. Counts tick up from zero once. Everything else fades up 16–24px when it enters the viewport, and hover lifts 2–4px. After landing, the opening photo stays alive: the stuck-on cards float on their own rhythms (4–6s), the stamp bobs, the photo breathes (scale 1→1.035 over 9s), and the whole portrait tilts in 3D toward the mouse (up to 7°) with the cards shifting more than the photo, as if they were stuck on top. The cursor is one of the diagrams' yellow packets with a trailing wire ring; the background grid lights up in a 240px circle around it; over links the ring grows yellow, and over video covers and repos it becomes a yellow label ("assistir", "abrir"). Cursor and tilt only run with a fine pointer (`site/src/scripts/cursor.ts`). With `prefers-reduced-motion: reduce` or without JS, nothing moves and the whole page is visible.
 
 The world was chosen on 2026-10-22 from three mocked directions (a thermal-receipt roll and a streaming title-card wall were rejected). Reference build: `mocks/b-diagrama.html`.
 
@@ -140,6 +142,7 @@ The world was chosen on 2026-10-22 from three mocked directions (a thermal-recei
 - Inter 800 for names, headlines and captions; JetBrains Mono for every label, date, number, handle and tag.
 - One yellow keyword per heading; meaning-bearing green/red.
 - Stuck-on elements (photo overlays, the yellow stamp, award stamps) are the only tilted things on the page.
+- Motion tells the videos' story: captions rise, stickers land, chains light up, packets run.
 
 ## Colors
 
@@ -199,7 +202,9 @@ One centered column, max width 1280px, with 32px side gutters (16px under 960px)
 
 Section headers are a row: headline on the left, a muted mono link or one-line description on the right, baseline-aligned, stacking under 960px.
 
-Grids are asymmetric by default: opening `460px | 1fr` (gap 72px), stacks `7fr | 5fr`, awards `4fr | 8fr`, contact `5fr | 7fr`, about `1fr | 1fr`. Repeated items use even grids: 4 video covers per row (2 on mobile), 2 featured projects per row (1 on mobile). Everything collapses to one column at 960px; the only exception is the video grid, which stays at 2 columns.
+Grids are asymmetric by default: opening `460px | 1fr` (gap 72px), stacks `7fr | 5fr`, awards `4fr | 8fr`, contact `5fr | 7fr`, about `1fr | 1fr`. Repeated items use even grids: 4 video covers per row (2 on mobile), 2 featured projects per row (1 on mobile). Everything collapses to one column at 960px. Long repeated lists become horizontal carousels on phones instead of stacking: video covers (about 2 visible, 46% wide) and featured projects (86% wide, the next card peeking in), with scroll-snap, edge-to-edge bleed and a small indicator under them (bars, the active one yellow and longer, plus a mono "n / total"). On phones, featured project descriptions clamp to 4 lines and repo descriptions to 2; stack layers put the pill and the chips on one wrapping line.
+
+**The Follow-Along Rule.** In a two-column section, the shorter column is sticky (96px from the top, under the sticky header) and travels with the taller one until the section ends, so neither side leaves an empty gap while scrolling. Desktop only; on one column nothing sticks.
 
 Spacing rhythm: 6–10px inside chips and pill rows, 14–20px inside cards, 20–28px between cards, 48–56px between columns, 72px between sections.
 
@@ -281,11 +286,13 @@ Large mono e-mail with a 3px yellow underline next to a neutral "copiar" pill th
 - **Do** use green only for ok/success and red only for failure/problem.
 - **Do** draw technical explanations as nodes and wires in the videos' style when an image is missing.
 - **Do** honor `prefers-reduced-motion`: all transitions off, smooth scroll off.
+- **Do** keep looping motion to diagrams and the opening photo, and pause it when it leaves the screen.
 
 ### Don't:
 - **Don't** use a light theme or the videos' paper color (`#F4F1EA`) as a page background; the site is the dark cover world.
 - **Don't** add gradients, glows or colored section backgrounds; color lives in pills, stamps, borders and one word per heading.
 - **Don't** rotate or shadow anything that is not stuck on top of something else.
+- **Don't** animate tilt with `transform`; tilt lives in the CSS `rotate` property so entrance animations (which use `transform`) keep it.
 - **Don't** add a generic dev-portfolio hero (avatar circle, gradient name, "Hi, I'm…").
 - **Don't** show API status, latency or circuit-breaker state on the page.
 - **Don't** hardcode video topics, scenes or categories; category colors come from caption hashtags.
