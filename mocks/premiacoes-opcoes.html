@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Premiações · opções</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<style>
+:root {
+	--fundo: #0B0F17;
+	--painel: #141B27;
+	--painel-claro: #1C2535;
+	--borda: #2A3549;
+	--texto: #E9EDF3;
+	--apagado: #8A95A8;
+	--ok: #3DDC84;
+	--erro: #FF5A5F;
+	--amarelo: #FFC247;
+	--azul: #5B9DFF;
+	--roxo: #B48CFF;
+	--neutro: #8A95A8;
+	--sans: 'Inter', system-ui, sans-serif;
+	--mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--fundo); scrollbar-color: var(--borda) var(--fundo); scroll-behavior: smooth; }
+body { font-family: var(--sans); color: var(--texto); background-color: var(--fundo); background-image: linear-gradient(rgba(42,53,73,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42,53,73,.28) 1px, transparent 1px); background-size: 48px 48px; background-position: -1px -1px; -webkit-font-smoothing: antialiased; line-height: 1.5; }
+::selection { background: var(--amarelo); color: var(--fundo); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--amarelo); outline-offset: 3px; border-radius: 8px; }
+svg.lucide { width: 16px; height: 16px; stroke-width: 2; flex: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 700 12px/1 var(--mono); padding: 6px 11px; border-radius: 999px; border: 1.5px solid currentColor; background: color-mix(in srgb, currentColor 12%, var(--fundo)); white-space: nowrap; text-decoration: none; }
+.pill svg.lucide { width: 13px; height: 13px; }
+.pill.amarelo { color: var(--amarelo); } .pill.verde { color: var(--ok); } .pill.vermelho { color: var(--erro); } .pill.azul { color: var(--azul); } .pill.roxo { color: var(--roxo); } .pill.neutro { color: var(--neutro); }
+.painel { background: var(--painel); border: 1.5px solid var(--borda); border-radius: 14px; }
+
+section { max-width: 1280px; margin: 0 auto; padding: 56px 32px 72px; }
+.opcao { font: 700 13px var(--mono); color: var(--apagado); display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.opcao b { background: var(--amarelo); color: var(--fundo); border-radius: 8px; padding: 5px 10px; }
+.separa { border: 0; border-top: 1.5px dashed var(--borda); max-width: 1216px; margin: 0 auto; }
+h2 { font-size: 34px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+h2 em { font-style: normal; color: var(--amarelo); }
+
+/* A · placar */
+.placar { margin-top: 28px; border-top: 1.5px solid var(--borda); }
+.linha { display: grid; grid-template-columns: 120px 1fr auto; gap: 32px; align-items: center; padding: 30px 4px; border-bottom: 1.5px solid var(--borda); }
+.linha .pos { font: 700 64px/1 var(--mono); letter-spacing: -.05em; color: var(--amarelo); }
+.linha .pos small { font-size: 22px; letter-spacing: 0; vertical-align: top; margin-left: 2px; }
+.linha h3 { font-size: clamp(22px, 2.6vw, 34px); font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+.linha .orgs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.linha time { font: 500 13px var(--mono); color: var(--apagado); text-align: right; white-space: nowrap; }
+
+/* B · legenda de capa */
+.legenda { font-size: clamp(40px, 6vw, 84px); font-weight: 800; letter-spacing: -.04em; line-height: 1; text-transform: uppercase; text-wrap: balance; max-width: 16ch; }
+.legenda em { font-style: normal; color: var(--amarelo); }
+.colados { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 44px; padding-left: 8px; }
+.colado { padding: 16px 20px; display: flex; align-items: center; gap: 16px; box-shadow: 0 14px 34px rgba(0,0,0,.45); }
+.colado:nth-child(1) { transform: rotate(-2.5deg); border-color: var(--amarelo); }
+.colado:nth-child(2) { transform: rotate(2deg) translateY(10px); border-color: var(--azul); }
+.colado .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--painel-claro); color: var(--amarelo); }
+.colado:nth-child(2) .ic { color: var(--azul); }
+.colado .ic svg.lucide { width: 22px; height: 22px; }
+.colado strong { display: block; font: 700 16px var(--mono); }
+.colado small { display: block; font: 500 12px var(--mono); color: var(--apagado); margin-top: 3px; }
+
+/* C · destaque com foto */
+.vitrine { display: grid; grid-template-columns: 7fr 5fr; gap: 24px; margin-top: 28px; align-items: stretch; }
+.foto-evento { position: relative; border-radius: 14px; border: 1.5px dashed var(--borda); background: repeating-linear-gradient(135deg, #111827 0 14px, #0E1520 14px 28px); min-height: 380px; display: grid; place-items: center; color: var(--apagado); font: 500 13px var(--mono); }
+.foto-evento .carimbo { position: absolute; top: -16px; left: 28px; transform: rotate(-3deg); background: var(--amarelo); color: var(--fundo); border-radius: 12px; padding: 10px 18px; font: 700 15px var(--mono); box-shadow: 0 10px 30px rgba(255,194,71,.25); display: flex; gap: 8px; align-items: center; }
+.foto-evento .titulo { position: absolute; left: 28px; right: 28px; bottom: 26px; font-size: clamp(26px, 3vw, 40px); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; color: var(--texto); font-family: var(--sans); text-transform: uppercase; }
+.foto-evento .titulo em { font-style: normal; color: var(--amarelo); }
+.lado { display: grid; gap: 20px; align-content: start; }
+.lado .painel { padding: 24px; }
+.lado h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin: 12px 0 10px; }
+.lado p { color: var(--apagado); font: 500 12.5px var(--mono); }
+.lado .orgs { display: flex; gap: 6px; flex-wrap: wrap; }
+
+@media (max-width: 860px) {
+	section { padding: 40px 16px 56px; }
+	.linha { grid-template-columns: 1fr; gap: 10px; padding: 24px 0; }
+	.linha .pos { font-size: 48px; }
+	.linha time { text-align: left; }
+	.vitrine { grid-template-columns: 1fr; }
+	.foto-evento { min-height: 300px; }
+	.colados { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<section>
+	<p class="opcao"><b>A</b>placar · cada prêmio é uma linha grande, como um resultado de corrida</p>
+	<h2><em>Premiações</em></h2>
+	<div class="placar">
+		<div class="linha">
+			<div class="pos">1<small>º</small></div>
+			<div><h3>Hackathon AWS × Três Corações × FIAP</h3><div class="orgs"><span class="pill verde">AWS</span><span class="pill vermelho">Três Corações</span><span class="pill roxo">FIAP</span></div></div>
+			<time>out 2026</time>
+		</div>
+		<div class="linha">
+			<div class="pos">1<small>º</small></div>
+			<div><h3>Hackathon CREA JR-DF</h3><div class="orgs"><span class="pill azul">CREA JR-DF</span></div></div>
+			<time>Distrito Federal</time>
+		</div>
+	</div>
+</section>
+
+<hr class="separa">
+
+<section>
+	<p class="opcao"><b>B</b>legenda de capa · a frase grande dos vídeos, com os prêmios colados por cima como nos cards da foto</p>
+	<p class="legenda">Primeiro lugar em <em>2 hackathons</em></p>
+	<div class="colados">
+		<div class="painel colado"><span class="ic"><i data-lucide="trophy"></i></span><span><strong>AWS × Três Corações × FIAP</strong><small>1º lugar · out 2026</small></span></div>
+		<div class="painel colado"><span class="ic"><i data-lucide="trophy"></i></span><span><strong>CREA JR-DF</strong><small>1º lugar · Distrito Federal</small></span></div>
+	</div>
+</section>
+
+<hr class="separa">
+
+<section>
+	<p class="opcao"><b>C</b>destaque com foto · o prêmio mais recente vira uma capa (precisa de uma foto do evento), o outro fica ao lado</p>
+	<h2><em>Premiações</em></h2>
+	<div class="vitrine">
+		<div class="foto-evento">
+			<span class="carimbo"><i data-lucide="trophy"></i>1º lugar</span>
+			foto do evento aqui
+			<p class="titulo">Hackathon <em>AWS × Três Corações × FIAP</em></p>
+		</div>
+		<div class="lado">
+			<div class="painel"><div class="orgs"><span class="pill verde">AWS</span><span class="pill vermelho">Três Corações</span><span class="pill roxo">FIAP</span></div><h3>O projeto</h3><p>out 2026 · uma frase sobre o que vocês construíram</p></div>
+			<div class="painel"><span class="pill amarelo">1º lugar</span><h3>Hackathon CREA JR-DF</h3><p>Distrito Federal</p></div>
+		</div>
+	</div>
+</section>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T08:28:30-03:00",
+  "title": "Design System: bueno_dev",
+  "extensions": {
+    "colorMeta": {
+      "signal-yellow": {
+        "role": "primary",
+        "displayName": "Signal Yellow",
+        "canonical": "#FFC247",
+        "tonalRamp": [
+          "#4C3300",
+          "#805500",
+          "#B27700",
+          "#E69900",
+          "#FFB31A",
+          "#FFC95C",
+          "#FFE1A3",
+          "#FFF7E5"
+        ]
+      },
+      "ok-green": {
+        "role": "secondary",
+        "displayName": "Ok Green",
+        "canonical": "#3DDC84",
+        "tonalRamp": [
+          "#0C4123",
+          "#136C3B",
+          "#1B9753",
+          "#23C26A",
+          "#3DDC84",
+          "#75E6A7",
+          "#B1F1CE",
+          "#E9FBF1"
+        ]
+      },
+      "failure-red": {
+        "role": "secondary",
+        "displayName": "Failure Red",
+        "canonical": "#FF5A5F",
+        "tonalRamp": [
+          "#4C0002",
+          "#800004",
+          "#B20005",
+          "#E60007",
+          "#FF1A20",
+          "#FF5C61",
+          "#FFA3A6",
+          "#FFE5E6"
+        ]
+      },
+      "diagram-blue": {
+        "role": "tertiary",
+        "displayName": "Diagram Blue",
+        "canonical": "#5B9DFF",
+        "tonalRamp": [
+          "#001F4C",
+          "#003380",
+          "#0048B2",
+          "#005CE6",
+          "#1A76FF",
+          "#5C9DFF",
+          "#A3C8FF",
+          "#E5F0FF"
+        ]
+      },
+      "diagram-purple": {
+        "role": "tertiary",
+        "displayName": "Diagram Purple",
+        "canonical": "#B48CFF",
+        "tonalRamp": [
+          "#1B004C",
+          "#2C0080",
+          "#3E00B2",
+          "#5000E6",
+          "#691AFF",
+          "#955CFF",
+          "#C3A3FF",
+          "#EEE5FF"
+        ]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#0B0F17",
+        "tonalRamp": [
+          "#192234",
+          "#293856",
+          "#3A4F79",
+          "#4A659B",
+          "#647FB5",
+          "#91A4CA",
+          "#C1CCE1",
+          "#EEF1F7"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Panel",
+        "canonical": "#141B27",
+        "tonalRamp": [
+          "#1A2333",
+          "#2B3A54",
+          "#3D5276",
+          "#4E6998",
+          "#6783B1",
+          "#93A6C8",
+          "#C2CDE0",
+          "#EEF1F6"
+        ]
+      },
+      "panel-raised": {
+        "role": "neutral",
+        "displayName": "Panel Raised",
+        "canonical": "#1C2535",
+        "tonalRamp": [
+          "#1A2332",
+          "#2C3A53",
+          "#3E5275",
+          "#4F6996",
+          "#6982B0",
+          "#94A6C7",
+          "#C3CDDF",
+          "#EEF1F6"
+        ]
+      },
+      "wire": {
+        "role": "neutral",
+        "displayName": "Wire",
+        "canonical": "#2A3549",
+        "tonalRamp": [
+          "#1C2331",
+          "#2F3B51",
+          "#415271",
+          "#546A92",
+          "#6D83AB",
+          "#97A7C3",
+          "#C5CEDD",
+          "#EFF1F6"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "canonical": "#E9EDF3",
+        "tonalRamp": [
+          "#1B2431",
+          "#2D3C52",
+          "#3F5473",
+          "#516C94",
+          "#6B86AE",
+          "#95A9C5",
+          "#C4CEDF",
+          "#EEF2F6"
+        ]
+      },
+      "text-soft": {
+        "role": "neutral",
+        "displayName": "Text Soft",
+        "canonical": "#C3CAD6",
+        "tonalRamp": [
+          "#1F242D",
+          "#343D4C",
+          "#48556A",
+          "#5D6D88",
+          "#7787A2",
+          "#9EA9BD",
+          "#C8CFDA",
+          "#F0F2F5"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#8A95A8",
+        "tonalRamp": [
+          "#21252C",
+          "#363D49",
+          "#4C5666",
+          "#626E84",
+          "#7B889D",
+          "#A1AAB9",
+          "#CACFD8",
+          "#F0F2F4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name in the opening, once per page."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Uppercase video-style claim sentence with one yellow keyword."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles with one yellow word."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Featured project and award card titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Copy inside panels."
+      },
+      "body-lead": {
+        "displayName": "Body Lead",
+        "purpose": "Bio, about and contact intros."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pills, buttons, form labels, stamps; lowercase."
+      },
+      "data": {
+        "displayName": "Data",
+        "purpose": "Dates, handles, counts, tech chips."
+      },
+      "number": {
+        "displayName": "Number",
+        "purpose": "Opening numbers strip, suffix in yellow."
+      }
+    },
+    "shadows": [
+      {
+        "name": "photo-lift",
+        "value": "0 30px 70px rgba(0,0,0,.5)",
+        "purpose": "Opening photo only."
+      },
+      {
+        "name": "stuck-on",
+        "value": "0 12px 30px rgba(0,0,0,.45)",
+        "purpose": "Overlay panels stuck on the photo."
+      },
+      {
+        "name": "yellow-stamp",
+        "value": "0 10px 30px rgba(255,194,71,.25), 0 10px 24px rgba(0,0,0,.4)",
+        "purpose": "Handle and award stamps."
+      },
+      {
+        "name": "live-dot",
+        "value": "0 0 0 4px rgba(61,220,132,.16)",
+        "purpose": "Green dot next to the brand."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-lift",
+        "value": "cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Hover lift of buttons, links and cards (0.3–0.35s)."
+      },
+      {
+        "name": "fade-state",
+        "value": "0.2s–0.25s ease",
+        "purpose": "Border and color changes on hover/focus."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "single-column",
+        "value": "960px"
+      }
+    ],
+    "background": {
+      "grid": "linear-gradient(rgba(42,53,73,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42,53,73,.28) 1px, transparent 1px); background-size: 48px 48px",
+      "purpose": "Diagram grid behind the whole page."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one main action in a block (ver projetos, enviar mensagem).",
+      "html": "<button class=\"ds-btn ds-btn-primary\">ver projetos <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/></svg></button>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-btn{display:inline-flex;align-items:center;gap:10px;font:700 14px var(--mono);padding:13px 20px;border-radius:12px;border:1.5px solid var(--borda);background:var(--painel);color:var(--texto);cursor:pointer;transition:border-color .2s,transform .3s cubic-bezier(.2,.8,.2,1),background .2s}.ds-btn:hover{border-color:var(--apagado);transform:translateY(-2px)}.ds-btn:focus-visible{outline:2px solid var(--amarelo);outline-offset:3px}.ds-btn-primary{background:var(--amarelo);border-color:var(--amarelo);color:var(--fundo)}.ds-btn-primary:hover{background:#FFD27A;border-color:#FFD27A}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Second action beside a primary (falar comigo).",
+      "html": "<button class=\"ds-btn\">falar comigo <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/></svg></button>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-btn{display:inline-flex;align-items:center;gap:10px;font:700 14px var(--mono);padding:13px 20px;border-radius:12px;border:1.5px solid var(--borda);background:var(--painel);color:var(--texto);cursor:pointer;transition:border-color .2s,transform .3s cubic-bezier(.2,.8,.2,1),background .2s}.ds-btn:hover{border-color:var(--apagado);transform:translateY(-2px)}.ds-btn:focus-visible{outline:2px solid var(--amarelo);outline-offset:3px}"
+    },
+    {
+      "name": "Category Pills",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Categories, tech tags, organizers and state feedback; color = currentColor tinted 12% into the ground.",
+      "html": "<span class=\"ds-pill\" style=\"color:#FF5A5F\">resiliência</span> <span class=\"ds-pill\" style=\"color:#3DDC84\">concorrência</span> <span class=\"ds-pill\" style=\"color:#FFC247\">consistência</span> <span class=\"ds-pill\" style=\"color:#5B9DFF\">segurança</span> <span class=\"ds-pill\" style=\"color:#8A95A8\">neutro</span>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-pill{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 var(--mono);padding:6px 11px;border-radius:999px;border:1.5px solid currentColor;background:color-mix(in srgb,currentColor 12%,var(--fundo));white-space:nowrap}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Contact form field: mono label above, night-ground well, yellow border on focus.",
+      "html": "<label class=\"ds-campo\"><span>e-mail</span><input placeholder=\"voce@empresa.com\"></label>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-campo{display:grid;gap:8px;width:320px}.ds-campo span{font:700 12px var(--mono);color:var(--apagado)}.ds-campo input{font:500 16px var(--sans);color:var(--texto);background:var(--fundo);border:1.5px solid var(--borda);border-radius:10px;padding:13px 14px;transition:border-color .2s}.ds-campo input::placeholder{color:#566176}.ds-campo input:focus{outline:none;border-color:var(--amarelo)}"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "description": "Brand with live dot on the left, mono section links on the right.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-marca\" href=\"#\"><b></b>bueno_dev</a><nav><a href=\"#\">vídeos</a><a href=\"#\">projetos</a><a href=\"#\">stacks</a><a href=\"#\">premiações</a><a href=\"#\">contato</a></nav></header>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-nav{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:16px 20px;background:var(--fundo)}.ds-marca{font:700 15px var(--mono);color:var(--texto);display:flex;align-items:center;gap:10px;text-decoration:none}.ds-marca b{width:10px;height:10px;border-radius:3px;background:var(--ok);box-shadow:0 0 0 4px rgba(61,220,132,.16)}.ds-nav nav{display:flex;gap:6px}.ds-nav nav a{font:500 13px var(--mono);color:var(--apagado);text-decoration:none;padding:8px 12px;border-radius:8px}.ds-nav nav a:hover{color:var(--texto);background:var(--painel)}"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Base container: panel fill, 1.5px wire border, 14px corners, flat.",
+      "html": "<div class=\"ds-painel\"><h3>Arquitetura</h3><p>O que mais aparece nos meus vídeos.</p><span class=\"ds-chip\">Kafka</span> <span class=\"ds-chip\">Redis</span></div>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-painel{background:var(--painel);border:1.5px solid var(--borda);border-radius:14px;padding:24px;width:320px;color:var(--texto);font-family:var(--sans)}.ds-painel h3{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}.ds-painel p{color:var(--apagado);font-size:14.5px;margin:0 0 16px}.ds-chip{font:500 13px var(--mono);background:var(--painel-claro);padding:5px 9px;border-radius:6px}"
+    },
+    {
+      "name": "Yellow Stamp",
+      "kind": "custom",
+      "refersTo": "stamp",
+      "description": "Stuck-on label (handle, 1º lugar); the only rotated element type besides photo overlays.",
+      "html": "<span class=\"ds-carimbo\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/></svg>1º lugar</span>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-carimbo{display:inline-flex;align-items:center;gap:8px;transform:rotate(-3deg);background:var(--amarelo);color:var(--fundo);border-radius:12px;padding:8px 16px;font:700 13px var(--mono);box-shadow:0 10px 30px rgba(255,194,71,.25),0 10px 24px rgba(0,0,0,.4)}"
+    },
+    {
+      "name": "Caption Heading",
+      "kind": "custom",
+      "description": "Section headline with one yellow word, and the uppercase caption claim.",
+      "html": "<div class=\"ds-cab\"><h2>Últimos <em>vídeos</em></h2><p class=\"ds-legenda\">Primeiro lugar em <em>2 hackathons</em></p></div>",
+      "css": ":host{--fundo:#0B0F17;--painel:#141B27;--painel-claro:#1C2535;--borda:#2A3549;--texto:#E9EDF3;--apagado:#8A95A8;--ok:#3DDC84;--erro:#FF5A5F;--amarelo:#FFC247;--azul:#5B9DFF;--roxo:#B48CFF;--mono:'JetBrains Mono',ui-monospace,monospace;--sans:Inter,system-ui,sans-serif}.ds-cab{font-family:var(--sans);color:var(--texto)}.ds-cab h2{font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.1;margin:0 0 20px}.ds-cab em{font-style:normal;color:var(--amarelo)}.ds-legenda{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;text-transform:uppercase;margin:0;max-width:14ch}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Living Cover",
+    "overview": "**Creative North Star: \"The Living Cover\"**\n\nThe site is one of Henrique's video covers, extended into a page. The same night-blue ground with a faint diagram grid, the same system panels and mono pills, the same bold caption with one yellow word. Someone who saw a Reel should recognize the site before reading a word. The person comes first (photo, name, role), and the panels are stuck onto that person the way the videos stick diagram cards over his face.\n\nDensity is calm: few elements per viewport, big type for names and claims, small mono text for facts and data. Color is functional, never decorative. Yellow marks the one thing to read, green means ok, red means failure, blue and purple only appear as category or organizer colors inside pills and diagram nodes. Motion is small and physical: things lift 2–4px on hover, nothing loops or bounces.\n\nThe world was chosen on 2026-10-22 from three mocked directions (a thermal-receipt roll and a streaming title-card wall were rejected). Reference build: `mocks/b-diagrama.html`.",
+    "keyCharacteristics": [
+      "Night-blue ground with a 48px diagram grid behind everything.",
+      "Panels with 1.5px wire borders and 14px corners; no floating cards without a border.",
+      "Inter 800 for names, headlines and captions; JetBrains Mono for every label, date, number, handle and tag.",
+      "One yellow keyword per heading; meaning-bearing green/red.",
+      "Stuck-on elements (photo overlays, the yellow stamp, award stamps) are the only tilted things on the page."
+    ],
+    "rules": [
+      {
+        "name": "The One Yellow Word Rule",
+        "body": "A heading gets at most one yellow phrase, and it is the noun the section is about. Yellow on a second element in the same block means one of them is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Meaning Rule",
+        "body": "Green only ever means ok and red only ever means failure or problem, as in the videos. Never use them as decoration or as \"brand colors\".",
+        "section": "colors"
+      },
+      {
+        "name": "The Pill-Only Rainbow Rule",
+        "body": "Blue and purple (and green/red when used as categories) appear only as a pill's text/border or a diagram node's outline, tinted 12% into the ground. Never as section backgrounds, gradients or large fills.",
+        "section": "colors"
+      },
+      {
+        "name": "The Machine-Prints-Mono Rule",
+        "body": "If a value could have come from an API or a log (a count, a date, a handle, a version, a tech name), set it in JetBrains Mono. Human sentences are Inter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lowercase Label Rule",
+        "body": "Pills, buttons and labels are lowercase (\"ver projetos\", \"falar comigo\", \"1º lugar\"). Uppercase is reserved for the caption sentence.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sticker Rule",
+        "body": "Only stuck-on elements get a shadow, and only stuck-on elements may rotate (−3° to 5°). Cards, sections and buttons are flat and straight.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep every surface on the night ground with the 48px wire grid visible behind it.",
+      "**Do** give each heading exactly one yellow word or phrase.",
+      "**Do** set every count, date, handle and tech name in JetBrains Mono, with tabular numbers for counts.",
+      "**Do** use green only for ok/success and red only for failure/problem.",
+      "**Do** draw technical explanations as nodes and wires in the videos' style when an image is missing.",
+      "**Do** honor `prefers-reduced-motion`: all transitions off, smooth scroll off."
+    ],
+    "donts": [
+      "**Don't** use a light theme or the videos' paper color (`#F4F1EA`) as a page background; the site is the dark cover world.",
+      "**Don't** add gradients, glows or colored section backgrounds; color lives in pills, stamps, borders and one word per heading.",
+      "**Don't** rotate or shadow anything that is not stuck on top of something else.",
+      "**Don't** add a generic dev-portfolio hero (avatar circle, gradient name, \"Hi, I'm…\").",
+      "**Don't** show API status, latency or circuit-breaker state on the page.",
+      "**Don't** hardcode video topics, scenes or categories; category colors come from caption hashtags."
+    ]
+  }
+}

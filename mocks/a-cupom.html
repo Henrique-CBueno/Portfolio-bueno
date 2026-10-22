@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bueno_dev · boletim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,300..800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root {
+	--papel: #F4F1EA;
+	--tinta: #1A1A1A;
+	--tinta-fraca: #615D55;
+	--mesa: #121110;
+	--impressora: #23221F;
+	--impressora-borda: #34322D;
+	--rolo: min(640px, calc(100vw - 32px));
+	--f: 'Martian Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--mesa); scrollbar-color: #3a3832 var(--mesa); }
+body { font-family: var(--f); font-variation-settings: 'wdth' 87.5; color: var(--tinta); background: var(--mesa); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--tinta); color: var(--papel); }
+a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:focus-visible, button:focus-visible { outline: 2px dashed var(--tinta); outline-offset: 3px; }
+
+/* impressora */
+.impressora { position: sticky; top: 0; z-index: 5; background: var(--impressora); border-bottom: 1px solid var(--impressora-borda); box-shadow: 0 10px 24px rgba(0,0,0,.45); }
+.impressora-corpo { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #B9B4A8; font-size: 12px; letter-spacing: .04em; }
+.impressora-corpo nav { display: flex; gap: 22px; }
+.impressora-corpo nav a { text-decoration: none; color: #B9B4A8; }
+.impressora-corpo nav a:hover { color: var(--papel); }
+.led { display: inline-flex; align-items: center; gap: 8px; }
+.led i { width: 7px; height: 7px; border-radius: 50%; background: #7BD88F; box-shadow: 0 0 0 3px rgba(123,216,143,.15); }
+.fenda { height: 10px; margin: 0 auto; width: calc(var(--rolo) + 28px); background: #0A0A09; border-radius: 0 0 6px 6px; }
+
+/* rolo */
+.rolo { width: var(--rolo); margin: -10px auto 0; background: var(--papel); padding: 40px 36px 0; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,.5); animation: alimentar 1.4s steps(14) both; }
+@keyframes alimentar { from { transform: translateY(-60px); clip-path: inset(0 0 100% 0); } to { transform: none; clip-path: inset(0 0 0 0); } }
+@media (prefers-reduced-motion: reduce) { .rolo { animation: none; } }
+.rolo::after { content: ''; position: absolute; left: 0; right: 0; bottom: -14px; height: 14px; background: var(--papel); -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%; mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 16px 100%; }
+
+.c { text-align: center; }
+.dupla { display: inline-block; transform: scaleY(2); transform-origin: top; margin-bottom: 1.4em; font-weight: 800; letter-spacing: .02em; }
+h1.dupla { font-size: 30px; line-height: 1; font-variation-settings: 'wdth' 112.5; }
+.fraca { color: var(--tinta-fraca); }
+.peq { font-size: 12.5px; }
+.corte { border: 0; border-top: 2px dashed var(--tinta); margin: 22px 0; opacity: .85; }
+.corte.fino { border-top-width: 1px; border-top-style: dotted; }
+.linha { display: flex; justify-content: space-between; gap: 12px; }
+.linha .pontos { flex: 1; border-bottom: 2px dotted var(--tinta-fraca); transform: translateY(-6px); }
+h2 { font-size: 15px; font-weight: 800; letter-spacing: .08em; font-variation-settings: 'wdth' 112.5; margin-bottom: 14px; }
+
+/* itens */
+.item { display: grid; grid-template-columns: 132px 1fr; gap: 20px; padding: 18px 0; border-bottom: 1px dotted var(--tinta-fraca); }
+.item:last-of-type { border-bottom: 0; }
+.item img { width: 132px; aspect-ratio: 9/16; object-fit: cover; display: block; filter: contrast(1.05); }
+.item .num { font-size: 12px; color: var(--tinta-fraca); letter-spacing: .06em; }
+.item h3 { font-size: 19px; line-height: 1.25; font-weight: 800; font-variation-settings: 'wdth' 100; margin: 4px 0 10px; text-wrap: balance; }
+.item p { font-size: 13.5px; margin-bottom: 12px; }
+.item .meta { font-size: 12px; color: var(--tinta-fraca); margin-bottom: 14px; }
+.abrir { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 13px; background: var(--tinta); color: var(--papel); padding: 8px 12px; text-decoration: none; }
+.abrir:hover { background: #000; }
+.abrir span { font-weight: 400; opacity: .7; }
+.destaque { display: grid; grid-template-columns: 1fr 120px; gap: 22px; align-items: start; }
+.destaque img { width: 100%; aspect-ratio: 9/16; object-fit: cover; }
+.destaque .qr svg { width: 120px; height: 120px; display: block; }
+.destaque .qr small { display: block; font-size: 11px; text-align: center; margin-top: 4px; }
+.destaque-capa { grid-column: 1 / -1; display: grid; grid-template-columns: 220px 1fr; gap: 22px; }
+.destaque h3 { font-size: 26px; line-height: 1.15; font-weight: 800; font-variation-settings: 'wdth' 100; margin: 6px 0 12px; text-wrap: balance; }
+.citacao { font-size: 14px; border-left: 0; padding: 10px 0; }
+
+/* totais */
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+th { text-align: left; font-weight: 400; color: var(--tinta-fraca); font-size: 12px; padding-bottom: 6px; }
+td { padding: 5px 0; }
+td.n, th.n { text-align: right; }
+tr.total td { font-weight: 800; border-top: 1px solid var(--tinta); padding-top: 9px; }
+.ao-vivo { display: inline-block; border: 1px solid var(--tinta); padding: 1px 6px; font-size: 11px; margin-left: 6px; }
+
+.assuntos { columns: 2; column-gap: 28px; font-size: 13.5px; }
+.assuntos li { list-style: none; break-inside: avoid; padding: 3px 0; }
+.assuntos li::before { content: '+ '; color: var(--tinta-fraca); }
+
+.hash { font-size: 11.5px; word-break: break-all; color: var(--tinta-fraca); }
+.rodape-qr { display: flex; justify-content: center; gap: 26px; margin: 18px 0 10px; }
+.rodape-qr figure { text-align: center; font-size: 11px; }
+.rodape-qr svg { width: 92px; height: 92px; display: block; }
+.fim { padding: 28px 0 46px; }
+.aviso-mock { max-width: var(--rolo); margin: 46px auto 60px; color: #8C877B; font-size: 12px; text-align: center; padding: 0 16px; }
+
+@media (max-width: 640px) {
+	.impressora-corpo nav { display: none; }
+	.rolo { padding: 28px 18px 0; }
+	h1.dupla { font-size: 22px; }
+	.destaque { grid-template-columns: 1fr; }
+	.destaque-capa { grid-template-columns: 120px 1fr; gap: 16px; }
+	.destaque h3 { font-size: 19px; }
+	.destaque .qr { display: none; }
+	.item { grid-template-columns: 92px 1fr; gap: 14px; }
+	.item img { width: 92px; }
+	.assuntos { columns: 1; }
+}
+</style>
+</head>
+<body>
+
+<header class="impressora">
+	<div class="impressora-corpo">
+		<span class="led"><i></i>bueno_dev · imprimindo</span>
+		<nav aria-label="Seções">
+			<a href="#videos">vídeos</a>
+			<a href="#totais">números</a>
+			<a href="#assuntos">assuntos</a>
+			<a href="#contato">contato</a>
+		</nav>
+	</div>
+</header>
+<div class="fenda" aria-hidden="true"></div>
+
+<main class="rolo">
+	<div class="c">
+		<h1 class="dupla">BUENO_DEV</h1>
+		<p>HENRIQUE BUENO · DEV</p>
+		<p class="fraca peq">backend e sistemas distribuídos em 90 segundos</p>
+	</div>
+	<hr class="corte">
+	<div class="c">
+		<p style="font-weight:800;letter-spacing:.1em">BOLETIM DE CONCEITOS</p>
+		<p class="peq">EMITIDO 22/10/2026 · 01:04 · PT-BR</p>
+		<p class="peq fraca">Nº DE CONCEITOS EXPLICADOS: 4</p>
+	</div>
+	<hr class="corte">
+
+	<section class="destaque" aria-labelledby="ultimo">
+		<div class="destaque-capa">
+			<img src="assets/capa-circuit-breaker.jpg" alt="Capa do vídeo: 1 API lenta derrubou tudo, circuit breaker">
+			<div>
+				<p class="num peq fraca">ITEM 004 · MAIS RECENTE · 1:18</p>
+				<h3 id="ultimo">Uma API lenta derrubou o site inteiro na Black Friday</h3>
+				<p class="peq">A API de frete demora 30 s, as 200 threads do Spring Boot ficam presas e até o login cai. O circuit breaker para de chamar quem já caiu.</p>
+				<p class="citacao">“Timeout protege uma requisição. Circuit breaker protege o sistema inteiro.”</p>
+				<p class="meta peq fraca">resiliência · Java · Resilience4j · Polly · opossum</p>
+				<a class="abrir" href="https://www.instagram.com/bueno_dev/">ASSISTIR NO INSTAGRAM <span>→</span></a>
+			</div>
+		</div>
+	</section>
+	<hr class="corte">
+
+	<section id="videos" aria-labelledby="t-videos">
+		<h2 id="t-videos">ITENS ANTERIORES</h2>
+
+		<article class="item">
+			<img src="assets/capa-fencing.jpg" alt="Capa: 1 assento vendido 2 vezes, fencing token">
+			<div>
+				<p class="num">ITEM 003 · 1:22</p>
+				<h3>O mesmo assento vendido duas vezes, com lock no Redis</h3>
+				<p>O lock expira enquanto o Bruno está no túnel. Quem garante a venda é o banco barrar o token atrasado.</p>
+				<p class="meta">consistência · Redis · SQL · ZooKeeper</p>
+				<a class="abrir" href="https://www.instagram.com/bueno_dev/">ASSISTIR <span>→</span></a>
+			</div>
+		</article>
+		<article class="item">
+			<img src="assets/capa-urna.jpg" alt="Capa: como provar que ninguém mexeu, assinatura digital">
+			<div>
+				<p class="num">ITEM 002 · 1:32</p>
+				<h3>Como a urna prova que ninguém mexeu no resultado</h3>
+				<p>Cadeia de boot, assinatura do software e do boletim. A urna não pede confiança, deixa evidência.</p>
+				<p class="meta">segurança · assinatura digital · hash</p>
+				<a class="abrir" href="https://www.instagram.com/bueno_dev/">ASSISTIR <span>→</span></a>
+			</div>
+		</article>
+		<article class="item">
+			<img src="assets/capa-virtual-threads.jpg" alt="Capa: CPU em 5% e travado, virtual threads">
+			<div>
+				<p class="num">ITEM 001 · 1:18</p>
+				<h3>CPU em 5% e o sistema travado em 400 pedidos por segundo</h3>
+				<p>Cada thread espera o antifraude por meio segundo. Virtual threads param de desperdiçar a espera.</p>
+				<p class="meta">concorrência · Java 21 · Spring Boot</p>
+				<a class="abrir" href="https://www.instagram.com/bueno_dev/">ASSISTIR <span>→</span></a>
+			</div>
+		</article>
+	</section>
+	<hr class="corte">
+
+	<section id="totais" aria-labelledby="t-totais">
+		<h2 id="t-totais">TOTAIS POR REDE <span class="ao-vivo">AO VIVO</span></h2>
+		<table>
+			<thead><tr><th>REDE</th><th class="n">SEGUIDORES</th><th class="n">VIEWS 30D</th></tr></thead>
+			<tbody>
+				<tr><td>INSTAGRAM</td><td class="n" data-conta>1.284</td><td class="n">18.902</td></tr>
+				<tr><td>TIKTOK</td><td class="n" data-conta>742</td><td class="n">9.117</td></tr>
+				<tr><td>YOUTUBE</td><td class="n" data-conta>96</td><td class="n">1.530</td></tr>
+				<tr class="total"><td>TOTAL</td><td class="n" id="total">2.122</td><td class="n">29.549</td></tr>
+			</tbody>
+		</table>
+		<p class="peq fraca" style="margin-top:10px">LEITURA 01:04:12 · ATUALIZA A CADA HORA</p>
+	</section>
+	<hr class="corte">
+
+	<section id="assuntos" aria-labelledby="t-assuntos">
+		<h2 id="t-assuntos">ASSUNTOS JÁ EXPLICADOS</h2>
+		<ul class="assuntos">
+			<li>circuit breaker</li><li>timeout e cascata de falhas</li>
+			<li>fencing token</li><li>lock distribuído</li>
+			<li>virtual threads</li><li>pool de threads</li>
+			<li>assinatura digital</li><li>cadeia de boot</li>
+		</ul>
+		<hr class="corte fino">
+		<div class="linha peq"><span>GITHUB</span><span class="pontos"></span><a href="https://github.com/Henrique-CBueno">Henrique-CBueno</a></div>
+	</section>
+	<hr class="corte">
+
+	<section id="contato" aria-labelledby="t-contato">
+		<h2 id="t-contato">PARA MARCAS E EMPRESAS</h2>
+		<p class="peq">Publi, vídeo explicando o seu produto ou vaga de backend: manda a proposta.</p>
+		<p style="margin:14px 0 4px"><a class="abrir" href="mailto:contato@exemplo.dev">CONTATO@EXEMPLO.DEV <span>→</span></a></p>
+	</section>
+	<hr class="corte">
+
+	<div class="c fim">
+		<p class="peq">ASSINATURA DO BOLETIM</p>
+		<p class="hash">9f3c 81ad 7e02 c4b9 5d11 0a6e 3f72 a71e</p>
+		<div class="rodape-qr">
+			<figure><div data-qr="https://www.instagram.com/bueno_dev/"></div><figcaption>INSTAGRAM</figcaption></figure>
+			<figure><div data-qr="https://www.tiktok.com/@bueno_dev0"></div><figcaption>TIKTOK</figcaption></figure>
+			<figure><div data-qr="https://www.youtube.com/@bueno_dev"></div><figcaption>YOUTUBE</figcaption></figure>
+		</div>
+		<p class="peq fraca">OBRIGADO PELA PREFERÊNCIA · VOLTE SEMPRE</p>
+	</div>
+</main>
+
+<p class="aviso-mock">Mock · números de seguidores e views são ilustrativos · o e-mail é um placeholder</p>
+
+<script>
+document.querySelectorAll('[data-qr]').forEach(function (el) {
+	try {
+		var q = qrcode(0, 'M');
+		q.addData(el.dataset.qr);
+		q.make();
+		el.innerHTML = q.createSvgTag({ cellSize: 3, margin: 0, scalable: true });
+	} catch (e) {}
+});
+</script>
+</body>
+</html>

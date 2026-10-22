@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bueno_dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<style>
+:root {
+	--fundo: #0B0F17;
+	--painel: #141B27;
+	--painel-claro: #1C2535;
+	--borda: #2A3549;
+	--texto: #E9EDF3;
+	--apagado: #8A95A8;
+	--ok: #3DDC84;
+	--erro: #FF5A5F;
+	--amarelo: #FFC247;
+	--azul: #5B9DFF;
+	--roxo: #B48CFF;
+	--neutro: #8A95A8;
+	--sans: 'Inter', system-ui, sans-serif;
+	--mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--fundo); scrollbar-color: var(--borda) var(--fundo); }
+body { font-family: var(--sans); color: var(--texto); background-color: var(--fundo); background-image: linear-gradient(rgba(42,53,73,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42,53,73,.28) 1px, transparent 1px); background-size: 48px 48px; background-position: -1px -1px; -webkit-font-smoothing: antialiased; line-height: 1.5; }
+::selection { background: var(--amarelo); color: var(--fundo); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--amarelo); outline-offset: 3px; border-radius: 8px; }
+svg.lucide { width: 16px; height: 16px; stroke-width: 2; flex: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 700 12px/1 var(--mono); padding: 6px 11px; border-radius: 999px; border: 1.5px solid currentColor; background: color-mix(in srgb, currentColor 12%, var(--fundo)); white-space: nowrap; text-decoration: none; }
+.pill svg.lucide { width: 13px; height: 13px; }
+.pill.amarelo { color: var(--amarelo); } .pill.verde { color: var(--ok); } .pill.vermelho { color: var(--erro); } .pill.azul { color: var(--azul); } .pill.roxo { color: var(--roxo); } .pill.neutro { color: var(--neutro); }
+.painel { background: var(--painel); border: 1.5px solid var(--borda); border-radius: 14px; }
+
+/* topo */
+.topo { max-width: 1280px; margin: 0 auto; padding: 22px 32px; display: flex; justify-content: space-between; align-items: center; }
+.marca { font: 700 15px var(--mono); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.marca b { width: 10px; height: 10px; border-radius: 3px; background: var(--ok); box-shadow: 0 0 0 4px rgba(61,220,132,.16); transition: background .3s, box-shadow .3s; }
+.marca[data-st="falha"] b { background: var(--amarelo); box-shadow: 0 0 0 4px rgba(255,194,71,.16); }
+.topo nav { display: flex; gap: 6px; }
+.topo nav a { font: 500 13px var(--mono); color: var(--apagado); text-decoration: none; padding: 8px 12px; border-radius: 8px; }
+.topo nav a:hover { color: var(--texto); background: var(--painel); }
+
+/* palco */
+.palco { max-width: 1280px; margin: 0 auto; padding: 8px 32px 0; }
+.diagrama { position: relative; height: 560px; }
+.diagrama svg.fios { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.fio { fill: none; stroke: var(--borda); stroke-width: 2; stroke-dasharray: 6 6; transition: stroke .3s; }
+.fio.aberto { stroke: rgba(255,90,95,.45); }
+.no { position: absolute; transform: translate(-50%, -50%); }
+.servico { width: 380px; padding: 22px 24px; border-color: var(--amarelo); box-shadow: 0 18px 50px rgba(0,0,0,.45); }
+.servico .rotulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; }
+.servico h1 { font-size: 30px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+.servico p { color: var(--apagado); font-size: 15px; margin-top: 6px; }
+.servico .stacks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.servico .stacks span { font: 500 12px var(--mono); color: var(--apagado); background: var(--painel-claro); padding: 4px 8px; border-radius: 6px; }
+.visitante { display: flex; flex-direction: column; align-items: center; gap: 10px; font: 500 12px var(--mono); color: var(--azul); }
+.visitante .bola { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--azul); color: var(--fundo); box-shadow: 0 0 0 8px rgba(91,157,255,.14); }
+.visitante .bola svg { width: 24px; height: 24px; }
+
+.rede { width: 270px; text-decoration: none; display: block; transition: border-color .25s; }
+.rede .cabeca { padding: 14px 16px 12px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.rede .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--painel-claro); }
+.rede strong { display: block; font-size: 15px; }
+.rede small { font: 500 12px var(--mono); color: var(--apagado); }
+.rede .n { font: 700 19px var(--mono); text-align: right; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.rede .n small { display: block; font-size: 11px; }
+.rede .estado { display: flex; justify-content: space-between; align-items: center; padding: 9px 16px; border-top: 1.5px solid var(--borda); font: 500 11.5px var(--mono); color: var(--apagado); }
+.rede .estado .pill { padding: 4px 8px; font-size: 11px; }
+.rede:hover, .rede:focus-visible { border-color: var(--apagado); }
+.rede[data-breaker="aberto"] { border-color: color-mix(in srgb, var(--erro) 55%, var(--borda)); }
+.rede[data-breaker="meio"] { border-color: color-mix(in srgb, var(--amarelo) 55%, var(--borda)); }
+.rede[data-breaker="aberto"] .n { color: var(--apagado); }
+
+.dica { position: absolute; left: 0; right: 0; top: calc(100% + 10px); z-index: 4; padding: 12px 14px; background: var(--painel-claro); border: 1.5px solid var(--borda); border-radius: 12px; font: 500 12px/1.6 var(--mono); color: var(--texto); box-shadow: 0 14px 34px rgba(0,0,0,.5); opacity: 0; transform: translateY(-4px); transition: opacity .2s, transform .25s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+.dica span { color: var(--apagado); }
+.rede:hover .dica, .rede:focus-visible .dica { opacity: 1; transform: none; }
+
+.legenda { text-align: center; font-size: clamp(30px, 3.6vw, 48px); font-weight: 800; letter-spacing: -.025em; line-height: 1.15; padding: 8px 0 80px; text-wrap: balance; }
+.legenda em { font-style: normal; color: var(--amarelo); }
+
+/* seções */
+section { max-width: 1280px; margin: 0 auto; padding: 72px 32px; }
+.cab { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+h2 { font-size: 34px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+h2 em { font-style: normal; color: var(--amarelo); }
+.cab a { font: 500 13px var(--mono); color: var(--apagado); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+.cab a:hover { color: var(--texto); }
+
+.videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.video { text-decoration: none; display: block; }
+.video .capa { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 9/16; transition: border-color .25s, transform .35s cubic-bezier(.2,.8,.2,1); background: var(--painel); }
+.video img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.video:hover .capa, .video:focus-visible .capa { border-color: var(--amarelo); transform: translateY(-4px); }
+.video h3 { font-size: 16px; font-weight: 700; line-height: 1.3; margin: 14px 0 10px; text-wrap: balance; }
+.video .info { display: flex; justify-content: space-between; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+.video .info time { font: 500 12px var(--mono); color: var(--apagado); white-space: nowrap; }
+.todos { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; border: 1.5px dashed var(--borda); border-radius: 14px; aspect-ratio: 9/16; text-decoration: none; color: var(--apagado); font: 500 13px var(--mono); text-align: center; padding: 20px; transition: border-color .25s, color .25s; }
+.todos .bola { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--painel-claro); color: var(--texto); }
+.todos:hover { border-color: var(--amarelo); color: var(--texto); }
+
+/* contato */
+.contato { padding-bottom: 96px; }
+.contato p { color: var(--apagado); margin: 12px 0 30px; font-size: 17px; }
+.email { display: inline-flex; align-items: center; gap: 18px; font: 700 clamp(22px, 3.4vw, 44px) var(--mono); letter-spacing: -.02em; color: var(--texto); background: none; border: 0; cursor: pointer; padding: 0; text-align: left; }
+.email .sublinha { border-bottom: 3px solid var(--amarelo); padding-bottom: 4px; }
+.email:hover .sublinha { border-color: var(--texto); }
+.email .pill { font-size: 13px; transition: opacity .2s; }
+.redes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 36px; }
+footer { max-width: 1280px; margin: 0 auto; padding: 28px 32px 40px; border-top: 1.5px solid var(--borda); display: flex; justify-content: space-between; font: 500 12px var(--mono); color: var(--apagado); gap: 16px; flex-wrap: wrap; }
+
+/* só no mock */
+.simular { position: fixed; right: 16px; bottom: 16px; z-index: 20; padding: 12px; display: flex; flex-direction: column; gap: 8px; font: 500 11px var(--mono); color: var(--apagado); background: rgba(20,27,39,.96); }
+.simular div { display: flex; gap: 6px; flex-wrap: wrap; }
+.simular button { font: 700 11px var(--mono); color: var(--texto); background: var(--painel-claro); border: 1.5px solid var(--borda); border-radius: 8px; padding: 6px 9px; cursor: pointer; }
+.simular button[aria-pressed="true"] { border-color: var(--amarelo); color: var(--amarelo); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media (max-width: 900px) {
+	.topo nav { display: none; }
+	.diagrama { height: auto; display: flex; flex-direction: column; gap: 14px; align-items: stretch; padding: 12px 0 28px; }
+	.diagrama svg.fios { display: none; }
+	.no { position: static; transform: none; }
+	.servico { width: auto; }
+	.visitante { flex-direction: row; justify-content: center; }
+	.rede { width: auto; position: relative; }
+	.dica { display: none; }
+	.videos { grid-template-columns: 1fr 1fr; gap: 14px; }
+	.cab { flex-direction: column; gap: 10px; }
+	.topo, .palco, section, footer { padding-left: 16px; padding-right: 16px; }
+	.email { flex-direction: column; align-items: flex-start; gap: 12px; word-break: break-all; }
+	.simular { position: static; margin: 0 16px 24px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+	<a class="marca" href="#" id="marca"><b></b>bueno_dev</a>
+	<nav aria-label="Seções">
+		<a href="#videos">vídeos</a>
+		<a href="#contato">contato</a>
+	</nav>
+</header>
+
+<div class="palco">
+	<div class="diagrama" id="diagrama">
+		<svg class="fios" id="fios" aria-hidden="true"></svg>
+
+		<div class="no visitante" data-x="9" data-y="50" id="n-voce">
+			<div class="bola"><i data-lucide="user"></i></div>
+			<span>você</span>
+		</div>
+
+		<div class="no painel servico" data-x="41" data-y="48" id="n-servico">
+			<div class="rotulo"><span class="pill amarelo">api · em produção</span><span class="pill verde" id="st-api"><i data-lucide="check"></i>200</span></div>
+			<h1>Henrique Bueno</h1>
+			<p>Dev backend. Explico o que acontece por trás do sistema.</p>
+			<div class="stacks"><span>Java</span><span>Spring Boot</span><span>Redis</span><span>SQL</span><span>Node</span></div>
+		</div>
+
+		<a class="no painel rede" data-x="84" data-y="17" id="n-ig" data-fonte="ig" href="https://www.instagram.com/bueno_dev/">
+			<div class="cabeca">
+				<span class="ic"><i data-lucide="instagram"></i></span>
+				<span><strong>Instagram</strong><small>@bueno_dev</small></span>
+				<span class="n"><span class="v" data-alvo="1284">1.284</span><small>seguidores</small></span>
+			</div>
+			<div class="estado"><span class="lat">182 ms</span><span class="pill verde br">fechado</span></div>
+			<div class="dica"></div>
+		</a>
+		<a class="no painel rede" data-x="84" data-y="50" id="n-tt" data-fonte="tt" href="https://www.tiktok.com/@bueno_dev0">
+			<div class="cabeca">
+				<span class="ic"><i data-lucide="music-2"></i></span>
+				<span><strong>TikTok</strong><small>@bueno_dev0</small></span>
+				<span class="n"><span class="v" style="color:var(--apagado)">—</span><small>sem contagem</small></span>
+			</div>
+			<div class="estado"><span>perfil</span><span class="pill neutro">só link</span></div>
+			<div class="dica"><span>contagem de seguidores:</span><br>aguardando revisão do app no TikTok.<br><span>o link funciona normalmente.</span></div>
+		</a>
+		<a class="no painel rede" data-x="84" data-y="83" id="n-yt" data-fonte="yt" href="https://www.youtube.com/@bueno_dev">
+			<div class="cabeca">
+				<span class="ic"><i data-lucide="youtube"></i></span>
+				<span><strong>YouTube</strong><small>@bueno_dev</small></span>
+				<span class="n"><span class="v">~96</span><small>inscritos</small></span>
+			</div>
+			<div class="estado"><span class="lat">94 ms</span><span class="pill verde br">fechado</span></div>
+			<div class="dica"></div>
+		</a>
+	</div>
+	<p class="legenda">Sistemas distribuídos em <em>90 segundos</em>, com exemplos do Brasil.</p>
+</div>
+
+<section id="videos">
+	<div class="cab">
+		<h2>Últimos <em>vídeos</em></h2>
+		<a href="https://www.instagram.com/bueno_dev/">ver todos no Instagram <i data-lucide="arrow-up-right"></i></a>
+	</div>
+	<div class="videos">
+		<a class="video" href="https://www.instagram.com/bueno_dev/">
+			<div class="capa"><img src="assets/capa-circuit-breaker.jpg" alt=""></div>
+			<h3>1 API lenta derrubou tudo</h3>
+			<div class="info"><span class="pill vermelho">resiliência</span><time>há 2 dias</time></div>
+		</a>
+		<a class="video" href="https://www.instagram.com/bueno_dev/">
+			<div class="capa"><img src="assets/capa-fencing.jpg" alt=""></div>
+			<h3>1 assento vendido 2 vezes</h3>
+			<div class="info"><span class="pill amarelo">consistência</span><time>há 5 dias</time></div>
+		</a>
+		<a class="video" href="https://www.instagram.com/bueno_dev/">
+			<div class="capa"><img src="assets/capa-urna.jpg" alt=""></div>
+			<h3>Como provar que ninguém mexeu?</h3>
+			<div class="info"><span class="pill azul">segurança</span><time>há 1 semana</time></div>
+		</a>
+		<a class="video" href="https://www.instagram.com/bueno_dev/">
+			<div class="capa"><img src="assets/capa-virtual-threads.jpg" alt=""></div>
+			<h3>CPU em 5% e travado</h3>
+			<div class="info"><span class="pill verde">concorrência</span><time>há 2 semanas</time></div>
+		</a>
+	</div>
+</section>
+
+<section id="contato" class="contato">
+	<h2>Contato</h2>
+	<p>Parcerias, convites ou só pra conversar sobre backend.</p>
+	<button class="email" id="email" data-email="contato@seudominio.dev" aria-describedby="copiado">
+		<span class="sublinha">contato@seudominio.dev</span>
+		<span class="pill neutro" id="copiado"><i data-lucide="copy"></i>copiar</span>
+	</button>
+	<div class="redes">
+		<a class="pill roxo" href="https://www.instagram.com/bueno_dev/"><i data-lucide="instagram"></i>instagram</a>
+		<a class="pill azul" href="https://www.tiktok.com/@bueno_dev0"><i data-lucide="music-2"></i>tiktok</a>
+		<a class="pill vermelho" href="https://www.youtube.com/@bueno_dev"><i data-lucide="youtube"></i>youtube</a>
+		<a class="pill verde" href="https://github.com/Henrique-CBueno"><i data-lucide="github"></i>github</a>
+	</div>
+</section>
+
+<footer>
+	<span>bueno_dev · Henrique Bueno</span>
+	<span id="rodape-st">api: todas as fontes respondendo</span>
+</footer>
+
+<div class="painel simular" role="group" aria-label="Simular estados (só no mock)">
+	só no mock: simular
+	<div>
+		<button data-sim="normal" aria-pressed="true">normal</button>
+		<button data-sim="ig-lento">instagram lento</button>
+		<button data-sim="api-fora">api fora</button>
+	</div>
+</div>
+
+<script>
+lucide.createIcons();
+
+// fios do diagrama
+const dg = document.getElementById('diagrama');
+const fios = document.getElementById('fios');
+const NS = 'http://www.w3.org/2000/svg';
+const ligacoes = { voce: ['n-voce', 'n-servico'], ig: ['n-servico', 'n-ig'], tt: ['n-servico', 'n-tt'], yt: ['n-servico', 'n-yt'] };
+let caminhos = {};
+function posicionar() {
+	const empilhado = getComputedStyle(fios).display === 'none';
+	document.querySelectorAll('.diagrama .no').forEach(n => { n.style.left = empilhado ? '' : n.dataset.x + '%'; n.style.top = empilhado ? '' : n.dataset.y + '%'; });
+	if (empilhado) return;
+	fios.innerHTML = '';
+	caminhos = {};
+	for (const [k, [a, b]] of Object.entries(ligacoes)) {
+		const r = dg.getBoundingClientRect(), A = document.getElementById(a).getBoundingClientRect(), B = document.getElementById(b).getBoundingClientRect();
+		const x1 = A.right - r.left, y1 = A.top + A.height / 2 - r.top, x2 = B.left - r.left, y2 = B.top + B.height / 2 - r.top, mx = (x1 + x2) / 2;
+		const p = document.createElementNS(NS, 'path');
+		p.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+		p.setAttribute('class', 'fio');
+		fios.appendChild(p);
+		caminhos[k] = p;
+	}
+	aplicar();
+}
+
+const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function pacote(k, cor, dur, volta = false) {
+	const p = caminhos[k]; if (!p || calmo) return Promise.resolve();
+	const d = document.createElementNS(NS, 'circle');
+	d.setAttribute('r', 5); d.setAttribute('fill', cor);
+	fios.appendChild(d);
+	const L = p.getTotalLength(); const t0 = performance.now();
+	return new Promise(res => {
+		(function passo(t) {
+			const k2 = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k2, 3);
+			const pt = p.getPointAtLength((volta ? 1 - e : e) * L);
+			d.setAttribute('cx', pt.x); d.setAttribute('cy', pt.y);
+			k2 < 1 ? requestAnimationFrame(passo) : (d.remove(), res());
+		})(t0);
+	});
+}
+
+// estado das fontes, como a API mandaria pelo SSE
+const fontes = {
+	ig: { nome: 'Instagram', seg: 1284, lat: 182, breaker: 'fechado', falhas: 0, leitura: Date.now() },
+	yt: { nome: 'YouTube', seg: 96, lat: 94, breaker: 'fechado', falhas: 0, leitura: Date.now(), aprox: true },
+};
+let modo = 'normal';
+const corBreaker = { fechado: 'verde', aberto: 'vermelho', meio: 'amarelo' };
+const nomeBreaker = { fechado: 'fechado', aberto: 'aberto', meio: 'meio-aberto' };
+function ha(ms) { const s = Math.round(ms / 1000); return s < 60 ? `há ${s} s` : `há ${Math.round(s / 60)} min`; }
+function aplicar() {
+	const apiFora = modo === 'api-fora';
+	for (const [k, f] of Object.entries(fontes)) {
+		const el = document.getElementById('n-' + k);
+		const br = apiFora ? 'desconhecido' : f.breaker;
+		el.dataset.breaker = br;
+		el.querySelector('.v').textContent = (f.aprox ? '~' : '') + f.seg.toLocaleString('pt-BR');
+		el.querySelector('.lat').textContent = apiFora ? `último valor ${ha(Date.now() - f.leitura)}` : br === 'aberto' ? 'sem chamar' : `${f.lat} ms`;
+		const pill = el.querySelector('.br');
+		pill.className = 'pill br ' + (apiFora ? 'neutro' : corBreaker[br]);
+		pill.textContent = apiFora ? 'sem sinal' : nomeBreaker[br];
+		el.querySelector('.dica').innerHTML = apiFora
+			? `<span>a API não respondeu.</span><br>mostrando o último valor, lido ${ha(Date.now() - f.leitura)}.`
+			: br === 'aberto'
+				? `<span>circuit breaker:</span> aberto<br>${f.nome} lento, ${f.falhas}/10 chamadas falharam.<br><span>mostrando o último valor, lido ${ha(Date.now() - f.leitura)}.</span>`
+				: br === 'meio'
+					? `<span>circuit breaker:</span> meio-aberto<br>testando uma chamada pra ver se o ${f.nome} voltou.`
+					: `<span>última leitura:</span> ${ha(Date.now() - f.leitura)}<br><span>latência:</span> ${f.lat} ms<br><span>circuit breaker:</span> fechado · ${f.falhas}/10 falhas${f.aprox ? '<br><span>o YouTube arredonda inscritos.</span>' : ''}`;
+		if (caminhos[k]) caminhos[k].classList.toggle('aberto', br === 'aberto');
+	}
+	const st = document.getElementById('st-api');
+	st.className = 'pill ' + (apiFora ? 'vermelho' : 'verde');
+	st.innerHTML = apiFora ? 'offline' : '200';
+	document.getElementById('marca').dataset.st = apiFora || fontes.ig.breaker !== 'fechado' ? 'falha' : 'ok';
+	document.getElementById('rodape-st').textContent = apiFora ? 'api: sem sinal, mostrando os últimos valores' : fontes.ig.breaker !== 'fechado' ? 'api: instagram com falhas, breaker ' + nomeBreaker[fontes.ig.breaker] : 'api: todas as fontes respondendo';
+}
+
+// a cada ciclo a API consulta as fontes (no site real ~20 s; aqui 5 s)
+async function ciclo() {
+	if (modo !== 'api-fora') {
+		pacote('voce', '#5B9DFF', 700);
+		const chamadas = ['ig', 'yt'].map(async k => {
+			const f = fontes[k];
+			if (k === 'ig' && modo === 'ig-lento') {
+				if (f.breaker === 'aberto') { f.meioEm = (f.meioEm || 0) + 1; if (f.meioEm >= 2) { f.breaker = 'meio'; f.meioEm = 0; } aplicar(); return; }
+				await pacote(k, '#5B9DFF', 900);
+				f.falhas = Math.min(10, f.falhas + 3);
+				if (f.breaker === 'meio' || f.falhas >= 5) f.breaker = 'aberto';
+				await pacote(k, '#FF5A5F', 600, true);
+			} else {
+				await pacote(k, '#5B9DFF', 800);
+				if (Math.random() < .35) f.seg += 1;
+				f.lat = Math.round((k === 'ig' ? 160 : 80) + Math.random() * 60);
+				f.falhas = 0; f.breaker = 'fechado'; f.leitura = Date.now();
+				await pacote(k, '#3DDC84', 700, true);
+			}
+			aplicar();
+		});
+		await Promise.all(chamadas);
+	}
+	aplicar();
+	setTimeout(ciclo, 5000);
+}
+posicionar();
+addEventListener('resize', posicionar);
+setTimeout(ciclo, 600);
+setInterval(aplicar, 1000);
+
+document.querySelectorAll('[data-sim]').forEach(b => b.onclick = () => {
+	modo = b.dataset.sim;
+	document.querySelectorAll('[data-sim]').forEach(x => x.setAttribute('aria-pressed', x === b));
+	if (modo === 'normal') { fontes.ig.breaker = 'fechado'; fontes.ig.falhas = 0; }
+	aplicar();
+});
+
+// e-mail copiável
+const email = document.getElementById('email'), copiado = document.getElementById('copiado');
+email.onclick = async () => {
+	try { await navigator.clipboard.writeText(email.dataset.email); } catch (e) {}
+	copiado.className = 'pill verde';
+	copiado.innerHTML = '<i data-lucide="check"></i>copiado';
+	lucide.createIcons();
+	setTimeout(() => { copiado.className = 'pill neutro'; copiado.innerHTML = '<i data-lucide="copy"></i>copiar'; lucide.createIcons(); }, 2200);
+};
+</script>
+</body>
+</html>

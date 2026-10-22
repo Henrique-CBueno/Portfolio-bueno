@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Henrique Bueno · bueno_dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<style>
+:root {
+	--fundo: #0B0F17;
+	--painel: #141B27;
+	--painel-claro: #1C2535;
+	--borda: #2A3549;
+	--texto: #E9EDF3;
+	--apagado: #8A95A8;
+	--ok: #3DDC84;
+	--erro: #FF5A5F;
+	--amarelo: #FFC247;
+	--azul: #5B9DFF;
+	--roxo: #B48CFF;
+	--neutro: #8A95A8;
+	--sans: 'Inter', system-ui, sans-serif;
+	--mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--fundo); scrollbar-color: var(--borda) var(--fundo); scroll-behavior: smooth; }
+body { font-family: var(--sans); color: var(--texto); background-color: var(--fundo); background-image: linear-gradient(rgba(42,53,73,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(42,53,73,.28) 1px, transparent 1px); background-size: 48px 48px; background-position: -1px -1px; -webkit-font-smoothing: antialiased; line-height: 1.5; }
+::selection { background: var(--amarelo); color: var(--fundo); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--amarelo); outline-offset: 3px; border-radius: 8px; }
+svg.lucide { width: 16px; height: 16px; stroke-width: 2; flex: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 700 12px/1 var(--mono); padding: 6px 11px; border-radius: 999px; border: 1.5px solid currentColor; background: color-mix(in srgb, currentColor 12%, var(--fundo)); white-space: nowrap; text-decoration: none; }
+.pill svg.lucide { width: 13px; height: 13px; }
+.pill.amarelo { color: var(--amarelo); } .pill.verde { color: var(--ok); } .pill.vermelho { color: var(--erro); } .pill.azul { color: var(--azul); } .pill.roxo { color: var(--roxo); } .pill.neutro { color: var(--neutro); }
+.painel { background: var(--painel); border: 1.5px solid var(--borda); border-radius: 14px; }
+
+/* topo */
+.topo { max-width: 1280px; margin: 0 auto; padding: 22px 32px; display: flex; justify-content: space-between; align-items: center; }
+.marca { font: 700 15px var(--mono); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.marca b { width: 10px; height: 10px; border-radius: 3px; background: var(--ok); box-shadow: 0 0 0 4px rgba(61,220,132,.16); }
+.topo nav { display: flex; gap: 6px; }
+.topo nav a { font: 500 13px var(--mono); color: var(--apagado); text-decoration: none; padding: 8px 12px; border-radius: 8px; }
+.topo nav a:hover { color: var(--texto); background: var(--painel); }
+
+/* abertura: a foto como as capas dos vídeos, com os cartões por cima */
+.abertura { max-width: 1280px; margin: 0 auto; padding: 40px 32px 96px; display: grid; grid-template-columns: 460px 1fr; gap: 72px; align-items: center; }
+.retrato { position: relative; }
+.retrato .foto { border-radius: 18px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 1; box-shadow: 0 30px 70px rgba(0,0,0,.5); }
+.retrato img { width: 100%; height: 100%; object-fit: cover; display: block; filter: contrast(1.06) saturate(1.08); }
+.colado { position: absolute; padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: color-mix(in srgb, var(--painel) 94%, transparent); box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+.colado .ic { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; background: var(--painel-claro); color: var(--amarelo); }
+.colado strong { display: block; font: 700 14px var(--mono); }
+.colado small { display: block; font: 500 11px var(--mono); color: var(--apagado); }
+.colado.java { top: 28px; left: -34px; transform: rotate(-3deg); border-color: var(--amarelo); }
+.colado.aws { bottom: 64px; right: -38px; transform: rotate(5deg); border-color: var(--ok); }
+.colado.aws .ic { color: var(--ok); }
+.carimbo { position: absolute; bottom: -22px; left: 40px; transform: rotate(-2deg); background: var(--amarelo); color: var(--fundo); border-radius: 12px; padding: 8px 16px; font: 700 13px var(--mono); box-shadow: 0 10px 30px rgba(255,194,71,.25), 0 10px 24px rgba(0,0,0,.4); display: flex; align-items: center; gap: 8px; }
+
+.texto h1 { font-size: clamp(48px, 6vw, 84px); font-weight: 800; letter-spacing: -.035em; line-height: 1; }
+.texto .papel { font-size: clamp(26px, 2.8vw, 38px); font-weight: 800; letter-spacing: -.025em; line-height: 1.15; margin-top: 14px; color: var(--amarelo); }
+.texto .bio { font-size: 18px; color: var(--apagado); max-width: 46ch; margin-top: 24px; }
+.texto .bio b { color: var(--texto); font-weight: 700; }
+.redes-topo { display: grid; grid-template-columns: repeat(2, minmax(0, 260px)); gap: 10px; margin-top: 32px; }
+.rede { display: inline-flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; text-decoration: none; transition: border-color .25s, transform .3s cubic-bezier(.2,.8,.2,1); }
+.rede:hover, .rede:focus-visible { border-color: var(--apagado); transform: translateY(-2px); }
+.rede .ic { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--painel-claro); }
+.rede strong { display: block; font-size: 14px; line-height: 1.2; }
+.rede small { display: block; font: 500 12px var(--mono); color: var(--apagado); font-variant-numeric: tabular-nums; }
+.acoes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.botao { display: inline-flex; align-items: center; gap: 10px; font: 700 14px var(--mono); padding: 13px 20px; border-radius: 12px; text-decoration: none; border: 1.5px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; transition: border-color .2s, transform .3s cubic-bezier(.2,.8,.2,1), background .2s; }
+.botao:hover { border-color: var(--apagado); transform: translateY(-2px); }
+.botao.primario { background: var(--amarelo); border-color: var(--amarelo); color: var(--fundo); }
+.botao.primario:hover { background: #FFD27A; border-color: #FFD27A; }
+.numeros { display: flex; gap: 0; margin-top: 30px; border-top: 1.5px solid var(--borda); border-bottom: 1.5px solid var(--borda); }
+.numeros div { flex: 1; padding: 14px 18px 14px 0; }
+.numeros div + div { padding-left: 18px; border-left: 1.5px solid var(--borda); }
+.numeros strong { display: block; font: 700 30px/1.1 var(--mono); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.numeros strong em { font-style: normal; color: var(--amarelo); }
+.numeros span { display: block; font: 500 12px var(--mono); color: var(--apagado); margin-top: 4px; }
+.local { display: flex; align-items: center; gap: 8px; margin-top: 22px; font: 500 13px var(--mono); color: var(--apagado); }
+
+/* seções */
+section { max-width: 1280px; margin: 0 auto; padding: 72px 32px; }
+.cab { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+h2 { font-size: 34px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
+h2 em { font-style: normal; color: var(--amarelo); }
+.cab a { font: 500 13px var(--mono); color: var(--apagado); text-decoration: none; display: inline-flex; gap: 8px; align-items: center; }
+.cab a:hover { color: var(--texto); }
+.cab p { color: var(--apagado); max-width: 48ch; }
+
+.videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.video { text-decoration: none; display: block; }
+.video .capa { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 9/16; transition: border-color .25s, transform .35s cubic-bezier(.2,.8,.2,1); background: var(--painel); }
+.video img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.video:hover .capa, .video:focus-visible .capa { border-color: var(--amarelo); transform: translateY(-4px); }
+.video h3 { font-size: 16px; font-weight: 700; line-height: 1.3; margin: 14px 0 10px; text-wrap: balance; }
+.video .info { display: flex; justify-content: space-between; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+.video .info time { font: 500 12px var(--mono); color: var(--apagado); white-space: nowrap; }
+
+/* projetos: destaques com print + repositórios fixados do GitHub */
+.destaques { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.destaque { display: flex; flex-direction: column; overflow: hidden; transition: border-color .25s, transform .35s cubic-bezier(.2,.8,.2,1); }
+.destaque:hover { border-color: var(--apagado); transform: translateY(-3px); }
+.destaque .janela { border-bottom: 1.5px solid var(--borda); background: var(--painel-claro); }
+.destaque .barra { display: flex; align-items: center; gap: 6px; padding: 10px 14px; font: 500 11.5px var(--mono); color: var(--apagado); }
+.destaque .barra i { width: 9px; height: 9px; border-radius: 50%; background: var(--borda); }
+.destaque .barra span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.destaque .print { aspect-ratio: 16/9; overflow: hidden; background: #0E141F; }
+.destaque .print img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+.destaque .corpo { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+.destaque .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.destaque h3 { font-size: 22px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
+.destaque p { color: #C3CAD6; font-size: 15.5px; }
+.destaque .links { display: flex; gap: 18px; flex-wrap: wrap; margin-top: auto; padding-top: 6px; }
+.destaque .links a { font: 700 13px var(--mono); color: var(--texto); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border-bottom: 2px solid var(--amarelo); padding-bottom: 2px; }
+.destaque .links a:hover { border-color: var(--texto); }
+.destaque .links small { font: 500 12px var(--mono); color: var(--apagado); align-self: center; }
+/* diagrama no lugar do print, no estilo dos vídeos */
+.fluxo { height: 100%; display: flex; align-items: center; justify-content: center; gap: 0; padding: 24px; background-image: linear-gradient(rgba(42,53,73,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(42,53,73,.35) 1px, transparent 1px); background-size: 24px 24px; }
+.fluxo .no { font: 700 12px var(--mono); padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--borda); background: var(--painel); white-space: nowrap; }
+.fluxo .no.amarelo { border-color: var(--amarelo); color: var(--amarelo); }
+.fluxo .fio { width: 26px; height: 2px; background: var(--borda); position: relative; flex: none; }
+.fluxo .fio::after { content: ''; position: absolute; right: -1px; top: -3px; border: 4px solid transparent; border-left: 6px solid var(--borda); border-right: 0; }
+.fluxo .saidas { display: grid; gap: 10px; }
+.fluxo .no.verde { border-color: var(--ok); color: var(--ok); }
+.fluxo .no.azul { border-color: var(--azul); color: var(--azul); }
+.subtitulo { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 48px 0 6px; }
+.subtitulo h3 { font: 700 14px var(--mono); color: var(--apagado); }
+.projetos { display: grid; gap: 0; }
+.projeto { display: grid; grid-template-columns: 300px 1fr auto; gap: 32px; align-items: start; padding: 22px 4px; border-top: 1.5px solid var(--borda); text-decoration: none; transition: background .2s; }
+.projeto:last-child { border-bottom: 1.5px solid var(--borda); }
+.projeto:hover { background: rgba(20,27,39,.7); }
+.projeto h3 { font: 700 16px var(--mono); letter-spacing: -.01em; word-break: break-word; }
+.projeto .linguas { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.projeto .linguas span { font: 500 12px var(--mono); color: var(--apagado); background: var(--painel-claro); padding: 4px 8px; border-radius: 6px; }
+.projeto p { color: #C3CAD6; max-width: 70ch; font-size: 15px; }
+.projeto .seta { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; border: 1.5px solid var(--borda); color: var(--apagado); transition: border-color .2s, color .2s, transform .3s cubic-bezier(.2,.8,.2,1); }
+.projeto:hover .seta { border-color: var(--amarelo); color: var(--amarelo); transform: translate(2px, -2px); }
+
+/* certificações e prêmios */
+.premios { display: grid; grid-template-columns: 4fr 8fr; gap: 48px; align-items: start; }
+.premios .rotulo { font: 700 13px var(--mono); color: var(--apagado); margin-bottom: 18px; }
+.premios .legenda { font-size: clamp(38px, 4.4vw, 64px); font-weight: 800; letter-spacing: -.04em; line-height: 1; text-transform: uppercase; text-wrap: balance; }
+.premios .legenda em { font-style: normal; color: var(--amarelo); }
+.premios .apoio { color: var(--apagado); font-size: 16px; margin-top: 20px; max-width: 34ch; }
+.premios-lista { display: grid; gap: 20px; padding-top: 18px; }
+.premio.principal { display: grid; grid-template-columns: 1fr 1fr; }
+.premio.principal .foto-premio { aspect-ratio: auto; min-height: 100%; border-bottom: 0; border-right: 1.5px solid var(--borda); border-radius: 12px 0 0 12px; }
+.premio.principal .foto-premio img { border-radius: 12px 0 0 12px; }
+.premio.principal .corpo-premio { padding: 26px 26px 24px; }
+.premio.compacto { flex-direction: row; align-items: center; gap: 20px; padding: 20px 24px; }
+.premio.compacto .ic { flex: none; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; background: var(--painel-claro); color: var(--amarelo); }
+.premio.compacto .ic svg.lucide { width: 24px; height: 24px; }
+.premio.compacto .texto-premio { flex: 1; display: grid; gap: 4px; }
+.premio.compacto h3 { font-size: 19px; }
+.premio.compacto .lado-premio { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.premio { position: relative; display: flex; flex-direction: column; }
+.premio .carimbo-premio { position: absolute; top: -16px; left: 20px; z-index: 1; transform: rotate(-3deg); background: var(--amarelo); color: var(--fundo); border-radius: 10px; padding: 7px 14px; font: 700 13px var(--mono); display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 26px rgba(255,194,71,.25), 0 8px 20px rgba(0,0,0,.4); }
+.premio .foto-premio { aspect-ratio: 4/3; border-radius: 12px 12px 0 0; border-bottom: 1.5px solid var(--borda); background: repeating-linear-gradient(135deg, #111827 0 14px, #0E1520 14px 28px); display: grid; place-items: center; font: 500 12px var(--mono); color: var(--apagado); }
+.premio .corpo-premio { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.premio .quando { font: 500 12px var(--mono); color: var(--apagado); display: flex; align-items: center; gap: 8px; }
+.premio h3 { font-size: 21px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; text-wrap: balance; }
+.premio p { color: #C3CAD6; font-size: 15px; }
+.premio p b { color: var(--texto); }
+.premio .foto-premio img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 12px 12px 0 0; }
+.premio .contexto { font: 500 12px var(--mono); color: var(--apagado); }
+.premio .contexto b { color: var(--amarelo); font-weight: 700; }
+.premio .falta { color: var(--apagado); font: 500 12.5px var(--mono); border: 1.5px dashed var(--borda); border-radius: 8px; padding: 8px 10px; }
+.premio .orgs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 4px; }
+
+/* stacks: camadas encadeadas, como a cadeia de boot dos vídeos */
+.stacks-grade { display: grid; grid-template-columns: 7fr 5fr; gap: 28px; align-items: start; }
+.cadeia { display: grid; gap: 0; }
+.camada { display: grid; grid-template-columns: 170px 1fr; gap: 20px; align-items: center; padding: 16px 20px; position: relative; }
+.camada + .camada { margin-top: 18px; }
+.camada + .camada::before { content: ''; position: absolute; left: 50px; top: -19px; height: 18px; border-left: 2px solid var(--borda); }
+.camada .pill { justify-self: start; }
+.camada .itens { display: flex; gap: 8px; flex-wrap: wrap; }
+.camada .itens span { font: 500 13px var(--mono); color: var(--texto); background: var(--painel-claro); padding: 5px 9px; border-radius: 6px; }
+.lado-stacks { display: grid; gap: 20px; }
+.arquitetura { padding: 24px; border-color: var(--amarelo); }
+.arquitetura h3, .ia h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+.arquitetura p, .ia p { color: var(--apagado); font-size: 14.5px; margin-bottom: 16px; }
+.padroes { display: flex; flex-wrap: wrap; gap: 8px; }
+.ia { padding: 24px; }
+
+/* sobre */
+.sobre { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+.metodo { padding: 24px; }
+.metodo h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 20px; }
+.passo { display: grid; grid-template-columns: 124px 1fr; gap: 18px; align-items: start; position: relative; }
+.passo + .passo { margin-top: 22px; }
+.passo + .passo::before { content: ''; position: absolute; left: 30px; top: -21px; height: 20px; border-left: 2px solid var(--borda); }
+.passo .pill { justify-self: start; }
+.passo p { font-size: 15px; color: #C3CAD6; margin: 0; }
+.metodo footer { all: unset; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(42,53,73,.7); font: 500 12px var(--mono); color: var(--apagado); }
+.sobre p { font-size: 18px; color: #C3CAD6; margin-bottom: 18px; max-width: 58ch; }
+.sobre p b { color: var(--texto); }
+.idiomas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+/* contato */
+.contato { padding-bottom: 96px; }
+.contato > .contato-grade { display: grid; grid-template-columns: 5fr 7fr; gap: 56px; align-items: start; }
+.contato-texto > p { color: var(--apagado); margin: 12px 0 30px; font-size: 17px; }
+.contato-texto .ou { font: 500 12px var(--mono); color: var(--apagado); margin-bottom: 10px; }
+.formulario { padding: 28px; display: grid; gap: 18px; }
+.formulario .linha { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.campo { display: grid; gap: 8px; }
+.campo label { font: 700 12px var(--mono); color: var(--apagado); }
+.campo input, .campo textarea { font: 500 16px var(--sans); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 13px 14px; width: 100%; transition: border-color .2s; }
+.campo textarea { min-height: 150px; resize: vertical; line-height: 1.5; }
+.campo input::placeholder, .campo textarea::placeholder { color: #566176; }
+.campo input:focus, .campo textarea:focus { outline: none; border-color: var(--amarelo); }
+.campo input:user-invalid { border-color: var(--erro); }
+.armadilha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.enviar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.enviar small { font: 500 12px var(--mono); color: var(--apagado); }
+.email { display: inline-flex; align-items: center; gap: 14px; font: 700 clamp(18px, 2vw, 24px) var(--mono); letter-spacing: -.02em; color: var(--texto); background: none; border: 0; cursor: pointer; padding: 0; text-align: left; }
+.email .sublinha { border-bottom: 3px solid var(--amarelo); padding-bottom: 4px; }
+.email:hover .sublinha { border-color: var(--texto); }
+.email .pill { font-size: 12px; }
+.redes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+footer { max-width: 1280px; margin: 0 auto; padding: 28px 32px 40px; border-top: 1.5px solid var(--borda); display: flex; justify-content: space-between; font: 500 12px var(--mono); color: var(--apagado); gap: 16px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } html { scroll-behavior: auto; } }
+@media (max-width: 960px) {
+	.topo nav { display: none; }
+	.abertura { grid-template-columns: 1fr; gap: 48px; padding: 16px 16px 64px; }
+	.retrato { max-width: 340px; margin: 0 18px; }
+	.colado.java { left: -14px; top: 18px; }
+	.colado.aws { right: -14px; bottom: 54px; }
+	.videos { grid-template-columns: 1fr 1fr; gap: 14px; }
+	.cab { flex-direction: column; gap: 10px; }
+	.destaques, .contato > .contato-grade { grid-template-columns: 1fr; gap: 20px; }
+	.contato > .contato-grade { gap: 36px; }
+	.formulario { padding: 20px; }
+	.formulario .linha { grid-template-columns: 1fr; }
+	.fluxo { padding: 12px; }
+	.fluxo .no { font-size: 10px; padding: 6px 7px; border-radius: 8px; }
+	.fluxo .fio { width: 12px; }
+	.fluxo .saidas { gap: 6px; }
+	.numeros strong { font-size: 24px; }
+	.numeros div { padding-right: 10px; }
+	.numeros div + div { padding-left: 12px; }
+	.premios { grid-template-columns: 1fr; gap: 28px; }
+	.premios-lista { gap: 28px; }
+	.premio.principal { grid-template-columns: 1fr; }
+	.premio.principal .foto-premio { aspect-ratio: 4/3; border-right: 0; border-bottom: 1.5px solid var(--borda); border-radius: 12px 12px 0 0; }
+	.premio.principal .foto-premio img { border-radius: 12px 12px 0 0; }
+	.premio.principal .corpo-premio { padding: 20px 22px 22px; }
+	.premio.compacto { flex-wrap: wrap; align-items: flex-start; padding: 18px; gap: 14px; }
+	.premio.compacto .lado-premio { flex-direction: row; align-items: center; width: 100%; }
+	.projeto { grid-template-columns: 1fr auto; gap: 14px 20px; }
+	.projeto p { grid-column: 1 / -1; grid-row: 2; }
+	.sobre, .stacks-grade { grid-template-columns: 1fr; gap: 28px; }
+	.passo { grid-template-columns: 1fr; gap: 8px; }
+	.passo + .passo::before { display: none; }
+	.camada { grid-template-columns: 1fr; gap: 12px; }
+	.topo, section, footer { padding-left: 16px; padding-right: 16px; }
+	.email { flex-wrap: wrap; gap: 10px; word-break: break-all; }
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+	<a class="marca" href="#"><b></b>bueno_dev</a>
+	<nav aria-label="Seções">
+		<a href="#sobre">sobre</a>
+		<a href="#videos">vídeos</a>
+		<a href="#projetos">projetos</a>
+		<a href="#stacks">stacks</a>
+		<a href="#premiacoes">premiações</a>
+		<a href="#contato">contato</a>
+	</nav>
+</header>
+
+<main>
+	<div class="abertura">
+		<div class="retrato">
+			<div class="foto"><img src="assets/foto-github.jpg" alt="Henrique Bueno sentado com o notebook cheio de adesivos"></div>
+			<div class="painel colado java"><span class="ic"><i data-lucide="coffee"></i></span><span><strong>Java</strong><small>Spring Boot</small></span></div>
+			<div class="painel colado aws"><span class="ic"><i data-lucide="cloud"></i></span><span><strong>AWS</strong><small>cloud</small></span></div>
+			<div class="carimbo"><i data-lucide="at-sign"></i>bueno_dev</div>
+		</div>
+		<div class="texto">
+			<h1>Henrique Bueno</h1>
+			<p class="papel">Desenvolvedor backend</p>
+			<p class="bio">Trabalho com <b>Java e AWS</b> e gravo vídeos de 90 segundos explicando <b>sistemas distribuídos</b> com exemplos do Brasil.</p>
+			<div class="acoes">
+				<a class="botao primario" href="#projetos">ver projetos <i data-lucide="arrow-down"></i></a>
+				<a class="botao" href="#contato">falar comigo <i data-lucide="send"></i></a>
+			</div>
+			<div class="numeros">
+				<div><strong>1<em>+</em></strong><span>ano de experiência</span></div>
+				<div><strong>20<em>+</em></strong><span>projetos entregues</span></div>
+				<div><strong>2<em>×</em></strong><span>1º lugar em hackathon</span></div>
+			</div>
+			<div class="redes-topo">
+				<a class="painel rede" href="https://www.instagram.com/bueno_dev/"><span class="ic"><i data-lucide="instagram"></i></span><span><strong>Instagram</strong><small>1.284 seguidores</small></span></a>
+				<a class="painel rede" href="https://www.tiktok.com/@bueno_dev0"><span class="ic"><i data-lucide="music-2"></i></span><span><strong>TikTok</strong><small>@bueno_dev0</small></span></a>
+				<a class="painel rede" href="https://www.youtube.com/@bueno_dev"><span class="ic"><i data-lucide="youtube"></i></span><span><strong>YouTube</strong><small>~96 inscritos</small></span></a>
+				<a class="painel rede" href="https://github.com/Henrique-CBueno"><span class="ic"><i data-lucide="github"></i></span><span><strong>GitHub</strong><small>Henrique-CBueno</small></span></a>
+			</div>
+			<p class="local"><i data-lucide="map-pin"></i>Brasil</p>
+		</div>
+	</div>
+
+	<section id="sobre">
+		<div class="sobre">
+			<div>
+				<h2 style="margin-bottom:24px">Sobre</h2>
+				<p>Sou <b>software engineer</b> focado em backend com <b>Java e Spring Boot</b>, system design e arquitetura distribuída.</p>
+				<p>Já construí microsserviços, sistemas orientados a eventos e soluções na <b>AWS</b>, e participei de decisões sobre sharding, replicação e consistência, que são justamente os assuntos dos meus vídeos.</p>
+				<div class="idiomas"><span class="pill neutro">português · nativo</span><span class="pill neutro">inglês · avançado</span><span class="pill neutro">alemão · básico</span></div>
+			</div>
+			<div class="painel metodo">
+				<h3>Como eu explico um conceito</h3>
+				<div class="passo"><span class="pill vermelho">1 · o problema</span><p>Começo por uma situação que você já viveu, antes de qualquer termo técnico.</p></div>
+				<div class="passo"><span class="pill amarelo">2 · o conceito</span><p>O diagrama anima o sistema por dentro, peça por peça, até o problema fazer sentido.</p></div>
+				<div class="passo"><span class="pill verde">3 · a frase</span><p>Termino com uma linha só, pra você levar pro trabalho.</p></div>
+				<footer><span>~90 s</span><span>·</span><span>PT-BR</span><span>·</span><span>Instagram, TikTok e YouTube</span></footer>
+			</div>
+		</div>
+	</section>
+
+	<section id="videos">
+		<div class="cab">
+			<h2>Últimos <em>vídeos</em></h2>
+			<a href="https://www.instagram.com/bueno_dev/">ver todos no Instagram <i data-lucide="arrow-up-right"></i></a>
+		</div>
+		<div class="videos">
+			<a class="video" href="https://www.instagram.com/bueno_dev/">
+				<div class="capa"><img src="assets/capa-circuit-breaker.jpg" alt=""></div>
+				<h3>1 API lenta derrubou tudo</h3>
+				<div class="info"><span class="pill vermelho">resiliência</span><time>há 2 dias</time></div>
+			</a>
+			<a class="video" href="https://www.instagram.com/bueno_dev/">
+				<div class="capa"><img src="assets/capa-fencing.jpg" alt=""></div>
+				<h3>1 assento vendido 2 vezes</h3>
+				<div class="info"><span class="pill amarelo">consistência</span><time>há 5 dias</time></div>
+			</a>
+			<a class="video" href="https://www.instagram.com/bueno_dev/">
+				<div class="capa"><img src="assets/capa-urna.jpg" alt=""></div>
+				<h3>Como provar que ninguém mexeu?</h3>
+				<div class="info"><span class="pill azul">segurança</span><time>há 1 semana</time></div>
+			</a>
+			<a class="video" href="https://www.instagram.com/bueno_dev/">
+				<div class="capa"><img src="assets/capa-virtual-threads.jpg" alt=""></div>
+				<h3>CPU em 5% e travado</h3>
+				<div class="info"><span class="pill verde">concorrência</span><time>há 2 semanas</time></div>
+			</a>
+		</div>
+	</section>
+
+	<section id="projetos">
+		<div class="cab">
+			<h2>Projetos em <em>destaque</em></h2>
+			<a href="https://github.com/Henrique-CBueno">ver todo o GitHub <i data-lucide="arrow-up-right"></i></a>
+		</div>
+		<div class="destaques">
+			<article class="painel destaque">
+				<div class="janela"><div class="barra"><i></i><i></i><i></i><span>gioiainvestimentos.com</span></div><div class="print"><img src="assets/projeto-1.jpg" alt="Página inicial da Gioia Investimentos" loading="lazy"></div></div>
+				<div class="corpo">
+					<div class="tags"><span class="pill amarelo">Java</span><span class="pill verde">Spring Boot</span><span class="pill azul">React</span><span class="pill neutro">AWS</span></div>
+					<h3>Gioia Investimentos</h3>
+					<p>Plataforma de consultoria macroeconômica, com backend em Spring Boot, frontend em React e deploy automatizado na AWS (S3, SNS, SQS e CI/CD), feita pra entregar análises financeiras com confiabilidade e escala.</p>
+					<div class="links"><a href="https://gioiainvestimentos.com/">ver site <i data-lucide="arrow-up-right"></i></a></div>
+				</div>
+			</article>
+			<article class="painel destaque">
+				<div class="janela"><div class="barra"><i></i><i></i><i></i><span>sisprot.pg.df.gov.br</span></div><div class="print"><img src="assets/projeto-2.jpg" alt="Página inicial do Negocia-DF" loading="lazy"></div></div>
+				<div class="corpo">
+					<div class="tags"><span class="pill amarelo">Java</span><span class="pill roxo">Liferay</span><span class="pill azul">React</span></div>
+					<h3>NegociaDF</h3>
+					<p>Plataforma do GDF pra negociar débitos da Dívida Ativa do Distrito Federal. Atuei em funcionalidades e melhorias de um sistema de grande escala, em fluxos sensíveis ao negócio.</p>
+					<div class="links"><a href="https://sisprot.pg.df.gov.br/">ver sistema <i data-lucide="arrow-up-right"></i></a><small>participação</small></div>
+				</div>
+			</article>
+			<article class="painel destaque">
+				<div class="janela"><div class="barra"><i></i><i></i><i></i><span>catalog-service · swagger</span></div><div class="print"><img src="assets/projeto-3.jpg" alt="Documentação Swagger do serviço de catálogo da Cinema API" loading="lazy"></div></div>
+				<div class="corpo">
+					<div class="tags"><span class="pill verde">Spring Boot</span><span class="pill vermelho">Redis</span><span class="pill neutro">SQS</span><span class="pill neutro">SNS</span><span class="pill neutro">S3</span><span class="pill azul">Keycloak</span></div>
+					<h3>Cinema API</h3>
+					<p>Reserva de ingressos sem overbooking: lock distribuído de assentos no Redis, CQRS e Event Sourcing, PostgreSQL e MongoDB, tickets com QR Code assinado no S3 e autenticação com Keycloak.</p>
+					<div class="links"><a href="https://github.com/Henrique-CBueno/Cinema-API">ver no GitHub <i data-lucide="github"></i></a></div>
+				</div>
+			</article>
+			<article class="painel destaque">
+				<div class="janela"><div class="barra"><i></i><i></i><i></i><span>micro-tickets-cdc · arquitetura</span></div><div class="print"><div class="fluxo" aria-label="PostgreSQL envia mudanças pelo Debezium ao Kafka, que alimenta Redis e Elasticsearch">
+					<span class="no">PostgreSQL</span><span class="fio"></span><span class="no">Debezium</span><span class="fio"></span><span class="no amarelo">Kafka</span><span class="fio"></span>
+					<span class="saidas"><span class="no verde">Redis</span><span class="no azul">Elasticsearch</span></span>
+				</div></div></div>
+				<div class="corpo">
+					<div class="tags"><span class="pill amarelo">Kafka</span><span class="pill neutro">Debezium</span><span class="pill azul">Elasticsearch</span><span class="pill vermelho">Redis</span></div>
+					<h3>Plataforma CDC para busca e cache em tempo real</h3>
+					<p>Sincroniza banco, cache e busca via Change Data Capture: Outbox Pattern pra publicar eventos com segurança, projeções desacopladas e observabilidade com Prometheus, Micrometer e OpenTelemetry.</p>
+					<div class="links"><a href="https://github.com/Henrique-CBueno/micro-tickets-cdc">ver no GitHub <i data-lucide="github"></i></a></div>
+				</div>
+			</article>
+		</div>
+
+		<div class="subtitulo"><h3>// fixados no GitHub</h3></div>
+		<div class="projetos">
+			<a class="projeto" href="https://github.com/Henrique-CBueno/sharding-orchestrator">
+				<div><h3>sharding-orchestrator</h3><div class="linguas"><span>Java</span><span>PL/pgSQL</span></div></div>
+				<p>Sharding sobre PostgreSQL com consistent hashing e virtual nodes; entrada e saída de shards e rebalanceamento acionados via CDC (Debezium + Kafka), sem coordenador central.</p>
+				<span class="seta"><i data-lucide="arrow-up-right"></i></span>
+			</a>
+			<a class="projeto" href="https://github.com/Henrique-CBueno/persistencia-poliglota">
+				<div><h3>persistencia-poliglota</h3><div class="linguas"><span>Java</span><span>JavaScript</span></div></div>
+				<p>Ingestão e análise de feedbacks de clientes com classificação de tópicos e sentimento e atualização em tempo real por SSE.</p>
+				<span class="seta"><i data-lucide="arrow-up-right"></i></span>
+			</a>
+			<a class="projeto" href="https://github.com/Henrique-CBueno/ms-kafka">
+				<div><h3>ms-kafka</h3><div class="linguas"><span>Java</span></div></div>
+				<p>Pedidos em microsserviços com Kafka e Spring Boot, da criação ao faturamento, envio e rastreamento.</p>
+				<span class="seta"><i data-lucide="arrow-up-right"></i></span>
+			</a>
+		</div>
+	</section>
+
+	<section id="stacks">
+		<div class="cab">
+			<h2>Minhas <em>stacks</em></h2>
+			<p>Do código à nuvem, camada por camada.</p>
+		</div>
+		<div class="stacks-grade">
+			<div class="cadeia">
+				<div class="painel camada"><span class="pill amarelo">linguagens</span><div class="itens"><span>Java</span><span>Python</span><span>TypeScript</span></div></div>
+				<div class="painel camada"><span class="pill amarelo">backend</span><div class="itens"><span>Spring Boot</span><span>Spring Data JPA</span><span>Spring Security</span><span>WebFlux</span><span>REST</span><span>GraphQL</span></div></div>
+				<div class="painel camada"><span class="pill vermelho">mensageria</span><div class="itens"><span>Kafka</span><span>RabbitMQ</span></div></div>
+				<div class="painel camada"><span class="pill azul">bancos</span><div class="itens"><span>PostgreSQL</span><span>MongoDB</span><span>Redis</span><span>Elasticsearch</span><span>DynamoDB</span><span>Neo4j</span></div></div>
+				<div class="painel camada"><span class="pill verde">nuvem e devops</span><div class="itens"><span>AWS</span><span>Docker</span><span>Terraform</span><span>CI/CD</span></div></div>
+				<div class="painel camada"><span class="pill roxo">observabilidade</span><div class="itens"><span>Prometheus</span><span>Grafana</span><span>OpenTelemetry</span><span>Micrometer</span></div></div>
+				<div class="painel camada"><span class="pill neutro">segurança</span><div class="itens"><span>Keycloak</span><span>OAuth2</span><span>JWT</span><span>2FA</span></div></div>
+				<div class="painel camada"><span class="pill neutro">testes</span><div class="itens"><span>JUnit 5</span><span>Mockito</span><span>Testcontainers</span><span>TDD</span></div></div>
+			</div>
+			<div class="lado-stacks">
+				<div class="painel arquitetura">
+					<h3>Arquitetura</h3>
+					<p>O que mais aparece nos meus vídeos e nos sistemas em que trabalhei.</p>
+					<div class="padroes"><span class="pill amarelo">System Design</span><span class="pill amarelo">Sharding</span><span class="pill amarelo">Replicação</span><span class="pill amarelo">Event-Driven</span><span class="pill amarelo">CQRS</span><span class="pill amarelo">Event Sourcing</span><span class="pill amarelo">Saga</span><span class="pill amarelo">Outbox</span><span class="pill amarelo">DDD</span><span class="pill amarelo">Hexagonal</span></div>
+				</div>
+				<div class="painel ia">
+					<h3>IA no dia a dia</h3>
+					<p>Desenvolvimento assistido por IA pra acelerar entrega e revisar código.</p>
+					<div class="padroes"><span class="pill roxo">Claude Code</span><span class="pill roxo">LLM Agents</span><span class="pill roxo">LangChain</span><span class="pill roxo">Agno</span></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="premiacoes">
+		<div class="premios">
+			<div>
+				<p class="rotulo">// premiações</p>
+				<p class="legenda">Primeiro lugar em <em>2 hackathons</em></p>
+				<p class="apoio">Prazo curto e problema de verdade: o mesmo tipo de pressão dos sistemas que eu explico nos vídeos.</p>
+			</div>
+			<div class="premios-lista">
+				<article class="painel premio principal">
+					<span class="carimbo-premio"><i data-lucide="trophy"></i>1º lugar</span>
+					<div class="foto-premio"><img src="assets/premio-3coracoes.jpg" alt="Henrique e o time no palco segurando os shapes de skate do prêmio, com o telão anunciando o Grupo 4 em primeiro lugar" loading="lazy"></div>
+					<div class="corpo-premio">
+						<p class="quando"><i data-lucide="calendar"></i>out 2026 · Cafeína Week</p>
+						<h3>Hackathon AWS × Três Corações × FIAP</h3>
+						<p><b>Cora GPS</b>: em vez do PDF de indicadores que o vendedor da 3corações recebe todo dia, um roteiro que diz o que levar pra cada cliente da rota, quanto e a chance de aceite.</p>
+						<p class="contexto">desafio CORA Vendas · nota <b>4,62</b> de 5</p>
+						<div class="orgs"><span class="pill verde">AWS</span><span class="pill vermelho">Três Corações</span><span class="pill roxo">FIAP</span></div>
+					</div>
+				</article>
+				<article class="painel premio compacto">
+					<span class="ic"><i data-lucide="trophy"></i></span>
+					<div class="texto-premio">
+						<p class="quando"><i data-lucide="map-pin"></i>Distrito Federal</p>
+						<h3>Hackathon CREA JR-DF</h3>
+						<p>Projeto pra conectar estudantes das áreas do CREA ao mercado de trabalho.</p>
+					</div>
+					<div class="lado-premio"><span class="pill amarelo">1º lugar</span><span class="pill azul">CREA JR-DF</span></div>
+				</article>
+			</div>
+		</div>
+	</section>
+
+	<section id="contato" class="contato">
+		<div class="contato-grade">
+			<div class="contato-texto">
+				<h2>Contato</h2>
+				<p>Parcerias, convites, projetos ou só pra conversar sobre backend. Respondo pelo e-mail que você deixar.</p>
+				<p class="ou">prefere direto?</p>
+				<button class="email" id="email" data-email="contato@henriquebueno.com">
+					<span class="sublinha">contato@henriquebueno.com</span>
+					<span class="pill neutro" id="copiado"><i data-lucide="copy"></i>copiar</span>
+				</button>
+				<div class="redes">
+					<a class="pill roxo" href="https://www.instagram.com/bueno_dev/"><i data-lucide="instagram"></i>instagram</a>
+					<a class="pill azul" href="https://www.tiktok.com/@bueno_dev0"><i data-lucide="music-2"></i>tiktok</a>
+					<a class="pill vermelho" href="https://www.youtube.com/@bueno_dev"><i data-lucide="youtube"></i>youtube</a>
+					<a class="pill verde" href="https://github.com/Henrique-CBueno"><i data-lucide="github"></i>github</a>
+					<a class="pill amarelo" href="https://www.linkedin.com/in/henrique-cbueno"><i data-lucide="linkedin"></i>linkedin</a>
+				</div>
+			</div>
+			<form class="painel formulario" id="formulario" novalidate>
+				<div class="linha">
+					<div class="campo"><label for="nome">nome</label><input id="nome" name="nome" autocomplete="name" required placeholder="Como posso te chamar?"></div>
+					<div class="campo"><label for="de">e-mail</label><input id="de" name="email" type="email" autocomplete="email" required placeholder="voce@empresa.com"></div>
+				</div>
+				<div class="campo"><label for="assunto">assunto</label><input id="assunto" name="assunto" placeholder="Parceria, vaga, projeto, dúvida…"></div>
+				<div class="campo"><label for="mensagem">mensagem</label><textarea id="mensagem" name="mensagem" required placeholder="Conta um pouco do que você precisa."></textarea></div>
+				<div class="armadilha" aria-hidden="true"><label for="site">site</label><input id="site" name="site" tabindex="-1" autocomplete="off"></div>
+				<div class="enviar">
+					<small id="estado">vai direto pro meu e-mail</small>
+					<button class="botao primario" type="submit" id="botao-enviar">enviar mensagem <i data-lucide="send"></i></button>
+				</div>
+			</form>
+		</div>
+	</section>
+</main>
+
+<footer>
+	<span>Henrique Bueno · bueno_dev</span>
+	<span>mock · números e datas dos vídeos ilustrativos</span>
+</footer>
+
+<script>
+lucide.createIcons();
+const email = document.getElementById('email'), copiado = document.getElementById('copiado');
+email.onclick = async () => {
+	try { await navigator.clipboard.writeText(email.dataset.email); } catch (e) {}
+	copiado.className = 'pill verde';
+	copiado.innerHTML = '<i data-lucide="check"></i>copiado';
+	lucide.createIcons();
+	setTimeout(() => { copiado.className = 'pill neutro'; copiado.innerHTML = '<i data-lucide="copy"></i>copiar'; lucide.createIcons(); }, 2200);
+};
+const form = document.getElementById('formulario'), estado = document.getElementById('estado'), botao = document.getElementById('botao-enviar');
+form.onsubmit = (e) => {
+	e.preventDefault();
+	if (!form.checkValidity()) { form.reportValidity(); return; }
+	botao.disabled = true;
+	estado.innerHTML = '<span class="pill amarelo">enviando…</span>';
+	// no site real: POST /contato na API, que manda o e-mail
+	setTimeout(() => {
+		estado.innerHTML = '<span class="pill verde"><i data-lucide="check"></i>mensagem enviada</span>';
+		lucide.createIcons();
+		form.reset();
+		botao.disabled = false;
+	}, 900);
+};
+</script>
+</body>
+</html>
