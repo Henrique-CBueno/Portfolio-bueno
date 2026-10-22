@@ -18,6 +18,16 @@ function contar(el: HTMLElement, atraso: number) {
 	animate(0, alvo, { duration: 1.2, delay: atraso, ease: 'easeOut', onUpdate: (v) => (el.textContent = String(Math.round(v))) });
 }
 
+/** Marca do topo: os sinais < e /> saem do centro e abrem espaço pro nome. */
+function marca() {
+	const nome = document.querySelector<HTMLElement>('[data-marca-nome]');
+	if (!nome) return;
+	const meio = nome.offsetWidth / 2 + 4;
+	animate(nome, { clipPath: ['inset(0 50% 0 50%)', 'inset(0 0% 0 0%)'] }, { duration: 0.8, ease: sobe, delay: 0.1 });
+	animate('[data-marca-esq]', { x: [meio, 0] }, { duration: 0.8, ease: sobe, delay: 0.1 });
+	animate('[data-marca-dir]', { x: [-meio, 0] }, { duration: 0.8, ease: sobe, delay: 0.1 });
+}
+
 /** Abertura: a foto entra, os cards "colam" por cima e o nome sobe como legenda. */
 function abertura() {
 	animate('[data-foto]', { opacity: [0, 1], scale: [1.06, 1] }, { duration: 0.9, ease: sobe });
@@ -129,6 +139,7 @@ function carimbos() {
 }
 
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+	marca();
 	abertura();
 	revelacoes();
 	cadeias();

@@ -257,7 +257,7 @@ Diagram nodes reuse the same shapes: rounded panels joined by 2px wire connector
 - **Feedback:** the submit row shows state as a pill (yellow "enviando…", green "mensagem enviada").
 
 ### Navigation
-- **Style:** top bar with the brand (green live dot + "bueno_dev" in mono 700) on the left and section links in mono 500 13px muted on the right. Hover: text brightens and a panel background appears. Hidden under 960px.
+- **Style:** sticky top bar. On the left, the brand as a tag: `< HENRIQUE BUENO />`, the name in Inter 800 uppercase (19px, 17px on phones) between JetBrains Mono 700 brackets in signal yellow (carried over from the old site, henriquebueno.com, into this identity). On load the brackets open from the center and reveal the name; on hover they move 5px apart. On the right, section links in mono 500 13px muted, with a panel-colored marker that slides to the current section. Links hidden under 960px.
 
 ### Opening photo with stuck-on panels (signature)
 The GitHub photo at 1:1 with 18px corners, overlaid by small tilted panels (icon tile + mono title + mono subtitle) at the corners and a yellow handle stamp straddling the bottom edge. This is how the videos put diagram cards over Henrique's face.

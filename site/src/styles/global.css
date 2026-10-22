@@ -108,6 +108,7 @@ h2 em, .legenda em { font-style: normal; color: var(--amarelo); }
 @media (prefers-reduced-motion: no-preference) {
 	.js [data-revela], .js [data-grupo] > *, .js [data-entra], .js [data-foto], .js [data-colado], .js [data-carimbo], .js [data-elo], .js [data-no], .js [data-fio-h] { opacity: 0; }
 	.js .palavra > span { transform: translateY(105%); }
+	.js [data-marca-nome] { clip-path: inset(0 50% 0 50%); }
 }
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-behavior: auto; }
