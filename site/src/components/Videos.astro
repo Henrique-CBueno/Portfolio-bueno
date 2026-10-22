@@ -7,27 +7,27 @@ import Indicador from './Indicador.astro';
 import { redes } from '../dados/perfil';
 import { categoria } from '../lib/categorias';
 import { tempoRelativo } from '../lib/formato';
+import { assinatura } from '../lib/videos';
 import type { Video } from '../lib/tipos';
 
 interface Props { videos: Video[] }
 const videos = Astro.props.videos.slice(0, 8);
+const api = import.meta.env.PUBLIC_API_URL ?? '';
 ---
 <section class="secao" id="videos">
 	<div class="cab">
 		<Titulo antes="Últimos" destaque="vídeos" />
 		<a href={redes.instagram.url} target="_blank" rel="noopener noreferrer" data-revela>ver todos no Instagram <ArrowUpRight /></a>
 	</div>
-	{videos.length === 0 && (
-		<div class="painel vazio" data-revela>
-			<p>Os vídeos novos aparecem aqui. Enquanto isso, assista nas redes:</p>
-			<div class="redes-vazio">
-				<a class="pill roxo" href={redes.instagram.url} target="_blank" rel="noopener noreferrer">instagram</a>
-				<a class="pill azul" href={redes.tiktok.url} target="_blank" rel="noopener noreferrer">tiktok</a>
-				<a class="pill vermelho" href={redes.youtube.url} target="_blank" rel="noopener noreferrer">youtube</a>
-			</div>
+	<div class="painel vazio" id="videos-vazio" data-revela hidden={videos.length > 0}>
+		<p>Os vídeos novos aparecem aqui. Enquanto isso, assista nas redes:</p>
+		<div class="redes-vazio">
+			<a class="pill roxo" href={redes.instagram.url} target="_blank" rel="noopener noreferrer">instagram</a>
+			<a class="pill azul" href={redes.tiktok.url} target="_blank" rel="noopener noreferrer">tiktok</a>
+			<a class="pill vermelho" href={redes.youtube.url} target="_blank" rel="noopener noreferrer">youtube</a>
 		</div>
-	)}
-	<div class="videos carrossel" id="lista-videos" data-carrossel data-grupo>
+	</div>
+	<div class="videos carrossel" id="lista-videos" data-carrossel data-grupo data-api={api} data-assinatura={assinatura(videos)}>
 		{videos.map((v) => {
 			const cat = categoria(v.categoria);
 			return (
@@ -46,11 +46,80 @@ const videos = Astro.props.videos.slice(0, 8);
 			);
 		})}
 	</div>
-	{videos.length > 0 && <Indicador de="lista-videos" total={videos.length} />}
+	<div id="videos-indicador" hidden={videos.length === 0}><Indicador de="lista-videos" total={videos.length} /></div>
+	<template id="modelo-video">
+		<a class="video" href="" target="_blank" rel="noopener noreferrer" data-cursor="assistir">
+			<div class="capa"><img src="" alt="" width="540" height="960" loading="lazy" decoding="async" /></div>
+			<h3></h3>
+			<div class="info"><time data-relativo></time></div>
+		</a>
+	</template>
 </section>
+
+<script>
+	import { categoria } from '../lib/categorias';
+	import { tempoRelativo } from '../lib/formato';
+	import { assinatura } from '../lib/videos';
+	import type { Video } from '../lib/tipos';
+
+	// O HTML traz os vídeos do último build; aqui a lista é conferida com a API e redesenhada se mudou,
+	// pra um vídeo novo no /admin aparecer sem esperar um novo build do site.
+	const lista = document.getElementById('lista-videos');
+	const modelo = document.getElementById('modelo-video') as HTMLTemplateElement | null;
+	const api = lista?.dataset.api;
+	if (lista && modelo && api) {
+		fetch(new URL('/snapshot', api))
+			.then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+			.then((snapshot: { videos: Video[] }) => {
+				const videos = snapshot.videos.slice(0, 8).map((v) => ({ ...v, capa: new URL(v.capa as string, api).href }));
+				if (assinatura(videos) === lista.dataset.assinatura) return;
+				desenhar(videos);
+				lista.dataset.assinatura = assinatura(videos);
+			})
+			.catch(() => {
+				// API fora do ar: fica a lista do build
+			});
+	}
+
+	function desenhar(videos: Video[]) {
+		const cards = videos.map((v) => {
+			const card = (modelo!.content.firstElementChild as HTMLElement).cloneNode(true) as HTMLAnchorElement;
+			if (/^https?:\/\//.test(v.link)) card.href = v.link;
+			card.style.opacity = '1';
+			const img = card.querySelector('img')!;
+			img.src = v.capa as string;
+			card.querySelector('h3')!.textContent = v.titulo;
+			const info = card.querySelector('.info')!;
+			const cat = categoria(v.categoria);
+			if (cat) {
+				const pill = document.createElement('span');
+				pill.className = `pill ${cat.cor}`;
+				pill.textContent = cat.nome;
+				info.prepend(pill);
+			}
+			const tempo = info.querySelector('time')!;
+			tempo.dateTime = v.publicadoEm;
+			tempo.textContent = tempoRelativo(new Date(v.publicadoEm));
+			return card;
+		});
+		lista!.replaceChildren(...cards);
+		const vazio = document.getElementById('videos-vazio')!;
+		vazio.hidden = videos.length > 0;
+		vazio.style.opacity = '1';
+		document.getElementById('videos-indicador')!.hidden = videos.length === 0;
+		const indicador = document.querySelector('[data-indicador="lista-videos"]')!;
+		indicador.querySelectorAll('i').forEach((i) => i.remove());
+		const contador = indicador.querySelector('span')!;
+		contador.before(...videos.map((_, i) => Object.assign(document.createElement('i'), { className: i === 0 ? 'ativo' : '' })));
+		contador.textContent = `1 / ${videos.length}`;
+		lista!.scrollLeft = 0;
+	}
+</script>
 
 <style>
 	.vazio { padding: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+	.vazio[hidden] { display: none; }
+	.vazio[hidden] { display: none; }
 	.vazio p { color: var(--texto-suave); }
 	.redes-vazio { display: flex; gap: 8px; flex-wrap: wrap; }
 	.videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }

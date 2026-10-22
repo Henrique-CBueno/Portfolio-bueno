@@ -106,10 +106,11 @@ if (form) {
 document.querySelectorAll<HTMLElement>('[data-carrossel]').forEach((lista) => {
 	const indicador = document.querySelector<HTMLElement>(`[data-indicador="${lista.id}"]`);
 	if (!indicador) return;
-	const barras = Array.from(indicador.querySelectorAll('i'));
 	const contador = indicador.querySelector('span')!;
 	let atual = 0;
 	const atualizar = () => {
+		// a lista de vídeos pode ser redesenhada depois do carregamento (ver Videos.astro)
+		const barras = Array.from(indicador.querySelectorAll('i'));
 		const itens = Array.from(lista.children) as HTMLElement[];
 		const inicio = lista.getBoundingClientRect().left + parseFloat(getComputedStyle(lista).paddingLeft);
 		let melhor = 0, distancia = Infinity;
