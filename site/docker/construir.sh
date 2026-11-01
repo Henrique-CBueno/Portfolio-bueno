@@ -9,9 +9,9 @@ PEDIDO=/dados/rebuild-pedido
 construir() {
 	destino="build-$(date +%Y%m%d-%H%M%S)"
 	echo "[construtor] construindo $destino"
-	# o build acontece dentro do contêiner (o Astro move arquivos e não atravessa pra outro disco);
-	# depois a pasta pronta é copiada pro volume que o Nginx serve
-	if rm -rf /app/dist && npx astro build && cp -r /app/dist "$SAIDA/$destino"; then
+	# o build acontece dentro do contêiner e a pasta pronta é copiada pro volume que o Nginx serve,
+	# então o site no ar só troca quando o build inteiro deu certo
+	if rm -rf /app/dist /app/dist-ssr && npm run build && cp -r /app/dist "$SAIDA/$destino"; then
 		ln -sfn "$destino" "$SAIDA/atual"
 		for antigo in "$SAIDA"/build-*; do
 			[ "$antigo" = "$SAIDA/$destino" ] || rm -rf "$antigo"
