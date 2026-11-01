@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 # saída intermediária do build (prerender)
 dist-ssr/
+
+# testes de ponta a ponta (Playwright)
+test-results/
+playwright-report/

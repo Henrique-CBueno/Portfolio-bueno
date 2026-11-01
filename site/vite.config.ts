@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig, type EnvironmentModuleNode, type Plugin, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react';
 import { imagetools } from 'vite-imagetools';
@@ -79,4 +80,10 @@ export default defineConfig(({ isSsrBuild, isPreview }) => ({
 	server: { port: 4321, strictPort: true },
 	preview: { port: 4321, strictPort: true },
 	build: isSsrBuild ? {} : { rolldownOptions: { input: { index: 'index.html', admin: 'admin/index.html' } } },
+	// npm test: componentes e regras no jsdom (os testes no navegador de verdade ficam em e2e/, com o Playwright)
+	test: {
+		environment: 'jsdom',
+		include: ['src/**/*.test.{ts,tsx}'],
+		setupFiles: ['src/test/setup.ts'],
+	},
 }));
