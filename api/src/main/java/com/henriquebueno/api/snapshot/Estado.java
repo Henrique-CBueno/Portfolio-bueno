@@ -20,7 +20,7 @@ import jakarta.inject.Inject;
 
 /**
  * O último snapshot conhecido. Sobrevive a reinícios (dados/snapshot.json) e dispara um evento
- * quando as contagens ou a lista de vídeos mudam.
+ * quando as contagens, a lista de vídeos ou os repositórios fixados mudam.
  */
 @ApplicationScoped
 public class Estado {
@@ -68,8 +68,13 @@ public class Estado {
 		if (!antes.videos().equals(depois.videos())) publicar.accept(new Eventos.VideosMudaram(antes.videos(), depois.videos()));
 	}
 
-	public synchronized void atualizarRepositorios(List<Repositorio> novos) {
-		trocar(s -> s.comRepositorios(novos, relogio.instant()));
+	public void atualizarRepositorios(List<Repositorio> novos) {
+		Snapshot antes, depois;
+		synchronized (this) {
+			antes = atual;
+			depois = trocar(s -> s.comRepositorios(novos, relogio.instant()));
+		}
+		if (!antes.repositorios().equals(depois.repositorios())) publicar.accept(new Eventos.RepositoriosMudaram(depois.repositorios()));
 	}
 
 	private Snapshot trocar(UnaryOperator<Snapshot> mudanca) {

@@ -9,11 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jboss.logging.Logger;
 
 import com.henriquebueno.api.PortfolioConfig;
+import com.henriquebueno.api.snapshot.Eventos;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
 
 /**
- * Roda o comando que reconstrói o site (REBUILD_COMANDO) quando o painel muda alguma coisa.
+ * Roda o comando que reconstrói o site (REBUILD_COMANDO) quando os vídeos, os repositórios fixados ou o painel mudam alguma coisa.
  * Pedidos que chegam durante um rebuild viram um único rebuild logo depois.
  */
 @ApplicationScoped
@@ -30,6 +32,16 @@ public class Rebuild {
 	Rebuild(PortfolioConfig config) {
 		this.comando = config.rebuild().comando().filter(c -> !c.isBlank()).orElse(null);
 		this.registro = config.dados().resolve("rebuild.log");
+	}
+
+	/** Reel novo, apagado ou editado no Instagram: o site precisa de um build novo. */
+	void videosMudaram(@Observes Eventos.VideosMudaram e) {
+		pedir();
+	}
+
+	/** Repositório fixado, desafixado ou com descrição nova no GitHub: o HTML do build também precisa mudar. */
+	void repositoriosMudaram(@Observes Eventos.RepositoriosMudaram e) {
+		pedir();
 	}
 
 	public void pedir() {

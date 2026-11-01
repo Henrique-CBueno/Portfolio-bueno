@@ -21,6 +21,8 @@ public interface PortfolioConfig {
 
 	GitHub github();
 
+	Instagram instagram();
+
 	Contato contato();
 
 	Rebuild rebuild();
@@ -51,6 +53,26 @@ public interface PortfolioConfig {
 		String usuario();
 
 		String base();
+
+		Duration intervalo();
+	}
+
+	interface Instagram {
+		/** Token da Meta (META_API_KEY): do Facebook (via Página) ou do login do Instagram; o tipo é descoberto na primeira leitura. */
+		Optional<String> token();
+
+		/** Id da conta do Instagram (com token do Facebook). Vazio: descoberto pela Página ligada (precisa de pages_show_list). */
+		Optional<String> conta();
+
+		/** Versão da Graph API nas leituras. */
+		String versao();
+
+		String baseInstagram();
+
+		String baseFacebook();
+
+		/** Quantas publicações recentes ler por rodada (só os vídeos viram card). */
+		int quantas();
 
 		Duration intervalo();
 	}

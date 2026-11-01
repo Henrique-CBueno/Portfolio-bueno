@@ -43,6 +43,18 @@ class EstadoTest {
 	}
 
 	@Test
+	void avisaSoQuandoOsRepositoriosMudam() {
+		var estado = novoEstado();
+		var repo = new Repositorio("repo", "Descrição.", List.of("Java"), "https://github.com/u/repo");
+		estado.atualizarRepositorios(List.of(repo));
+		estado.atualizarRepositorios(List.of(repo));
+		var semDescricao = new Repositorio("repo", null, List.of("Java"), "https://github.com/u/repo");
+		estado.atualizarRepositorios(List.of(semDescricao));
+
+		assertThat(eventos).containsExactly(new Eventos.RepositoriosMudaram(List.of(repo)), new Eventos.RepositoriosMudaram(List.of(semDescricao)));
+	}
+
+	@Test
 	void videosFicamDoMaisNovoProMaisAntigo() {
 		var estado = novoEstado();
 		var velho = new Video("velho", "A", "https://x", new Video.Links("https://x", null, null), "/capas/a", Instant.parse("2026-01-01T00:00:00Z"), null);

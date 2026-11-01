@@ -50,6 +50,8 @@ services:
       YOUTUBE_CANAL: ${YOUTUBE_CANAL:-@bueno_dev}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
       GITHUB_USUARIO: ${GITHUB_USUARIO:-Henrique-CBueno}
+      META_API_KEY: ${META_API_KEY:-}
+      INSTAGRAM_CONTA: ${INSTAGRAM_CONTA:-17841421020065645}
       MAIL_MOCK: ${MAIL_MOCK:-true}
       MAIL_HOST: ${MAIL_HOST:-smtp.hostinger.com}
       MAIL_PORTA: ${MAIL_PORTA:-465}

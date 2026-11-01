@@ -3,7 +3,7 @@ package com.henriquebueno.api.snapshot;
 import java.time.Instant;
 
 /**
- * Um vídeo da vitrine, cadastrado no painel. {@code link} é pra onde o card leva (Instagram, senão
+ * Um vídeo da vitrine, lido do Instagram (um Reel). {@code link} é pra onde o card leva (Instagram, senão
  * TikTok, senão YouTube); {@code capa} é um caminho desta API ({@code /capas/<id>}).
  */
 public record Video(String id, String titulo, String link, Links links, String capa, Instant publicadoEm, String categoria) {
