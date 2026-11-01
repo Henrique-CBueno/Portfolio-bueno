@@ -14,6 +14,18 @@ colors:
   text: "#E9EDF3"
   text-soft: "#C3CAD6"
   muted: "#8A95A8"
+  light-ground: "#F4F1EA"
+  light-panel: "#FBF9F4"
+  light-panel-raised: "#ECE7DC"
+  light-wire: "#D6CFC0"
+  light-text: "#1A1A1A"
+  light-text-soft: "#3D3A35"
+  light-muted: "#66625A"
+  light-amber: "#7D4F00"
+  light-ok-green: "#17703D"
+  light-failure-red: "#A8262C"
+  light-diagram-blue: "#2459B8"
+  light-diagram-purple: "#6B3FC0"
 typography:
   display:
     fontFamily: "Inter, system-ui, sans-serif"
@@ -146,7 +158,7 @@ The world was chosen on 2026-10-22 from three mocked directions (a thermal-recei
 
 ## Colors
 
-A dark diagram palette lifted straight from the videos' theme file: one warm signal color over cool night blues, with green and red reserved for meaning.
+A dark diagram palette lifted straight from the videos' theme file: one warm signal color over cool night blues, with green and red reserved for meaning. Dark is the site; a light theme exists only as a visitor's choice (see **Light Theme** below).
 
 ### Primary
 - **Signal Yellow** (`signal-yellow`): the emphasis color. The keyword in each heading (`Últimos **vídeos**`, `Projetos em **destaque**`), the role line under the name, the primary button, the handle stamp and award stamps, link underlines, focus rings and text selection.
@@ -171,6 +183,14 @@ A dark diagram palette lifted straight from the videos' theme file: one warm sig
 **The One Yellow Word Rule.** A heading gets at most one yellow phrase, and it is the noun the section is about. Yellow on a second element in the same block means one of them is wrong.
 
 **The Meaning Rule.** Green only ever means ok and red only ever means failure or problem, as in the videos. Never use them as decoration or as "brand colors".
+
+### Light Theme
+A visitor option (decided 2026-11-01), never the default: every first visit opens dark, and the choice is remembered (`localStorage`, applied in `<head>` before painting so dark never flashes). Toggled by the sun/moon button in the top bar. It is the videos' paper and ink, not a generic white theme:
+- **Paper Ground** `#F4F1EA`, **Paper Panel** `#FBF9F4`, **Paper Raised** `#ECE7DC`, **Paper Wire** `#D6CFC0`; **Ink** `#1A1A1A`, **Ink Soft** `#3D3A35`, **Ink Muted** `#66625A`. The background grid becomes ink at 6%.
+- **Signal Yellow stays a fill only** (primary button, stamps, underlines, the cursor packet): on paper it reads at 1.4:1, so yellow *words*, yellow pills and the focus ring switch to **Signal Amber** `#7D4F00`. Text on yellow is always night ink (`#0B0F17`), in both themes.
+- Green, red, blue and purple take darker twins (`#17703D`, `#A8262C`, `#2459B8`, `#6B3FC0`) so pills keep ≥ 4.5:1 even on their 12% tint.
+- Shadows turn warm and light (`rgba(70,52,20,.14)`) instead of black.
+- Every color comes from a token in `site/src/styles/global.css` (`:root` and `:root[data-tema="claro"]`); no hard-coded colors in component CSS, or the light theme breaks.
 
 **The Pill-Only Rainbow Rule.** Blue and purple (and green/red when used as categories) appear only as a pill's text/border or a diagram node's outline, tinted 12% into the ground. Never as section backgrounds, gradients or large fills.
 
@@ -289,7 +309,8 @@ Large mono e-mail with a 3px yellow underline next to a neutral "copiar" pill th
 - **Do** keep looping motion to diagrams and the opening photo, and pause it when it leaves the screen.
 
 ### Don't:
-- **Don't** use a light theme or the videos' paper color (`#F4F1EA`) as a page background; the site is the dark cover world.
+- **Don't** make the light theme the default or follow the system setting on a first visit; the site is the dark cover world, and paper is only the visitor's choice.
+- **Don't** use signal yellow for text on paper; use Signal Amber.
 - **Don't** add gradients, glows or colored section backgrounds; color lives in pills, stamps, borders and one word per heading.
 - **Don't** rotate or shadow anything that is not stuck on top of something else.
 - **Don't** animate tilt with `transform`; tilt lives in the CSS `rotate` property so entrance animations (which use `transform`) keep it.
