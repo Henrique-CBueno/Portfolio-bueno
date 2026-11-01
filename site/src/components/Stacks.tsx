@@ -2,6 +2,7 @@ import { Pill } from './Pill';
 import { Titulo } from './Titulo';
 import { camadas, arquitetura, ia } from '../dados/stacks';
 import './Stacks.css';
+import { Card } from './Card';
 
 export function Stacks() {
 	return (
@@ -13,24 +14,24 @@ export function Stacks() {
 			<div className="grade">
 				<ol className="cadeia" data-cadeia="">
 					{camadas.map((c) => (
-						<li key={c.nome} className="painel camada" data-elo="">
+						<Card key={c.nome} as="li" className="camada" data-elo="">
 							<span className="fio" aria-hidden="true" data-fio=""></span>
 							<Pill cor={c.cor}>{c.nome}</Pill>
 							<div className="itens">{c.itens.map((i) => <span key={i} className="chip">{i}</span>)}</div>
-						</li>
+						</Card>
 					))}
 				</ol>
 				<div className="lado acompanha">
-					<div className="painel bloco arquitetura" data-revela="">
+					<Card className="bloco arquitetura" data-revela="">
 						<h3>Arquitetura</h3>
 						<p>O que mais aparece nos meus vídeos e nos sistemas em que trabalhei.</p>
 						<div className="padroes" data-grupo="">{arquitetura.map((a) => <Pill key={a} cor="amarelo">{a}</Pill>)}</div>
-					</div>
-					<div className="painel bloco" data-revela="">
+					</Card>
+					<Card className="bloco" data-revela="">
 						<h3>IA no dia a dia</h3>
 						<p>Desenvolvimento assistido por IA pra acelerar entrega e revisar código.</p>
 						<div className="padroes" data-grupo="">{ia.map((a) => <Pill key={a} cor="roxo">{a}</Pill>)}</div>
-					</div>
+					</Card>
 				</div>
 			</div>
 		</section>

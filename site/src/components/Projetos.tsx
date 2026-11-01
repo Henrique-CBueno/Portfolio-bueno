@@ -14,6 +14,8 @@ import type { Carga } from '../hooks/useSnapshot';
 import { enderecosEmDestaque, resolverDestaques, type ItemDestaque } from '../lib/destaques';
 import type { Destaque, Repositorio, Snapshot } from '../lib/tipos';
 import './Projetos.css';
+import { Botao } from './Botao';
+import { Card } from './Card';
 
 /** Cor no formato #rrggbb (o que vem da API vira estilo, então só isso passa). */
 const corValida = (cor?: string | null) => !!cor && /^#[0-9a-f]{6}$/i.test(cor);
@@ -50,10 +52,10 @@ export function Projetos({ carga, tentarDeNovo }: Props) {
 				<div className="destaques carrossel" aria-busy="true">
 					<span className="so-leitor" role="status">carregando os projetos em destaque</span>
 					{Array.from({ length: 2 }, (_, i) => (
-						<div key={i} className="painel destaque esqueleto-destaque" aria-hidden="true">
+						<Card key={i} className="destaque esqueleto-destaque" aria-hidden="true">
 							<div className="janela"><div className="barra"><i></i><i></i><i></i></div><div className="print esqueleto"></div></div>
 							<div className="corpo"><span className="esqueleto tags-e"></span><span className="esqueleto titulo-e"></span><span className="esqueleto texto-e"></span><span className="esqueleto texto-e curto"></span></div>
-						</div>
+						</Card>
 					))}
 				</div>
 			)}
@@ -82,7 +84,7 @@ export function Projetos({ carga, tentarDeNovo }: Props) {
 /** Projeto curado: print (ou diagrama), tags, texto; o card abre a página dele. */
 function CardProjeto({ projeto: d, ordem }: { projeto: Destaque; ordem: number }) {
 	return (
-		<article className={d.largo ? 'painel destaque largo chega' : 'painel destaque chega'} style={{ animationDelay: `${ordem * 70}ms` }}>
+		<Card as="article" className={d.largo ? 'destaque largo chega' : 'destaque chega'} style={{ animationDelay: `${ordem * 70}ms` }}>
 			{/* o card abre a página do projeto; o site dele fica nos links de baixo */}
 			<Link className="janela" to={caminhoDoProjeto(d.slug)} data-cursor="ver" aria-label={`Ver o projeto ${d.titulo}`}>
 				<div className="barra"><i></i><i></i><i></i><span>{d.endereco}</span></div>
@@ -101,7 +103,7 @@ function CardProjeto({ projeto: d, ordem }: { projeto: Destaque; ordem: number }
 					{d.nota && <small>{d.nota}</small>}
 				</div>
 			</div>
-		</article>
+		</Card>
 	);
 }
 
@@ -109,7 +111,7 @@ function CardProjeto({ projeto: d, ordem }: { projeto: Destaque; ordem: number }
 function CardRepositorio({ repositorio: r, ordem }: { repositorio: Repositorio; ordem: number }) {
 	const caminho = r.url.replace(/^https?:\/\//, '');
 	return (
-		<article className="painel destaque chega" style={{ animationDelay: `${ordem * 70}ms` }}>
+		<Card as="article" className="destaque chega" style={{ animationDelay: `${ordem * 70}ms` }}>
 			<a className="janela" href={seguro(r.url)} target="_blank" rel="noopener noreferrer" data-cursor="abrir" aria-label={`Abrir ${r.nome} no GitHub`}>
 				<div className="barra"><i></i><i></i><i></i><span>{caminho}</span></div>
 				<div className="print capa-repo">
@@ -127,7 +129,7 @@ function CardRepositorio({ repositorio: r, ordem }: { repositorio: Repositorio; 
 					{r.atualizadoEm && <small>atualizado {tempoRelativo(new Date(r.atualizadoEm))}</small>}
 				</div>
 			</div>
-		</article>
+		</Card>
 	);
 }
 
@@ -149,13 +151,13 @@ function Fixados({ carga, tentarDeNovo, emDestaque }: Props & { emDestaque: Set<
 	}
 	if (carga.estado === 'erro') {
 		return (
-			<div className="painel falha chega" role="alert">
+			<Card className="falha chega" role="alert">
 				<p><strong>Não deu pra carregar os repositórios agora.</strong>Eles continuam todos no GitHub.</p>
 				<div className="redes-vazio">
-					<button className="botao" type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></button>
+					<Botao type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></Botao>
 					<a className="pill verde" href={redes.github.url} target="_blank" rel="noopener noreferrer">github</a>
 				</div>
-			</div>
+			</Card>
 		);
 	}
 	const outros = (carga.dados.repositorios ?? []).filter((r) => !emDestaque.has(r.url.toLowerCase()));

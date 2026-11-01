@@ -8,6 +8,8 @@ import { movimentoReduzido } from '../lib/movimento-reduzido';
 import { CAMPOS, MAXIMO, MINIMO_MENSAGEM, VAZIO, validar, validarCampo, type Campo, type Erros, type Valores } from '../lib/contato';
 import type { Cor, Rede } from '../lib/tipos';
 import './Contato.css';
+import { Botao } from './Botao';
+import { Card } from './Card';
 
 const cores: Record<Rede, Cor> = { instagram: 'roxo', tiktok: 'azul', youtube: 'vermelho', github: 'verde', linkedin: 'amarelo' };
 
@@ -182,7 +184,7 @@ function Formulario() {
 	});
 
 	return (
-		<form className="painel formulario acompanha" noValidate onSubmit={enviar} aria-busy={enviando} data-revela="">
+		<Card as="form" className="formulario acompanha" noValidate onSubmit={enviar} aria-busy={enviando} data-revela="">
 			<div className="linha">
 				<CampoDoFormulario {...props('nome')} rotulo="nome" extra={{ autoComplete: 'name', placeholder: 'Como posso te chamar?' }} />
 				<CampoDoFormulario {...props('email')} rotulo="e-mail" extra={{ type: 'email', autoComplete: 'email', inputMode: 'email', placeholder: 'voce@empresa.com' }} />
@@ -197,11 +199,11 @@ function Formulario() {
 			<div className="armadilha" aria-hidden="true"><label htmlFor="site">site</label><input id="site" name="site" tabIndex={-1} autoComplete="off" value={armadilha} onChange={(e) => setArmadilha(e.target.value)} /></div>
 			<div className="enviar">
 				<small aria-live="polite">{estado ? <span key={estado.vez} ref={pill} className={`pill ${estado.cor}`}>{estado.texto}</span> : 'vai direto pro meu e-mail'}</small>
-				<button className="botao primario" type="submit" disabled={enviando}>
+				<Botao variante="primario" type="submit" disabled={enviando}>
 					{enviando ? <>enviando… <LoaderCircle className="gira" aria-hidden="true" /></> : <>enviar mensagem <Send /></>}
-				</button>
+				</Botao>
 			</div>
-		</form>
+		</Card>
 	);
 }
 

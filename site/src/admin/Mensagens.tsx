@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { CheckCheck, LoaderCircle, Mail, Reply, Trash2 } from 'lucide-react';
 import { FalhaApi } from '../components/FalhaApi';
 import { chamar } from './api';
+import { Botao } from '../components/Botao';
+import { Card } from '../components/Card';
 
 /** Mensagem do formulário de contato, como a API guarda (GET /admin-api/mensagens). */
 interface Recebida {
@@ -55,13 +57,13 @@ export function Mensagens() {
 				<div className="mensagens">
 					<span className="so-leitor" role="status">carregando as mensagens</span>
 					{Array.from({ length: 2 }, (_, i) => (
-						<div key={i} className="painel mensagem esqueleto-mensagem" aria-hidden="true">
+						<Card key={i} className="mensagem esqueleto-mensagem" aria-hidden="true">
 							<span className="esqueleto"></span><span className="esqueleto"></span><span className="esqueleto"></span>
-						</div>
+						</Card>
 					))}
 				</div>
 			)}
-			{mensagens?.length === 0 && <p className="painel vazio-mensagens">Nenhuma mensagem ainda. Quando alguém escrever pelo site, ela aparece aqui.</p>}
+			{mensagens?.length === 0 && <Card as="p" className="vazio-mensagens">Nenhuma mensagem ainda. Quando alguém escrever pelo site, ela aparece aqui.</Card>}
 			{mensagens && mensagens.length > 0 && (
 				<div className="mensagens">
 					{mensagens.map((m) => <Item key={m.id} mensagem={m} aoTrocar={trocar} aoApagar={tirar} />)}
@@ -112,7 +114,7 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 
 	const assunto = m.assunto ? `Re: ${m.assunto}` : 'Re: sua mensagem pelo site';
 	return (
-		<article className={['painel mensagem', !m.lida && 'nova', m.respondida && 'respondida'].filter(Boolean).join(' ')}>
+		<Card as="article" className={['mensagem', !m.lida && 'nova', m.respondida && 'respondida'].filter(Boolean).join(' ')}>
 			<header>
 				<div>
 					<strong>{m.nome}</strong>
@@ -128,24 +130,24 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 			<p className="texto">{m.mensagem}</p>
 			<div className="acoes-mensagem">
 				{emailSeguro(m.email) && (
-					<a className="botao" href={`mailto:${m.email}?subject=${encodeURIComponent(assunto)}`}><Reply /> responder</a>
+					<Botao href={`mailto:${m.email}?subject=${encodeURIComponent(assunto)}`}><Reply /> responder</Botao>
 				)}
-				<button className={m.respondida ? 'botao' : 'botao marcar-respondida'} type="button" disabled={ocupado !== null} onClick={() => acao('respondida')}>
+				<Botao className={m.respondida ? undefined : 'marcar-respondida'} disabled={ocupado !== null} onClick={() => acao('respondida')}>
 					{ocupado === 'respondida' ? <LoaderCircle className="gira" aria-hidden="true" /> : <CheckCheck />}
 					{m.respondida ? 'desfazer "respondida"' : 'marcar como respondida'}
-				</button>
+				</Botao>
 				{!m.respondida && (
-				<button className="botao" type="button" disabled={ocupado !== null} onClick={() => acao('lida')}>
+				<Botao type="button" disabled={ocupado !== null} onClick={() => acao('lida')}>
 					{ocupado === 'lida' ? <LoaderCircle className="gira" aria-hidden="true" /> : <Mail />}
 					{m.lida ? 'marcar como não lida' : 'marcar como lida'}
-				</button>
+				</Botao>
 				)}
-				<button className={confirmar ? 'botao perigo' : 'botao'} type="button" disabled={ocupado !== null} onClick={() => acao('apagar')}>
+				<Botao variante={confirmar ? 'perigo' : undefined} disabled={ocupado !== null} onClick={() => acao('apagar')}>
 					{ocupado === 'apagar' ? <LoaderCircle className="gira" aria-hidden="true" /> : <Trash2 />}
 					{confirmar ? 'confirmar?' : 'apagar'}
-				</button>
+				</Botao>
 				{erro && <span className="pill vermelho" role="alert">{erro}</span>}
 			</div>
-		</article>
+		</Card>
 	);
 }

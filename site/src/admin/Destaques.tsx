@@ -5,6 +5,8 @@ import { destaques as curados } from '../dados/projetos';
 import { chaveDoProjeto, chaveDoRepositorio, MAXIMO_DESTAQUES, PADRAO } from '../lib/destaques';
 import type { Repositorio } from '../lib/tipos';
 import { chamar } from './api';
+import { Botao } from '../components/Botao';
+import { Card } from '../components/Card';
 
 /** O que GET /admin-api/destaques devolve. */
 interface NoPainel {
@@ -99,12 +101,12 @@ export function Destaques() {
 			{!falhou && !dados && (
 				<div className="destaques-painel" aria-busy="true">
 					<span className="so-leitor" role="status">carregando os projetos</span>
-					{Array.from({ length: 2 }, (_, i) => <div key={i} className="painel esqueleto-mensagem" aria-hidden="true"><span className="esqueleto"></span><span className="esqueleto"></span><span className="esqueleto"></span></div>)}
+					{Array.from({ length: 2 }, (_, i) => <Card key={i} className="esqueleto-mensagem" aria-hidden="true"><span className="esqueleto"></span><span className="esqueleto"></span><span className="esqueleto"></span></Card>)}
 				</div>
 			)}
 			{dados && (
 				<div className="destaques-painel">
-					<div className="painel coluna">
+					<Card className="coluna">
 						<h3>Na home</h3>
 						{selecao.length === 0
 							? <p className="dica">Nenhum projeto selecionado: a home mostra "Nenhum projeto em destaque agora".</p>
@@ -125,14 +127,14 @@ export function Destaques() {
 								</ol>
 							)}
 						<div className="acoes-destaques">
-							<button className="botao primario" type="button" disabled={!mudou || salvando} onClick={() => salvar(selecao.filter((c) => opcoes.has(c)))}>
+							<Botao variante="primario" type="button" disabled={!mudou || salvando} onClick={() => salvar(selecao.filter((c) => opcoes.has(c)))}>
 								{salvando ? <>salvando <LoaderCircle className="gira" aria-hidden="true" /></> : 'salvar'}
-							</button>
-							<button className="botao" type="button" disabled={salvando || salva === null} onClick={() => salvar(null)}>voltar ao padrão</button>
+							</Botao>
+							<Botao type="button" disabled={salvando || salva === null} onClick={() => salvar(null)}>voltar ao padrão</Botao>
 							{aviso && <span className={`pill ${aviso.cor}`} role="status">{aviso.texto}</span>}
 						</div>
-					</div>
-					<div className="painel coluna">
+					</Card>
+					<Card className="coluna">
 						<h3>Disponíveis</h3>
 						<input className="filtro" type="search" placeholder="filtrar por nome" value={filtro} onChange={(e) => setFiltro(e.target.value)} aria-label="filtrar projetos disponíveis" />
 						{dados.repositorios.length === 0 && <p className="dica">Os repositórios do GitHub ainda não foram lidos (a API lê a cada 10 min).</p>}
@@ -143,14 +145,14 @@ export function Destaques() {
 									{disponiveis.map((o) => (
 										<li key={o.chave}>
 											<span className="nome"><strong>{o.titulo}</strong><small>{o.detalhe}</small></span>
-											<button type="button" className="botao" disabled={cheio} title={cheio ? `no máximo ${MAXIMO_DESTAQUES}` : undefined} onClick={() => { setSelecao((s) => [...s, o.chave]); setAviso(undefined); }}>
+											<Botao type="button" disabled={cheio} title={cheio ? `no máximo ${MAXIMO_DESTAQUES}` : undefined} onClick={() => { setSelecao((s) => [...s, o.chave]); setAviso(undefined); }}>
 												<Plus /> adicionar
-											</button>
+											</Botao>
 										</li>
 									))}
 								</ul>
 							)}
-					</div>
+					</Card>
 				</div>
 			)}
 		</section>

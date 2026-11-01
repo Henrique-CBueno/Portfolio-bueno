@@ -11,6 +11,8 @@ import { caminhoDoProjeto } from '../lib/cabecalho';
 import { usePaginaAnimada } from '../hooks/usePaginaAnimada';
 import type { Destaque } from '../lib/tipos';
 import './Projeto.css';
+import { Botao } from '../components/Botao';
+import { Card } from '../components/Card';
 
 /** /projetos/:slug — slug que não existe cai no 404. */
 export function Projeto() {
@@ -37,21 +39,21 @@ function PaginaDoProjeto({ projeto: d }: { projeto: Destaque }) {
 					{d.nota && <p className="nota" data-revela="">{d.nota}</p>}
 				</header>
 
-				<div className="painel janela" data-revela="">
+				<Card className="janela" data-revela="">
 					<div className="barra"><i></i><i></i><i></i><span>{d.endereco}</span></div>
 					<div className="print" data-print="">
 						{d.print && <Img imagem={d.print.imagem} alt={d.print.alt} sizes="(max-width: 960px) 92vw, 1216px" loading="eager" fetchPriority="high" />}
 						{d.diagrama && <Diagrama {...d.diagrama} />}
 					</div>
-				</div>
+				</Card>
 
 				<div className="corpo">
 					<p className="descricao" data-revela="">{d.descricao}</p>
 					<div className="links" data-revela="">
 						{d.links.map((l) => (
-							<a key={l.href} className={l === d.links[0] ? 'botao primario' : 'botao'} href={l.href} target="_blank" rel="noopener noreferrer">
+							<Botao key={l.href} variante={l === d.links[0] ? 'primario' : undefined} href={l.href} target="_blank" rel="noopener noreferrer">
 								{l.rotulo} {l.icone === 'github' ? <Marca rede="github" /> : <ArrowUpRight />}
-							</a>
+							</Botao>
 						))}
 					</div>
 				</div>
@@ -62,10 +64,10 @@ function PaginaDoProjeto({ projeto: d }: { projeto: Destaque }) {
 					<h2 className="subtitulo" id="outros-projetos" data-revela="">Outros projetos</h2>
 					<div className="lista-outros" data-grupo="">
 						{outros.map((o) => (
-							<Link key={o.slug} className="painel outro" to={caminhoDoProjeto(o.slug)} data-cursor="ver">
+							<Card key={o.slug} as={Link} className="outro" to={caminhoDoProjeto(o.slug)} data-cursor="ver">
 								<span><strong>{o.titulo}</strong><small>{o.endereco}</small></span>
 								<span className="seta"><ArrowRight /></span>
-							</Link>
+							</Card>
 						))}
 					</div>
 				</section>

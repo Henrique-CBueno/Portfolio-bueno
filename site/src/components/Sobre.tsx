@@ -3,6 +3,7 @@ import { Titulo } from './Titulo';
 import { idiomas } from '../dados/perfil';
 import type { Cor } from '../lib/tipos';
 import './Sobre.css';
+import { Card } from './Card';
 
 const passos: { rotulo: string; cor: Cor; texto: string }[] = [
 	{ rotulo: '1 · o problema', cor: 'vermelho', texto: 'Começo por uma situação que você já viveu, antes de qualquer termo técnico.' },
@@ -20,7 +21,7 @@ export function Sobre() {
 					<p data-revela="">Já construí microsserviços, sistemas orientados a eventos e soluções na <b>AWS</b>, e participei de decisões sobre sharding, replicação e consistência, que são justamente os assuntos dos meus vídeos.</p>
 					<div className="idiomas" data-grupo="">{idiomas.map((i) => <Pill key={i}>{i}</Pill>)}</div>
 				</div>
-				<div className="painel metodo acompanha" data-revela="">
+				<Card className="metodo acompanha" data-revela="">
 					<h3>Como eu explico um conceito</h3>
 					<ol data-cadeia="">
 						{passos.map((p) => (
@@ -32,7 +33,7 @@ export function Sobre() {
 						))}
 					</ol>
 					<p className="rodape-metodo"><span>~90 s</span><span>·</span><span>PT-BR</span><span>·</span><span>Instagram, TikTok e YouTube</span></p>
-				</div>
+				</Card>
 			</div>
 		</section>
 	);

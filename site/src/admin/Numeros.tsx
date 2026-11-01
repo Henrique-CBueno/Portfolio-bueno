@@ -4,6 +4,8 @@ import { FalhaApi } from '../components/FalhaApi';
 import { chamar, dataBR } from './api';
 import { formatarNumero } from '../lib/formato';
 import type { Contagem } from '../lib/tipos';
+import { Botao } from '../components/Botao';
+import { Card } from '../components/Card';
 
 /** O que o painel recebe: a contagem e se ela é digitada aqui ou lida da rede. */
 type NoPainel = Contagem & { editavel: boolean };
@@ -36,18 +38,18 @@ function Manual({ contagem: c }: { contagem: Contagem }) {
 	}
 
 	return (
-		<form className="painel" onSubmit={salvar}>
+		<Card as="form" onSubmit={salvar}>
 			<strong>{nomesRede[c.rede] ?? c.rede}</strong>
 			<div className="linha-numero">
 				<input type="number" min="0" inputMode="numeric" placeholder="seguidores" value={valor} onChange={(e) => setValor(e.target.value)} />
-				<button className="botao" type="submit" disabled={salvando}>{salvando ? <>salvando <LoaderCircle className="gira" aria-hidden="true" /></> : 'salvar'}</button>
+				<Botao type="submit" disabled={salvando}>{salvando ? <>salvando <LoaderCircle className="gira" aria-hidden="true" /></> : 'salvar'}</Botao>
 			</div>
 			<small>
 				{salvo === true ? <span className="pill verde">salvo ✓</span>
 					: salvo === false ? <span className="pill vermelho">não deu pra salvar</span>
 					: c.atualizadoEm ? `atualizado em ${dataBR.format(new Date(c.atualizadoEm))}` : 'sem número: o site mostra só o @'}
 			</small>
-		</form>
+		</Card>
 	);
 }
 
@@ -80,17 +82,17 @@ export function Numeros() {
 				{contagens === undefined && (
 					<>
 						<span className="so-leitor" role="status">carregando os números</span>
-						{Array.from({ length: 3 }, (_, i) => <div key={i} className="painel esqueleto-numero" aria-hidden="true"><span className="esqueleto"></span><span className="esqueleto"></span></div>)}
+						{Array.from({ length: 3 }, (_, i) => <Card key={i} className="esqueleto-numero" aria-hidden="true"><span className="esqueleto"></span><span className="esqueleto"></span></Card>)}
 					</>
 				)}
 				{contagens?.length === 0 && <p className="dica">Nenhuma rede pra mostrar agora.</p>}
 				{contagens?.map((c) => c.editavel
 					? <Manual key={c.rede} contagem={c} />
 					: (
-						<div key={c.rede} className="painel">
+						<Card key={c.rede}>
 							<strong>{nomesRede[c.rede] ?? c.rede}</strong>
 							<small>{lida(c)}</small>
-						</div>
+						</Card>
 					))}
 			</div>
 		</section>

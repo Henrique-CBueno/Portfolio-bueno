@@ -11,6 +11,8 @@ import { useCarrossel } from '../hooks/useCarrossel';
 import type { Carga } from '../hooks/useSnapshot';
 import type { Snapshot, Video } from '../lib/tipos';
 import './Videos.css';
+import { Botao } from './Botao';
+import { Card } from './Card';
 
 interface Props { carga: Carga<Snapshot>; tentarDeNovo: () => void }
 
@@ -43,30 +45,30 @@ export function Videos({ carga, tentarDeNovo }: Props) {
 			)}
 
 			{carga.estado === 'erro' && (
-				<div className="painel falha chega" role="alert">
+				<Card className="falha chega" role="alert">
 					<p><strong>Não deu pra carregar os vídeos agora.</strong>Enquanto isso, eles estão todos no Instagram.</p>
 					<div className="redes-vazio">
-						<button className="botao" type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></button>
+						<Botao type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></Botao>
 						<a className="pill roxo" href={redes.instagram.url} target="_blank" rel="noopener noreferrer">instagram</a>
 					</div>
-				</div>
+				</Card>
 			)}
 
 			{carga.estado === 'pronto' && videos.length === 0 && (
-				<div className="painel vazio chega">
+				<Card className="vazio chega">
 					<p>Os vídeos novos aparecem aqui. Enquanto isso, assista nas redes:</p>
 					<div className="redes-vazio">
 						<a className="pill roxo" href={redes.instagram.url} target="_blank" rel="noopener noreferrer">instagram</a>
 						<a className="pill azul" href={redes.tiktok.url} target="_blank" rel="noopener noreferrer">tiktok</a>
 						<a className="pill vermelho" href={redes.youtube.url} target="_blank" rel="noopener noreferrer">youtube</a>
 					</div>
-				</div>
+				</Card>
 			)}
 
 			{carga.estado === 'pronto' && videos.length > 0 && (
 				<>
 					<div className="videos carrossel" data-carrossel="" ref={lista}>
-						{videos.map((v, i) => <Card key={v.id ?? v.titulo} video={v} ordem={i} />)}
+						{videos.map((v, i) => <CardDoVideo key={v.id ?? v.titulo} video={v} ordem={i} />)}
 					</div>
 					<Indicador atual={atual} total={videos.length} />
 				</>
@@ -75,7 +77,7 @@ export function Videos({ carga, tentarDeNovo }: Props) {
 	);
 }
 
-function Card({ video: v, ordem }: { video: Video; ordem: number }) {
+function CardDoVideo({ video: v, ordem }: { video: Video; ordem: number }) {
 	const cat = categoria(v.categoria);
 	return (
 		<a className="video chega" style={{ animationDelay: `${ordem * 60}ms` }} href={seguro(v.link)} target="_blank" rel="noopener noreferrer" data-cursor="assistir">

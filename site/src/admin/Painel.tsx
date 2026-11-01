@@ -5,6 +5,7 @@ import { Mensagens } from './Mensagens';
 import { Numeros } from './Numeros';
 import { FalhaApi } from '../components/FalhaApi';
 import { TrocaTema } from '../components/TrocaTema';
+import { Botao } from '../components/Botao';
 
 type Fase = { tipo: 'entrando' } | { tipo: 'sem-login' } | { tipo: 'aviso'; texto: string } | { tipo: 'pronto' };
 
@@ -37,7 +38,7 @@ export function Painel() {
 					<TrocaTema />
 					<span className="pill amarelo">painel</span>
 					<span>{usuario}</span>
-					{usuario !== undefined && <button className="botao" type="button" onClick={() => keycloak.logout({ redirectUri: `${location.origin}/` })}>sair</button>}
+					{usuario !== undefined && <Botao type="button" onClick={() => keycloak.logout({ redirectUri: `${location.origin}/` })}>sair</Botao>}
 				</div>
 			</header>
 

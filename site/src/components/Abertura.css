@@ -38,6 +38,11 @@
 	.rede small.carregando .esqueleto { width: 104px; height: 12px; margin-top: 4px; border-radius: 4px; }
 	.local { display: flex; align-items: center; gap: 8px; margin-top: 22px; font: 500 13px var(--mono); color: var(--apagado); }
 
+	/* até 1344px a foto encosta na margem da página (32px): o card do Java, a -34px, saía 2–3px da tela */
+	@media (min-width: 961px) and (max-width: 1344px) {
+		.colado.java { left: -22px; }
+	}
+
 	@media (max-width: 960px) {
 		& { grid-template-columns: 1fr; gap: 48px; padding: 16px var(--margem) 64px; }
 		.retrato { max-width: 340px; margin: 0 18px; }

@@ -13,6 +13,8 @@ import { useContagensAoVivo } from '../hooks/useContagensAoVivo';
 import type { Carga } from '../hooks/useSnapshot';
 import type { Rede, Snapshot } from '../lib/tipos';
 import './Abertura.css';
+import { Botao } from './Botao';
+import { Card } from './Card';
 
 const foto = imagem(fotoPicture);
 const ordem: Rede[] = ['instagram', 'tiktok', 'youtube', 'github'];
@@ -62,8 +64,8 @@ export function Abertura({ carga, geradoEm }: Props) {
 				<div className="foto" data-foto="">
 					<Img imagem={foto} alt="Henrique Bueno sentado com o notebook cheio de adesivos" sizes="(max-width: 960px) 340px, 460px" loading="eager" fetchPriority="high" />
 				</div>
-				<div className="painel colado java" data-colado=""><span className="ic"><Coffee /></span><span><strong>Java</strong><small>Spring Boot</small></span></div>
-				<div className="painel colado aws" data-colado=""><span className="ic"><Cloud /></span><span><strong>AWS</strong><small>cloud</small></span></div>
+				<Card className="colado java" data-colado=""><span className="ic"><Coffee /></span><span><strong>Java</strong><small>Spring Boot</small></span></Card>
+				<Card className="colado aws" data-colado=""><span className="ic"><Cloud /></span><span><strong>AWS</strong><small>cloud</small></span></Card>
 				<div className="carimbo" data-carimbo=""><AtSign />{perfil.handle}</div>
 			</div>
 
@@ -72,8 +74,8 @@ export function Abertura({ carga, geradoEm }: Props) {
 				<Titulo tag="p" className="papel" destaque={perfil.papel} />
 				<p className="bio" data-entra="">Trabalho com <b>Java e AWS</b> e gravo vídeos de 90 segundos explicando <b>sistemas distribuídos</b> com exemplos do Brasil.</p>
 				<div className="acoes" data-entra="">
-					<a className="botao primario" href="#projetos">ver projetos <ArrowDown /></a>
-					<a className="botao" href="#contato">falar comigo <Send /></a>
+					<Botao variante="primario" href="#projetos">ver projetos <ArrowDown /></Botao>
+					<Botao href="#contato">falar comigo <Send /></Botao>
 				</div>
 				<div className="numeros" data-entra="">
 					{numeros.map((n) => (
@@ -82,7 +84,7 @@ export function Abertura({ carga, geradoEm }: Props) {
 				</div>
 				<div className="redes" data-entra="">
 					{ordem.map((rede) => (
-						<a key={rede} className="painel rede" href={redes[rede].url} target="_blank" rel="me noopener noreferrer">
+						<Card key={rede} as="a" className="rede" href={redes[rede].url} target="_blank" rel="me noopener noreferrer">
 							<span className="ic"><Marca rede={rede} /></span>
 							<span>
 								<strong>{redes[rede].nome}</strong>
@@ -90,7 +92,7 @@ export function Abertura({ carga, geradoEm }: Props) {
 									? <small className="carregando"><span className="esqueleto" aria-hidden="true"></span><span className="so-leitor">carregando seguidores</span></small>
 									: <Legenda texto={legenda(rede)!} aviso={redes[rede].unidade ? aviso : undefined} />}
 							</span>
-						</a>
+						</Card>
 					))}
 				</div>
 				<p className="local" data-entra=""><MapPin />{perfil.local}</p>
