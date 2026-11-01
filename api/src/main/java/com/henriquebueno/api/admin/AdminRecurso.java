@@ -5,10 +5,13 @@ import java.util.Map;
 
 import org.jboss.resteasy.reactive.server.ServerExceptionMapper;
 
+import com.henriquebueno.api.contato.Caixa;
+import com.henriquebueno.api.contato.Recebida;
 import com.henriquebueno.api.snapshot.Rede;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -19,7 +22,7 @@ import jakarta.ws.rs.core.Response;
 
 /**
  * Rotas do painel /admin do site. Só com token do Keycloak e o papel "admin".
- * Os vídeos vêm do Instagram; o painel só cuida dos números que não têm API ligada.
+ * Os vídeos vêm do Instagram; o painel cuida das mensagens do formulário e dos números sem API ligada.
  */
 @Path("/admin-api")
 @RolesAllowed("admin")
@@ -29,10 +32,37 @@ public class AdminRecurso {
 	public record NovoValor(Long valor) {
 	}
 
-	private final Numeros numeros;
+	public record Lida(boolean lida) {
+	}
 
-	AdminRecurso(Numeros numeros) {
+	private final Numeros numeros;
+	private final Caixa caixa;
+
+	AdminRecurso(Numeros numeros, Caixa caixa) {
 		this.numeros = numeros;
+		this.caixa = caixa;
+	}
+
+	/** Mensagens do formulário de contato, a mais nova primeiro. */
+	@GET
+	@Path("/mensagens")
+	public List<Recebida> mensagens() {
+		return caixa.todas();
+	}
+
+	@PUT
+	@Path("/mensagens/{id}/lida")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response marcarLida(@PathParam("id") String id, Lida corpo) {
+		return caixa.marcarLida(id, corpo == null || corpo.lida())
+				.map(m -> Response.ok(m).build())
+				.orElse(Response.status(Response.Status.NOT_FOUND).build());
+	}
+
+	@DELETE
+	@Path("/mensagens/{id}")
+	public Response apagar(@PathParam("id") String id) {
+		return caixa.apagar(id) ? Response.noContent().build() : Response.status(Response.Status.NOT_FOUND).build();
 	}
 
 	@GET

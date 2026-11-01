@@ -9,8 +9,8 @@ os inscritos do YouTube e os repositórios fixados do GitHub, guarda o número d
 | `GET /snapshot` | Lido pelo navegador a cada visita: vídeos (mais novo primeiro), contagens e repositórios fixados. |
 | `GET /capas/<id>` | Capa de cada vídeo, servida do MinIO (cache longo: capa nova ganha id novo). |
 | `GET /stream` | SSE: evento `contagens` ao conectar e sempre que um número muda. |
-| `POST /contato` | Formulário do site → e-mail, com o visitante no "responder para". 3 mensagens por IP a cada 10 min. |
-| `/admin-api/*` | Painel: `GET /contagens` (com `editavel`) e `PUT /contagens/instagram` quando não há `META_API_KEY`. O TikTok não tem número (só o @). Exige token do Keycloak com o papel `admin`. |
+| `POST /contato` | Formulário do site: guarda a mensagem (`dados/mensagens.json`, as últimas 500, pro painel) e manda por e-mail, com o visitante no "responder para". Campo inválido → 400 com uma mensagem por campo. 3 mensagens por IP a cada 10 min. |
+| `/admin-api/*` | Painel: `GET /mensagens`, `PUT /mensagens/<id>/lida` (`{"lida": true}`) e `DELETE /mensagens/<id>` pras mensagens do formulário; `GET /contagens` (com `editavel`) e `PUT /contagens/instagram` quando não há `META_API_KEY` (o TikTok não tem número, só o @). Exige token do Keycloak com o papel `admin`. |
 | `GET /q/health` | Saúde. |
 
 O site é estático e lê `GET /snapshot` no navegador a cada visita, então qualquer mudança aparece sem publicar o site de novo.
@@ -74,3 +74,13 @@ parágrafo do README, só com token), linguagens, a cor da principal e a data do
 O navegador nunca chama o GitHub: lê o `GET /snapshot` daqui, então visitas não gastam a cota. Se o GitHub responder
 que a cota acabou (403 com `x-ratelimit-remaining: 0`, ou 429/`retry-after`), a API não chama de novo até o horário
 que ele informou (`x-ratelimit-reset`/`retry-after`), mantém a última lista e avisa uma vez no log.
+
+## Formulário de contato
+
+Regras (as mesmas do site, em `site/src/lib/contato.ts`, com os mesmos textos): nome obrigatório (até 120), e-mail
+obrigatório e válido (com domínio, até 200), assunto opcional (até 160), mensagem obrigatória com 20 a 5000 caracteres;
+espaço nas pontas não conta. Um campo que quebra mais de uma regra recebe a mais básica (falta → formato → tamanho).
+
+A mensagem é guardada antes do e-mail: se o e-mail falhar, ela continua no painel e o visitante recebe sucesso
+(não precisa mandar de novo). Se não der pra guardar, a resposta é 503. A armadilha (`site` preenchido) recebe
+sucesso e nada é guardado nem enviado.

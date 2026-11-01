@@ -2,6 +2,8 @@ package com.henriquebueno.api.admin;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -23,6 +25,33 @@ class AdminTest {
 	@TestSecurity(user = "visitante", roles = "leitor")
 	void semOPapelAdminNaoEntra() {
 		given().get("/admin-api/contagens").then().statusCode(403);
+	}
+
+	@Test
+	@TestSecurity(user = "henrique", roles = "admin")
+	void mensagemDoFormularioApareceNoPainelEPodeSerLidaEApagada() {
+		given().contentType(ContentType.JSON).header("X-Forwarded-For", "10.9.0.1")
+				.body("{\"nome\": \"Bia\", \"email\": \"bia@empresa.com\", \"assunto\": \"Vaga\", \"mensagem\": \"Vi seus vídeos e queria conversar sobre uma vaga.\"}")
+				.post("/contato").then().statusCode(202);
+
+		String id = given().get("/admin-api/mensagens").then().statusCode(200)
+				.body("[0].nome", equalTo("Bia"))
+				.body("[0].email", equalTo("bia@empresa.com"))
+				.body("[0].assunto", equalTo("Vaga"))
+				.body("[0].lida", equalTo(false))
+				.body("[0].recebidaEm", notNullValue())
+				.extract().path("[0].id");
+
+		given().contentType(ContentType.JSON).body("{\"lida\": true}").put("/admin-api/mensagens/" + id + "/lida").then()
+				.statusCode(200).body("lida", equalTo(true));
+		given().delete("/admin-api/mensagens/" + id).then().statusCode(204);
+		given().get("/admin-api/mensagens").then().body("id", not(hasItem(id)));
+		given().delete("/admin-api/mensagens/" + id).then().statusCode(404);
+	}
+
+	@Test
+	void semLoginNaoVeAsMensagens() {
+		given().get("/admin-api/mensagens").then().statusCode(401);
 	}
 
 	@Test
