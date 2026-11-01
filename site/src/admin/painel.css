@@ -25,3 +25,22 @@ p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 .numeros .esqueleto-numero .esqueleto:first-child { width: 40%; height: 16px; }
 .numeros .esqueleto-numero .esqueleto:last-child { width: 80%; height: 40px; }
 .numeros .botao { display: inline-flex; align-items: center; gap: 8px; }
+
+/* mensagens do formulário de contato */
+.mensagens { display: grid; gap: 14px; }
+.mensagem { padding: 20px 22px; display: grid; gap: 10px; }
+.mensagem.nova { border-color: color-mix(in srgb, var(--amarelo) 60%, var(--borda)); }
+.mensagem header { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.mensagem header strong { font-size: 16px; margin-right: 10px; }
+.mensagem header a, .mensagem header span { font: 500 13px var(--mono); color: var(--apagado); }
+.mensagem .lado { display: flex; gap: 10px; align-items: center; }
+.mensagem time { font: 500 12px var(--mono); color: var(--apagado); }
+.mensagem .assunto { font-weight: 700; }
+.mensagem .texto { color: var(--texto-suave); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.acoes-mensagem { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.acoes-mensagem .botao { padding: 8px 12px; font-size: 12px; gap: 6px; }
+.acoes-mensagem .botao.perigo { border-color: var(--erro); color: var(--erro); }
+.vazio-mensagens { padding: 22px; color: var(--apagado); font: 500 13px var(--mono); }
+.esqueleto-mensagem .esqueleto:nth-child(1) { width: 30%; height: 16px; }
+.esqueleto-mensagem .esqueleto:nth-child(2) { width: 90%; height: 14px; }
+.esqueleto-mensagem .esqueleto:nth-child(3) { width: 60%; height: 14px; }

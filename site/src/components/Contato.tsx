@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { animate } from 'motion';
 import { Copy, Check, LoaderCircle, Send } from 'lucide-react';
 import { Marca } from './Marca';
 import { Titulo } from './Titulo';
 import { perfil, redes } from '../dados/perfil';
 import { movimentoReduzido } from '../lib/movimento-reduzido';
+import { CAMPOS, MAXIMO, MINIMO_MENSAGEM, VAZIO, validar, validarCampo, type Campo, type Erros, type Valores } from '../lib/contato';
 import type { Cor, Rede } from '../lib/tipos';
 import './Contato.css';
 
@@ -37,27 +38,99 @@ function Email() {
 
 type Estado = { cor: Cor; texto: string; vez: number };
 
-/** Formulário → POST /contato na API. */
+interface PropsCampo {
+	campo: Campo;
+	rotulo: string;
+	valor: string;
+	erro?: string;
+	/** Texto de ajuda quando não há erro (ex.: quantos caracteres faltam). */
+	dica?: string;
+	opcional?: boolean;
+	aoMudar: (campo: Campo, valor: string) => void;
+	aoSair: (campo: Campo) => void;
+	refCampo: (el: HTMLInputElement | HTMLTextAreaElement | null) => void;
+	extra: InputHTMLAttributes<HTMLInputElement> & TextareaHTMLAttributes<HTMLTextAreaElement>;
+}
+
+/** Um campo com a mensagem dele embaixo, ligada por aria-describedby (o leitor de tela lê junto). */
+function CampoDoFormulario({ campo, rotulo, valor, erro, dica, opcional, aoMudar, aoSair, refCampo, extra }: PropsCampo) {
+	const idAviso = `aviso-${campo}`;
+	const comum = {
+		id: campo,
+		name: campo,
+		value: valor,
+		maxLength: MAXIMO[campo],
+		'aria-invalid': erro ? true : undefined,
+		'aria-required': opcional ? undefined : true,
+		'aria-describedby': erro || dica ? idAviso : undefined,
+		onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => aoMudar(campo, e.target.value),
+		onBlur: () => aoSair(campo),
+		...extra,
+	};
+	return (
+		<div className="campo">
+			<label htmlFor={campo}>{rotulo}{opcional && <span className="opcional"> · opcional</span>}</label>
+			{campo === 'mensagem' ? <textarea ref={refCampo} {...comum} /> : <input ref={refCampo} {...comum} />}
+			{erro ? <small id={idAviso} className="aviso erro">{erro}</small> : dica ? <small id={idAviso} className="aviso">{dica}</small> : null}
+		</div>
+	);
+}
+
+/**
+ * Formulário → POST /contato na API, que guarda a mensagem (painel /admin) e manda por e-mail.
+ * Cada campo é conferido ao sair dele e ao enviar, com a mesma regra da API (lib/contato.ts); o que a API
+ * recusar volta pro campo certo.
+ */
 function Formulario() {
+	const [valores, setValores] = useState<Valores>(VAZIO);
+	const [erros, setErros] = useState<Erros>({});
+	// só mostra erro de campo que a pessoa já deixou (ou depois de tentar enviar), não enquanto digita pela primeira vez
+	const [vistos, setVistos] = useState<Set<Campo>>(new Set());
+	const [armadilha, setArmadilha] = useState('');
 	const [estado, setEstado] = useState<Estado>();
 	const [enviando, setEnviando] = useState(false);
 	// trava síncrona: o estado do React só atualiza no próximo desenho, e um clique duplo cairia nesse intervalo
 	const ocupado = useRef(false);
 	const pill = useRef<HTMLSpanElement>(null);
+	const campos = useRef(new Map<Campo, HTMLInputElement | HTMLTextAreaElement>());
 	const avisar = (cor: Cor, texto: string) => setEstado((e) => ({ cor, texto, vez: (e?.vez ?? 0) + 1 }));
 
 	useEffect(() => {
 		if (estado && pill.current && !movimentoReduzido()) animate(pill.current, { opacity: [0, 1], y: [6, 0] }, { duration: 0.3 });
 	}, [estado]);
 
+	function aoMudar(campo: Campo, valor: string) {
+		setValores((v) => ({ ...v, [campo]: valor }));
+		// erro some (ou muda) enquanto a pessoa corrige
+		if (vistos.has(campo)) setErros((e) => ({ ...e, [campo]: validarCampo(campo, valor) }));
+	}
+
+	function aoSair(campo: Campo) {
+		// sair de um campo obrigatório vazio sem nunca ter digitado não é erro ainda
+		if (!valores[campo] && !vistos.has(campo)) return;
+		setVistos((v) => new Set(v).add(campo));
+		setErros((e) => ({ ...e, [campo]: validarCampo(campo, valores[campo]) }));
+	}
+
+	function focarPrimeiroErro(lista: Erros) {
+		const primeiro = CAMPOS.find((c) => lista[c]);
+		if (primeiro) campos.current.get(primeiro)?.focus();
+	}
+
 	async function enviar(evento: FormEvent<HTMLFormElement>) {
 		evento.preventDefault();
 		if (ocupado.current) return;
-		const form = evento.currentTarget;
-		if (!form.checkValidity()) { form.reportValidity(); return; }
-		const dados = Object.fromEntries(new FormData(form)) as Record<string, string>;
+
+		const encontrados = validar(valores);
+		setVistos(new Set(CAMPOS));
+		setErros(encontrados);
+		if (Object.keys(encontrados).length > 0) {
+			avisar('vermelho', 'confira os campos destacados');
+			focarPrimeiroErro(encontrados);
+			return;
+		}
 		// armadilha preenchida = robô: finge que deu certo
-		if (dados.site) { avisar('verde', 'mensagem enviada ✓'); form.reset(); return; }
+		if (armadilha) { avisar('verde', 'mensagem enviada ✓'); limpar(); return; }
 
 		const api = import.meta.env.PUBLIC_API_URL;
 		ocupado.current = true;
@@ -68,30 +141,60 @@ function Formulario() {
 			const resposta = await fetch(new URL('/contato', api), {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ nome: dados.nome, email: dados.email, assunto: dados.assunto, mensagem: dados.mensagem }),
+				body: JSON.stringify({ nome: valores.nome.trim(), email: valores.email.trim(), assunto: valores.assunto.trim(), mensagem: valores.mensagem.trim() }),
 			});
 			if (resposta.status === 429) { avisar('amarelo', 'muitas mensagens seguidas · tente daqui a pouco'); return; }
-			if (resposta.status === 400) { avisar('vermelho', 'confira os campos'); return; }
+			if (resposta.status === 400) {
+				// a API conferiu de novo e achou algo: volta pro campo certo
+				const daApi = ((await resposta.json().catch(() => ({}))) as { erros?: Erros }).erros ?? {};
+				setErros(daApi);
+				avisar('vermelho', 'confira os campos destacados');
+				focarPrimeiroErro(daApi);
+				return;
+			}
 			if (!resposta.ok) throw new Error(String(resposta.status));
-			avisar('verde', 'mensagem enviada ✓');
-			form.reset();
+			avisar('verde', 'mensagem enviada ✓ · respondo no e-mail que você deixou');
+			limpar();
 		} catch {
-			avisar('vermelho', 'não foi agora · use o e-mail ao lado');
+			avisar('vermelho', 'não foi agora · tente de novo ou use o e-mail ao lado');
 		} finally {
 			ocupado.current = false;
 			setEnviando(false);
 		}
 	}
 
+	function limpar() {
+		setValores(VAZIO);
+		setErros({});
+		setVistos(new Set());
+		setArmadilha('');
+	}
+
+	const tamanho = valores.mensagem.trim().length;
+	const faltam = MINIMO_MENSAGEM - tamanho;
+	const props = (campo: Campo) => ({
+		campo,
+		valor: valores[campo],
+		erro: erros[campo],
+		aoMudar,
+		aoSair,
+		refCampo: (el: HTMLInputElement | HTMLTextAreaElement | null) => { if (el) campos.current.set(campo, el); else campos.current.delete(campo); },
+	});
+
 	return (
 		<form className="painel formulario acompanha" noValidate onSubmit={enviar} aria-busy={enviando} data-revela="">
 			<div className="linha">
-				<div className="campo"><label htmlFor="nome">nome</label><input id="nome" name="nome" autoComplete="name" required maxLength={120} placeholder="Como posso te chamar?" /></div>
-				<div className="campo"><label htmlFor="email">e-mail</label><input id="email" name="email" type="email" autoComplete="email" required maxLength={200} placeholder="voce@empresa.com" /></div>
+				<CampoDoFormulario {...props('nome')} rotulo="nome" extra={{ autoComplete: 'name', placeholder: 'Como posso te chamar?' }} />
+				<CampoDoFormulario {...props('email')} rotulo="e-mail" extra={{ type: 'email', autoComplete: 'email', inputMode: 'email', placeholder: 'voce@empresa.com' }} />
 			</div>
-			<div className="campo"><label htmlFor="assunto">assunto</label><input id="assunto" name="assunto" maxLength={160} placeholder="Parceria, vaga, projeto, dúvida…" /></div>
-			<div className="campo"><label htmlFor="mensagem">mensagem</label><textarea id="mensagem" name="mensagem" required maxLength={5000} placeholder="Conta um pouco do que você precisa."></textarea></div>
-			<div className="armadilha" aria-hidden="true"><label htmlFor="site">site</label><input id="site" name="site" tabIndex={-1} autoComplete="off" /></div>
+			<CampoDoFormulario {...props('assunto')} rotulo="assunto" opcional extra={{ placeholder: 'Parceria, vaga, projeto, dúvida…' }} />
+			<CampoDoFormulario
+				{...props('mensagem')}
+				rotulo="mensagem"
+				dica={tamanho > 0 && faltam > 0 ? `faltam ${faltam} ${faltam === 1 ? 'caractere' : 'caracteres'} (mínimo ${MINIMO_MENSAGEM})` : undefined}
+				extra={{ placeholder: 'Conta um pouco do que você precisa.' }}
+			/>
+			<div className="armadilha" aria-hidden="true"><label htmlFor="site">site</label><input id="site" name="site" tabIndex={-1} autoComplete="off" value={armadilha} onChange={(e) => setArmadilha(e.target.value)} /></div>
 			<div className="enviar">
 				<small aria-live="polite">{estado ? <span key={estado.vez} ref={pill} className={`pill ${estado.cor}`}>{estado.texto}</span> : 'vai direto pro meu e-mail'}</small>
 				<button className="botao primario" type="submit" disabled={enviando}>

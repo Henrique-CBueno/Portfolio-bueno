@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { entrar, keycloak } from './api';
+import { Mensagens } from './Mensagens';
 import { Numeros } from './Numeros';
 import { FalhaApi } from '../components/FalhaApi';
 
@@ -43,6 +44,7 @@ export function Painel() {
 				{fase.tipo === 'aviso' && <p className="aviso">{fase.texto}</p>}
 				{fase.tipo === 'pronto' && (
 					<>
+						<Mensagens />
 						<Numeros />
 						<section className="bloco">
 							<div className="cab-bloco"><h2>Vídeos</h2></div>

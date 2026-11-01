@@ -1,0 +1,137 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { LoaderCircle, Mail, Reply, Trash2 } from 'lucide-react';
+import { FalhaApi } from '../components/FalhaApi';
+import { chamar } from './api';
+
+/** Mensagem do formulário de contato, como a API guarda (GET /admin-api/mensagens). */
+interface Recebida {
+	id: string;
+	recebidaEm: string;
+	nome: string;
+	email: string;
+	assunto: string | null;
+	mensagem: string;
+	lida: boolean;
+}
+
+const quando = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+
+/** Só endereço com cara de e-mail vira link mailto (o que vem do formulário passa por aqui). */
+const emailSeguro = (email: string) => /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(email);
+
+/** As mensagens do formulário: a mais nova primeiro, as não lidas destacadas. */
+export function Mensagens() {
+	const [mensagens, setMensagens] = useState<Recebida[]>();
+	const [falhou, setFalhou] = useState(false);
+
+	const carregar = useCallback(() => {
+		setFalhou(false);
+		setMensagens(undefined);
+		chamar('/mensagens')
+			.then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+			.then(setMensagens)
+			.catch(() => setFalhou(true));
+	}, []);
+	useEffect(carregar, [carregar]);
+
+	const trocar = (nova: Recebida) => setMensagens((lista) => lista?.map((m) => (m.id === nova.id ? nova : m)));
+	const tirar = (id: string) => setMensagens((lista) => lista?.filter((m) => m.id !== id));
+	const novas = mensagens?.filter((m) => !m.lida).length ?? 0;
+
+	return (
+		<section className="bloco">
+			<div className="cab-bloco">
+				<h2>Mensagens {novas > 0 && <em>{novas} {novas === 1 ? 'nova' : 'novas'}</em>}</h2>
+				<small className="dica">do formulário de contato do site · também chegam por e-mail</small>
+			</div>
+			{falhou && <FalhaApi oque="as mensagens" tentarDeNovo={carregar} />}
+			{!falhou && mensagens === undefined && (
+				<div className="mensagens">
+					<span className="so-leitor" role="status">carregando as mensagens</span>
+					{Array.from({ length: 2 }, (_, i) => (
+						<div key={i} className="painel mensagem esqueleto-mensagem" aria-hidden="true">
+							<span className="esqueleto"></span><span className="esqueleto"></span><span className="esqueleto"></span>
+						</div>
+					))}
+				</div>
+			)}
+			{mensagens?.length === 0 && <p className="painel vazio-mensagens">Nenhuma mensagem ainda. Quando alguém escrever pelo site, ela aparece aqui.</p>}
+			{mensagens && mensagens.length > 0 && (
+				<div className="mensagens">
+					{mensagens.map((m) => <Item key={m.id} mensagem={m} aoTrocar={trocar} aoApagar={tirar} />)}
+				</div>
+			)}
+		</section>
+	);
+}
+
+function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTrocar: (m: Recebida) => void; aoApagar: (id: string) => void }) {
+	const [ocupado, setOcupado] = useState<'lida' | 'apagar' | null>(null);
+	const [confirmar, setConfirmar] = useState(false);
+	const [erro, setErro] = useState<string>();
+	const trava = useRef(false);
+
+	// apagar em dois toques, sem janela de confirmação do navegador
+	useEffect(() => {
+		if (!confirmar) return;
+		const volta = setTimeout(() => setConfirmar(false), 3000);
+		return () => clearTimeout(volta);
+	}, [confirmar]);
+
+	async function acao(qual: 'lida' | 'apagar') {
+		if (trava.current) return;
+		if (qual === 'apagar' && !confirmar) { setConfirmar(true); return; }
+		trava.current = true;
+		setOcupado(qual);
+		setErro(undefined);
+		try {
+			if (qual === 'lida') {
+				const r = await chamar(`/mensagens/${m.id}/lida`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lida: !m.lida }) });
+				if (!r.ok) throw new Error();
+				aoTrocar(await r.json());
+			} else {
+				const r = await chamar(`/mensagens/${m.id}`, { method: 'DELETE' });
+				if (!r.ok && r.status !== 404) throw new Error();
+				aoApagar(m.id);
+			}
+		} catch {
+			setErro(qual === 'lida' ? 'não deu pra marcar agora' : 'não deu pra apagar agora');
+		} finally {
+			trava.current = false;
+			setOcupado(null);
+			setConfirmar(false);
+		}
+	}
+
+	const assunto = m.assunto ? `Re: ${m.assunto}` : 'Re: sua mensagem pelo site';
+	return (
+		<article className={m.lida ? 'painel mensagem' : 'painel mensagem nova'}>
+			<header>
+				<div>
+					<strong>{m.nome}</strong>
+					{emailSeguro(m.email) ? <a href={`mailto:${m.email}`}>{m.email}</a> : <span>{m.email}</span>}
+				</div>
+				<div className="lado">
+					{!m.lida && <span className="pill amarelo">nova</span>}
+					<time dateTime={m.recebidaEm}>{quando.format(new Date(m.recebidaEm))}</time>
+				</div>
+			</header>
+			{m.assunto && <p className="assunto">{m.assunto}</p>}
+			<p className="texto">{m.mensagem}</p>
+			<div className="acoes-mensagem">
+				{emailSeguro(m.email) && (
+					<a className="botao" href={`mailto:${m.email}?subject=${encodeURIComponent(assunto)}`}><Reply /> responder</a>
+				)}
+				<button className="botao" type="button" disabled={ocupado !== null} onClick={() => acao('lida')}>
+					{ocupado === 'lida' ? <LoaderCircle className="gira" aria-hidden="true" /> : <Mail />}
+					{m.lida ? 'marcar como não lida' : 'marcar como lida'}
+				</button>
+				<button className={confirmar ? 'botao perigo' : 'botao'} type="button" disabled={ocupado !== null} onClick={() => acao('apagar')}>
+					{ocupado === 'apagar' ? <LoaderCircle className="gira" aria-hidden="true" /> : <Trash2 />}
+					{confirmar ? 'confirmar?' : 'apagar'}
+				</button>
+				{erro && <span className="pill vermelho" role="alert">{erro}</span>}
+			</div>
+		</article>
+	);
+}
