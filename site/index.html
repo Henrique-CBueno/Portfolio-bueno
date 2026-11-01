@@ -10,6 +10,10 @@
 		<meta property="og:locale" content="pt_BR" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<script>document.documentElement.classList.add('js');</script>
+		<script>
+			// tema guardado: aplicado antes de desenhar, pra não piscar o escuro em quem escolheu o claro (ver src/lib/tema.ts)
+			try { if (localStorage.getItem('tema') === 'claro') { document.documentElement.dataset.tema = 'claro'; document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#F4F1EA'); } } catch (e) {}
+		</script>
 	</head>
 	<body>
 		<div id="raiz"><!--app--></div>

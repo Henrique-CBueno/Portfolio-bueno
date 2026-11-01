@@ -9,7 +9,7 @@
 	.itens { display: flex; gap: 8px; flex-wrap: wrap; }
 	.lado { display: grid; gap: 20px; }
 	.bloco { padding: 24px; }
-	.arquitetura { border-color: var(--amarelo); }
+	.arquitetura { border-color: var(--amarelo-texto); }
 	h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
 	.bloco p { color: var(--apagado); font-size: 14.5px; margin-bottom: 16px; }
 	.padroes { display: flex; flex-wrap: wrap; gap: 8px; }

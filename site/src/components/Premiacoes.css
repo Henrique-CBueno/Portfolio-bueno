@@ -4,9 +4,9 @@
 	.apoio { color: var(--apagado); font-size: 16px; margin-top: 20px; max-width: 34ch; }
 	.lista { display: grid; gap: 20px; padding-top: 18px; }
 	.premio { position: relative; display: flex; flex-direction: column; }
-	.carimbo { position: absolute; top: -16px; left: 20px; z-index: 1; rotate: -3deg; background: var(--amarelo); color: var(--fundo); border-radius: 10px; padding: 7px 14px; font: 700 13px var(--mono); display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 26px rgba(255, 194, 71, .25), 0 8px 20px rgba(0, 0, 0, .4); }
+	.carimbo { position: absolute; top: -16px; left: 20px; z-index: 1; rotate: -3deg; background: var(--amarelo); color: var(--sobre-amarelo); border-radius: 10px; padding: 7px 14px; font: 700 13px var(--mono); display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 26px rgba(255, 194, 71, .25), 0 8px 20px var(--sombra); }
 	.principal { display: grid; grid-template-columns: 1fr 1fr; }
-	.principal .foto { overflow: hidden; border-right: 1.5px solid var(--borda); border-radius: 12px 0 0 12px; background: #0E141F; }
+	.principal .foto { overflow: hidden; border-right: 1.5px solid var(--borda); border-radius: 12px 0 0 12px; background: var(--fundo-print); }
 	.principal .foto img { width: 100%; height: 100%; object-fit: cover; }
 	.corpo { padding: 26px 26px 24px; display: flex; flex-direction: column; gap: 12px; }
 	.quando { font: 500 12px var(--mono); color: var(--apagado); display: flex; align-items: center; gap: 8px; }
@@ -15,10 +15,10 @@
 	.premio p b { color: var(--texto); }
 	.premio p.quando { color: var(--apagado); font-size: 12px; }
 	.premio p.contexto { font: 500 12px var(--mono); color: var(--apagado); }
-	.premio p.contexto b { color: var(--amarelo); font-weight: 700; }
+	.premio p.contexto b { color: var(--amarelo-texto); font-weight: 700; }
 	.orgs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 4px; }
 	.compacto { flex-direction: row; align-items: center; gap: 20px; padding: 20px 24px; }
-	.compacto .ic { width: 52px; height: 52px; border-radius: 12px; color: var(--amarelo); }
+	.compacto .ic { width: 52px; height: 52px; border-radius: 12px; color: var(--amarelo-texto); }
 	.compacto .ic svg { width: 24px; height: 24px; }
 	.compacto .texto { flex: 1; display: grid; gap: 4px; }
 	.compacto h3 { font-size: 19px; }

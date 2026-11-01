@@ -2,7 +2,7 @@
 .topo { max-width: var(--largura); margin: 0 auto; padding: 18px var(--margem); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .marca { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .marca .nome { font: 800 17px var(--sans); letter-spacing: -.02em; text-transform: uppercase; }
-.marca .tag { font: 700 17px var(--mono); color: var(--amarelo); }
+.marca .tag { font: 700 17px var(--mono); color: var(--amarelo-texto); }
 .quem { display: flex; align-items: center; gap: 12px; font: 500 13px var(--mono); color: var(--apagado); }
 .quem .botao { padding: 8px 14px; font-size: 12px; }
 .painel-admin { max-width: var(--largura); margin: 0 auto; padding: 16px var(--margem) 96px; }
@@ -10,7 +10,7 @@
 .bloco + .bloco { margin-top: 56px; }
 .cab-bloco { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
 .cab-bloco h2 { font-size: 28px; }
-.cab-bloco h2 em { font-style: normal; color: var(--amarelo); }
+.cab-bloco h2 em { font-style: normal; color: var(--amarelo-texto); }
 .dica { font: 500 12px var(--mono); color: var(--apagado); }
 p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 
@@ -19,7 +19,7 @@ p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 .numeros strong { font-size: 16px; }
 .numeros .linha-numero { display: flex; gap: 8px; }
 .numeros input { flex: 1; width: 100%; font: 700 18px var(--mono); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 9px 12px; min-width: 0; }
-.numeros input:focus { outline: none; border-color: var(--amarelo); }
+.numeros input:focus { outline: none; border-color: var(--amarelo-texto); }
 .numeros small { font: 500 12px var(--mono); color: var(--apagado); }
 
 .numeros .esqueleto-numero .esqueleto:first-child { width: 40%; height: 16px; }
@@ -51,7 +51,7 @@ p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 .destaques-painel h3 { font-size: 16px; }
 .escolhidos, .disponiveis { list-style: none; display: grid; gap: 8px; }
 .escolhidos li, .disponiveis li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--borda); border-radius: 10px; background: var(--fundo); }
-.escolhidos .ordem { font: 700 13px var(--mono); color: var(--amarelo); width: 18px; }
+.escolhidos .ordem { font: 700 13px var(--mono); color: var(--amarelo-texto); width: 18px; }
 .destaques-painel .nome { flex: 1; min-width: 0; display: grid; }
 .destaques-painel .nome strong { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .destaques-painel .nome small { font: 500 11.5px var(--mono); color: var(--apagado); }
@@ -61,7 +61,7 @@ p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 .disponiveis { max-height: 360px; overflow-y: auto; }
 .disponiveis .botao { padding: 6px 10px; font-size: 12px; gap: 6px; }
 .filtro { font: 500 14px var(--sans); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 9px 12px; }
-.filtro:focus { outline: none; border-color: var(--amarelo); }
+.filtro:focus { outline: none; border-color: var(--amarelo-texto); }
 .acoes-destaques { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 @media (max-width: 760px) { .destaques-painel { grid-template-columns: 1fr; } }
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
 import { Link, useLocation } from 'react-router';
 import { movimentoReduzido } from '../lib/movimento-reduzido';
+import { TrocaTema } from './TrocaTema';
 import './Topo.css';
 
 const secoes = [
@@ -68,6 +69,7 @@ export function Topo() {
 					))}
 					<span className="marcador" aria-hidden="true" ref={marcador}></span>
 				</nav>
+				<TrocaTema />
 			</div>
 		</header>
 	);

@@ -15,10 +15,10 @@
 	.barra { display: flex; align-items: center; gap: 6px; padding: 10px 14px; font: 500 11.5px var(--mono); color: var(--apagado); }
 	.barra i { width: 9px; height: 9px; border-radius: 50%; background: var(--borda); }
 	.barra span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-	.print { aspect-ratio: 16 / 9; overflow: hidden; background: #0E141F; }
+	.print { aspect-ratio: 16 / 9; overflow: hidden; background: var(--fundo-print); }
 	.print img { width: 100%; height: 108%; object-fit: cover; object-position: center top; }
 	/* repositório do GitHub em destaque: no lugar do print, o próprio repo sobre a grade dos diagramas */
-	.capa-repo { display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; background-color: #0E141F; background-image: linear-gradient(rgba(42, 53, 73, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 53, 73, .35) 1px, transparent 1px); background-size: 24px 24px; }
+	.capa-repo { display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; background-color: var(--fundo-print); background-image: linear-gradient(var(--grade-forte) 1px, transparent 1px), linear-gradient(90deg, var(--grade-forte) 1px, transparent 1px); background-size: 24px 24px; }
 	.capa-repo .logo { width: 28px; height: 28px; color: var(--apagado); }
 	.capa-repo strong { font: 700 clamp(20px, 2.4vw, 28px) var(--mono); letter-spacing: -.02em; word-break: break-word; }
 	.capa-repo .linguagem { display: inline-flex; align-items: center; gap: 8px; font: 500 13px var(--mono); color: var(--apagado); }
@@ -44,7 +44,7 @@
 	.subtitulo { font: 700 14px var(--mono); color: var(--apagado); margin: 48px 0 6px; }
 	.repo { display: grid; grid-template-columns: 300px 1fr auto; gap: 32px; align-items: start; padding: 22px 4px; border-top: 1.5px solid var(--borda); text-decoration: none; transition: background .2s; }
 	.repo:last-child { border-bottom: 1.5px solid var(--borda); }
-	.repo:hover { background: rgba(20, 27, 39, .7); }
+	.repo:hover { background: var(--realce); }
 	h4 { font: 700 16px var(--mono); letter-spacing: -.01em; word-break: break-word; }
 	.linguas { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
 	.linguas .chip { font-size: 12px; color: var(--apagado); padding: 4px 8px; display: inline-flex; align-items: center; gap: 6px; }
@@ -53,7 +53,7 @@
 	.repo p { color: var(--texto-suave); max-width: 70ch; font-size: 15px; }
 	.repo p.vazio { color: var(--apagado); font: 500 13px var(--mono); }
 	.seta { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; border: 1.5px solid var(--borda); color: var(--apagado); transition: border-color .2s, color .2s, transform .3s var(--sobe); }
-	.repo:hover .seta { border-color: var(--amarelo); color: var(--amarelo); transform: translate(2px, -2px); }
+	.repo:hover .seta { border-color: var(--amarelo-texto); color: var(--amarelo-texto); transform: translate(2px, -2px); }
 	/* esqueleto no formato da linha de repositório */
 	.esqueleto-repo:hover { background: none; }
 	.esqueleto-repo .nome { width: 70%; height: 18px; }

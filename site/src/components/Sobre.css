@@ -13,7 +13,7 @@
 	.passo p { font-size: 15px; color: var(--texto-suave); }
 	.fio { position: absolute; left: 30px; top: -21px; height: 20px; border-left: 2px solid var(--borda); transform-origin: top; }
 	.passo:first-child .fio { display: none; }
-	.rodape-metodo { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(42, 53, 73, .7); font: 500 12px var(--mono); color: var(--apagado); }
+	.rodape-metodo { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--divisoria); font: 500 12px var(--mono); color: var(--apagado); }
 	@media (max-width: 960px) {
 		& { grid-template-columns: 1fr; gap: 28px; }
 		.passo { grid-template-columns: 1fr; gap: 8px; }

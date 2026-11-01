@@ -6,7 +6,7 @@
 	.video { text-decoration: none; display: block; }
 	.capa { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 9 / 16; transition: border-color .25s, transform .35s var(--sobe); background: var(--painel); }
 	.capa img { width: 100%; height: 100%; object-fit: cover; transition: scale .6s var(--sobe); }
-	.video:hover .capa, .video:focus-visible .capa { border-color: var(--amarelo); transform: translateY(-4px); }
+	.video:hover .capa, .video:focus-visible .capa { border-color: var(--amarelo-texto); transform: translateY(-4px); }
 	.video:hover .capa img { scale: 1.035; }
 	h3 { font-size: 16px; font-weight: 700; line-height: 1.3; margin: 14px 0 10px; text-wrap: balance; }
 	.info { display: flex; justify-content: space-between; align-items: center; gap: 8px 10px; flex-wrap: wrap; }

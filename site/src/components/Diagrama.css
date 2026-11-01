@@ -1,7 +1,7 @@
 .fluxo {
-	height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; background-color: #0E141F; background-image: linear-gradient(rgba(42, 53, 73, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 53, 73, .35) 1px, transparent 1px); background-size: 24px 24px;
+	height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; background-color: var(--fundo-print); background-image: linear-gradient(var(--grade-forte) 1px, transparent 1px), linear-gradient(90deg, var(--grade-forte) 1px, transparent 1px); background-size: 24px 24px;
 	.no { font: 700 12px var(--mono); padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--borda); background: var(--painel); white-space: nowrap; }
-	.no.amarelo { border-color: var(--amarelo); color: var(--amarelo); }
+	.no.amarelo { border-color: var(--amarelo-texto); color: var(--amarelo-texto); }
 	.no.verde { border-color: var(--ok); color: var(--ok); }
 	.no.azul { border-color: var(--azul); color: var(--azul); }
 	.fio { width: 26px; height: 2px; background: var(--borda); position: relative; flex: none; transform-origin: left; }
