@@ -15,10 +15,14 @@ export function useCarrossel<T extends HTMLElement = HTMLDivElement>(total: numb
 		const atualizar = () => {
 			const itens = Array.from(el.children) as HTMLElement[];
 			const inicio = el.getBoundingClientRect().left + parseFloat(getComputedStyle(el).paddingLeft);
-			let melhor = 0, distancia = Infinity;
+			let melhor = 0,
+				distancia = Infinity;
 			itens.forEach((item, i) => {
 				const d = Math.abs(item.getBoundingClientRect().left - inicio);
-				if (d < distancia) { distancia = d; melhor = i; }
+				if (d < distancia) {
+					distancia = d;
+					melhor = i;
+				}
 			});
 			// no fim da fila o último pode não alinhar no começo
 			if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 4) melhor = itens.length - 1;

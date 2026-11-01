@@ -17,9 +17,18 @@ export function Sobre() {
 			<div className="sobre">
 				<div className="acompanha">
 					<Titulo antes="Sobre" className="titulo" />
-					<p data-revela="">Sou <b>software engineer</b> focado em backend com <b>Java e Spring Boot</b>, system design e arquitetura distribuída.</p>
-					<p data-revela="">Já construí microsserviços, sistemas orientados a eventos e soluções na <b>AWS</b>, e participei de decisões sobre sharding, replicação e consistência, que são justamente os assuntos dos meus vídeos.</p>
-					<div className="idiomas" data-grupo="">{idiomas.map((i) => <Pill key={i}>{i}</Pill>)}</div>
+					<p data-revela="">
+						Sou <b>software engineer</b> focado em backend com <b>Java e Spring Boot</b>, system design e arquitetura distribuída.
+					</p>
+					<p data-revela="">
+						Já construí microsserviços, sistemas orientados a eventos e soluções na <b>AWS</b>, e participei de decisões sobre sharding, replicação e
+						consistência, que são justamente os assuntos dos meus vídeos.
+					</p>
+					<div className="idiomas" data-grupo="">
+						{idiomas.map((i) => (
+							<Pill key={i}>{i}</Pill>
+						))}
+					</div>
 				</div>
 				<Card className="metodo acompanha" data-revela="">
 					<h3>Como eu explico um conceito</h3>
@@ -32,7 +41,13 @@ export function Sobre() {
 							</li>
 						))}
 					</ol>
-					<p className="rodape-metodo"><span>~90 s</span><span>·</span><span>PT-BR</span><span>·</span><span>Instagram, TikTok e YouTube</span></p>
+					<p className="rodape-metodo">
+						<span>~90 s</span>
+						<span>·</span>
+						<span>PT-BR</span>
+						<span>·</span>
+						<span>Instagram, TikTok e YouTube</span>
+					</p>
 				</Card>
 			</div>
 		</section>

@@ -6,9 +6,7 @@ import type { Destaque, Repositorio } from './tipos';
  * "projeto:<slug>" (curado, em dados/projetos.ts) ou "github:<nome>" (repositório público).
  * Sem seleção (nunca escolhida, ou API fora do ar) vale o padrão: todos os curados, na ordem do código.
  */
-export type ItemDestaque =
-	| { chave: string; tipo: 'projeto'; projeto: Destaque }
-	| { chave: string; tipo: 'github'; repositorio: Repositorio };
+export type ItemDestaque = { chave: string; tipo: 'projeto'; projeto: Destaque } | { chave: string; tipo: 'github'; repositorio: Repositorio };
 
 export const MAXIMO_DESTAQUES = 6;
 export const chaveDoProjeto = (slug: string) => `projeto:${slug}`;

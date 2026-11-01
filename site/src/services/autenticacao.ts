@@ -1,7 +1,5 @@
-// Login no Keycloak (PKCE) e chamadas às rotas /admin-api da API com o token.
+// Login do painel /admin no Keycloak (PKCE, papel "admin").
 import Keycloak from 'keycloak-js';
-
-const api = import.meta.env.PUBLIC_API_URL ?? '';
 
 const login = {
 	url: import.meta.env.PUBLIC_KEYCLOAK_URL ?? 'http://localhost:8180',
@@ -20,22 +18,29 @@ async function keycloakNoAr() {
 }
 
 let inicio: Promise<boolean> | undefined;
-/** O keycloak-js só aceita um init(); o Fast Refresh do dev pode pedir de novo. */
+
+/**
+ * Exige login: quem não está autenticado é mandado pra tela do Keycloak e volta pro painel depois.
+ * O keycloak-js só aceita um init(); o Fast Refresh do dev pode pedir de novo.
+ */
 export function entrar() {
 	inicio ??= keycloakNoAr().then(() => keycloak.init({ onLoad: 'login-required', pkceMethod: 'S256', checkLoginIframe: false }));
 	// se falhou, a próxima tentativa começa do zero
-	inicio.catch(() => { inicio = undefined; });
+	inicio.catch(() => {
+		inicio = undefined;
+	});
 	return inicio;
 }
 
-export async function chamar(caminho: string, init: RequestInit = {}) {
+export const usuarioLogado = () => String(keycloak.tokenParsed?.preferred_username ?? '');
+export const ehAdmin = () => keycloak.hasRealmRole('admin');
+export const sair = () => keycloak.logout({ redirectUri: `${location.origin}/` });
+
+/** Token válido pra próxima chamada (renova se faltar menos de 30 s). */
+export async function tokenAtual() {
 	await keycloak.updateToken(30);
-	const resposta = await fetch(`${api}/admin-api${caminho}`, {
-		...init,
-		headers: { ...(init.headers ?? {}), Authorization: `Bearer ${keycloak.token}` },
-	});
-	if (resposta.status === 401) keycloak.login();
-	return resposta;
+	return keycloak.token;
 }
 
-export const dataBR = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+/** A API recusou o token: de volta pro login. */
+export const pedirLoginDeNovo = () => keycloak.login();

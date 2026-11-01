@@ -99,7 +99,11 @@ describe('formulário de contato', () => {
 
 	it('enquanto envia, o botão trava com "enviando…" e clique duplo manda uma vez só', async () => {
 		let responder!: (r: Response) => void;
-		fetch.mockReturnValue(new Promise<Response>((r) => { responder = r; }));
+		fetch.mockReturnValue(
+			new Promise<Response>((r) => {
+				responder = r;
+			}),
+		);
 		const f = montar();
 		await preencherCerto(f);
 		await f.usuario.dblClick(f.enviar);

@@ -9,7 +9,11 @@ import { usePaginaAnimada } from '../hooks/usePaginaAnimada';
 import type { Carga } from '../hooks/useSnapshot';
 import type { Snapshot } from '../lib/tipos';
 
-interface Props { geradoEm: string; carga: Carga<Snapshot>; tentarDeNovo: () => void }
+interface Props {
+	geradoEm: string;
+	carga: Carga<Snapshot>;
+	tentarDeNovo: () => void;
+}
 
 export function Inicio({ geradoEm, carga, tentarDeNovo }: Props) {
 	const raiz = usePaginaAnimada();

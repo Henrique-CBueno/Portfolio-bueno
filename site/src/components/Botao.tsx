@@ -18,7 +18,7 @@ type ComoRota = Comum & Omit<LinkProps, 'className'>;
 type ComoLink = Comum & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'className'> & { href: string };
 type ComoBotao = Comum & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'>;
 
-export function classeDoBotao(variante?: VarianteBotao, className?: string) {
+function classeDoBotao(variante?: VarianteBotao, className?: string) {
 	return ['botao', variante, className].filter(Boolean).join(' ');
 }
 

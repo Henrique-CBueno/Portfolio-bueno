@@ -34,13 +34,28 @@ function PaginaDoProjeto({ projeto: d }: { projeto: Destaque }) {
 				</Link>
 
 				<header className="cabeca">
-					<div className="tags" data-grupo="">{d.tags.map((t) => <Pill key={t.nome} cor={t.cor}>{t.nome}</Pill>)}</div>
+					<div className="tags" data-grupo="">
+						{d.tags.map((t) => (
+							<Pill key={t.nome} cor={t.cor}>
+								{t.nome}
+							</Pill>
+						))}
+					</div>
 					<Titulo tag="h1" antes={d.titulo} />
-					{d.nota && <p className="nota" data-revela="">{d.nota}</p>}
+					{d.nota && (
+						<p className="nota" data-revela="">
+							{d.nota}
+						</p>
+					)}
 				</header>
 
 				<Card className="janela" data-revela="">
-					<div className="barra"><i></i><i></i><i></i><span>{d.endereco}</span></div>
+					<div className="barra">
+						<i></i>
+						<i></i>
+						<i></i>
+						<span>{d.endereco}</span>
+					</div>
 					<div className="print" data-print="">
 						{d.print && <Img imagem={d.print.imagem} alt={d.print.alt} sizes="(max-width: 960px) 92vw, 1216px" loading="eager" fetchPriority="high" />}
 						{d.diagrama && <Diagrama {...d.diagrama} />}
@@ -48,7 +63,9 @@ function PaginaDoProjeto({ projeto: d }: { projeto: Destaque }) {
 				</Card>
 
 				<div className="corpo">
-					<p className="descricao" data-revela="">{d.descricao}</p>
+					<p className="descricao" data-revela="">
+						{d.descricao}
+					</p>
 					<div className="links" data-revela="">
 						{d.links.map((l) => (
 							<Botao key={l.href} variante={l === d.links[0] ? 'primario' : undefined} href={l.href} target="_blank" rel="noopener noreferrer">
@@ -61,12 +78,19 @@ function PaginaDoProjeto({ projeto: d }: { projeto: Destaque }) {
 
 			{outros.length > 0 && (
 				<section className="secao outros" aria-labelledby="outros-projetos">
-					<h2 className="subtitulo" id="outros-projetos" data-revela="">Outros projetos</h2>
+					<h2 className="subtitulo" id="outros-projetos" data-revela="">
+						Outros projetos
+					</h2>
 					<div className="lista-outros" data-grupo="">
 						{outros.map((o) => (
 							<Card key={o.slug} as={Link} className="outro" to={caminhoDoProjeto(o.slug)} data-cursor="ver">
-								<span><strong>{o.titulo}</strong><small>{o.endereco}</small></span>
-								<span className="seta"><ArrowRight /></span>
+								<span>
+									<strong>{o.titulo}</strong>
+									<small>{o.endereco}</small>
+								</span>
+								<span className="seta">
+									<ArrowRight />
+								</span>
 							</Card>
 						))}
 					</div>

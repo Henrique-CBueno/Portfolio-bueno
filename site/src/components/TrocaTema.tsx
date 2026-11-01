@@ -1,37 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { aplicarTema, CHAVE_TEMA, temaAtual, type Tema } from '../lib/tema';
+import { aplicarTema, assinarTema, temaAtual, type Tema } from '../lib/tema';
 import './TrocaTema.css';
 
+/** No servidor (build) não há escolha do visitante: o HTML sai com o padrão, o escuro. */
+const temaNoServidor = (): Tema => 'escuro';
+
 /**
- * Botão de tema. O ícone vem do CSS (pelo data-tema do <html>), não do estado: o HTML do build não sabe a
- * escolha do visitante, e assim nada muda na hidratação.
+ * Botão de tema. O tema vive no <html> (data-tema), fora do React: useSyncExternalStore lê de lá e
+ * acompanha as trocas, inclusive de outra aba. O ícone vem do CSS, então nada muda na hidratação.
  */
 export function TrocaTema() {
-	const [tema, setTema] = useState<Tema>('escuro');
-
-	useEffect(() => {
-		setTema(temaAtual());
-		// outra aba trocou: acompanha
-		const aoMudar = (e: StorageEvent) => {
-			if (e.key !== CHAVE_TEMA) return;
-			const novo: Tema = e.newValue === 'claro' ? 'claro' : 'escuro';
-			aplicarTema(novo, false);
-			setTema(novo);
-		};
-		addEventListener('storage', aoMudar);
-		return () => removeEventListener('storage', aoMudar);
-	}, []);
-
+	const tema = useSyncExternalStore(assinarTema, temaAtual, temaNoServidor);
 	const proximo: Tema = tema === 'claro' ? 'escuro' : 'claro';
 	return (
-		<button
-			type="button"
-			className="troca-tema"
-			aria-label={`usar tema ${proximo}`}
-			title={`tema ${proximo}`}
-			onClick={() => { aplicarTema(proximo); setTema(proximo); }}
-		>
+		<button type="button" className="troca-tema" aria-label={`usar tema ${proximo}`} title={`tema ${proximo}`} onClick={() => aplicarTema(proximo)}>
 			<Sun className="sol" aria-hidden="true" />
 			<Moon className="lua" aria-hidden="true" />
 		</button>

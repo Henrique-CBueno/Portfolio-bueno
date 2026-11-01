@@ -19,7 +19,10 @@ import { Card } from './Card';
 const foto = imagem(fotoPicture);
 const ordem: Rede[] = ['instagram', 'tiktok', 'youtube', 'github'];
 
-interface Props { carga: Carga<Snapshot>; geradoEm: string }
+interface Props {
+	carga: Carga<Snapshot>;
+	geradoEm: string;
+}
 
 /** Número de seguidores; quando muda ao vivo, pisca verde e desce um pouco. */
 function Legenda({ texto, aviso }: { texto: string; aviso?: string }) {
@@ -34,7 +37,11 @@ function Legenda({ texto, aviso }: { texto: string; aviso?: string }) {
 		const volta = setTimeout(() => setMudou(false), 1500);
 		return () => clearTimeout(volta);
 	}, [texto]);
-	return <small ref={el} className={mudou ? 'mudou' : undefined} title={aviso}>{texto}</small>;
+	return (
+		<small ref={el} className={mudou ? 'mudou' : undefined} title={aviso}>
+			{texto}
+		</small>
+	);
 }
 
 export function Abertura({ carga, geradoEm }: Props) {
@@ -62,40 +69,87 @@ export function Abertura({ carga, geradoEm }: Props) {
 		<div className="abertura" id="inicio">
 			<div className="retrato" data-retrato="">
 				<div className="foto" data-foto="">
-					<Img imagem={foto} alt="Henrique Bueno sentado com o notebook cheio de adesivos" sizes="(max-width: 960px) 340px, 460px" loading="eager" fetchPriority="high" />
+					<Img
+						imagem={foto}
+						alt="Henrique Bueno sentado com o notebook cheio de adesivos"
+						sizes="(max-width: 960px) 340px, 460px"
+						loading="eager"
+						fetchPriority="high"
+					/>
 				</div>
-				<Card className="colado java" data-colado=""><span className="ic"><Coffee /></span><span><strong>Java</strong><small>Spring Boot</small></span></Card>
-				<Card className="colado aws" data-colado=""><span className="ic"><Cloud /></span><span><strong>AWS</strong><small>cloud</small></span></Card>
-				<div className="carimbo" data-carimbo=""><AtSign />{perfil.handle}</div>
+				<Card className="colado java" data-colado="">
+					<span className="ic">
+						<Coffee />
+					</span>
+					<span>
+						<strong>Java</strong>
+						<small>Spring Boot</small>
+					</span>
+				</Card>
+				<Card className="colado aws" data-colado="">
+					<span className="ic">
+						<Cloud />
+					</span>
+					<span>
+						<strong>AWS</strong>
+						<small>cloud</small>
+					</span>
+				</Card>
+				<div className="carimbo" data-carimbo="">
+					<AtSign />
+					{perfil.handle}
+				</div>
 			</div>
 
 			<div className="texto">
 				<Titulo tag="h1" antes={perfil.nome} />
 				<Titulo tag="p" className="papel" destaque={perfil.papel} />
-				<p className="bio" data-entra="">Trabalho com <b>Java e AWS</b> e gravo vídeos de 90 segundos explicando <b>sistemas distribuídos</b> com exemplos do Brasil.</p>
+				<p className="bio" data-entra="">
+					Trabalho com <b>Java e AWS</b> e gravo vídeos de 90 segundos explicando <b>sistemas distribuídos</b> com exemplos do Brasil.
+				</p>
 				<div className="acoes" data-entra="">
-					<Botao variante="primario" href="#projetos">ver projetos <ArrowDown /></Botao>
-					<Botao href="#contato">falar comigo <Send /></Botao>
+					<Botao variante="primario" href="#projetos">
+						ver projetos <ArrowDown />
+					</Botao>
+					<Botao href="#contato">
+						falar comigo <Send />
+					</Botao>
 				</div>
 				<div className="numeros" data-entra="">
 					{numeros.map((n) => (
-						<div key={n.rotulo}><strong><span data-conta={n.valor}>{n.valor}</span><em>{n.sufixo}</em></strong><span>{n.rotulo}</span></div>
+						<div key={n.rotulo}>
+							<strong>
+								<span data-conta={n.valor}>{n.valor}</span>
+								<em>{n.sufixo}</em>
+							</strong>
+							<span>{n.rotulo}</span>
+						</div>
 					))}
 				</div>
 				<div className="redes" data-entra="">
 					{ordem.map((rede) => (
 						<Card key={rede} as="a" className="rede" href={redes[rede].url} target="_blank" rel="me noopener noreferrer">
-							<span className="ic"><Marca rede={rede} /></span>
+							<span className="ic">
+								<Marca rede={rede} />
+							</span>
 							<span>
 								<strong>{redes[rede].nome}</strong>
-								{legenda(rede) === null
-									? <small className="carregando"><span className="esqueleto" aria-hidden="true"></span><span className="so-leitor">carregando seguidores</span></small>
-									: <Legenda texto={legenda(rede)!} aviso={redes[rede].unidade ? aviso : undefined} />}
+								{legenda(rede) === null ? (
+									<small className="carregando">
+										<span className="esqueleto" aria-hidden="true"></span>
+										<span className="so-leitor">carregando seguidores</span>
+									</small>
+								) : (
+									<Legenda texto={legenda(rede)!} aviso={redes[rede].unidade ? aviso : undefined} />
+								)}
 							</span>
 						</Card>
 					))}
 				</div>
-				<p className="local" data-entra=""><MapPin />{perfil.local}</p>
+				<p className="local" data-entra="">
+					<MapPin />
+					{perfil.local}
+				</p>
 			</div>
 		</div>
 	);

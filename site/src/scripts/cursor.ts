@@ -21,7 +21,12 @@ export function iniciarCursor() {
 	const rotulo = cursor.querySelector<HTMLElement>('.cursor-rotulo')!;
 	const raiz = document.documentElement;
 
-	let mx = -100, my = -100, ax = -100, ay = -100, quadro = 0, escala = 1;
+	let mx = -100,
+		my = -100,
+		ax = -100,
+		ay = -100,
+		quadro = 0,
+		escala = 1;
 	const passo = () => {
 		ax += (mx - ax) * 0.2;
 		ay += (my - ay) * 0.2;
@@ -29,16 +34,20 @@ export function iniciarCursor() {
 		quadro = Math.abs(mx - ax) + Math.abs(my - ay) > 0.1 ? requestAnimationFrame(passo) : 0;
 	};
 
-	addEventListener('pointermove', (e) => {
-		if (e.pointerType !== 'mouse') return;
-		mx = e.clientX;
-		my = e.clientY;
-		ponto.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
-		raiz.style.setProperty('--mx', `${mx}px`);
-		raiz.style.setProperty('--my', `${my}px`);
-		cursor.classList.remove('fora');
-		if (!quadro) quadro = requestAnimationFrame(passo);
-	}, { passive: true });
+	addEventListener(
+		'pointermove',
+		(e) => {
+			if (e.pointerType !== 'mouse') return;
+			mx = e.clientX;
+			my = e.clientY;
+			ponto.style.transform = `translate3d(${mx}px, ${my}px, 0)`;
+			raiz.style.setProperty('--mx', `${mx}px`);
+			raiz.style.setProperty('--my', `${my}px`);
+			cursor.classList.remove('fora');
+			if (!quadro) quadro = requestAnimationFrame(passo);
+		},
+		{ passive: true },
+	);
 
 	document.addEventListener('pointerleave', () => cursor.classList.add('fora'));
 
@@ -55,6 +64,12 @@ export function iniciarCursor() {
 	});
 
 	// clique: o anel "aperta" e volta
-	addEventListener('pointerdown', () => { escala = 0.8; if (!quadro) quadro = requestAnimationFrame(passo); });
-	addEventListener('pointerup', () => { escala = 1; if (!quadro) quadro = requestAnimationFrame(passo); });
+	addEventListener('pointerdown', () => {
+		escala = 0.8;
+		if (!quadro) quadro = requestAnimationFrame(passo);
+	});
+	addEventListener('pointerup', () => {
+		escala = 1;
+		if (!quadro) quadro = requestAnimationFrame(passo);
+	});
 }

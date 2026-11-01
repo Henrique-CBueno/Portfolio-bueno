@@ -1,6 +1,7 @@
 // Seguidores: chegam com o snapshot da API e depois ao vivo pelo SSE (que também manda os números
 // assim que conecta). Se o SSE cair, ficam os últimos números e o aviso de quando foram lidos.
 import { useEffect, useState } from 'react';
+import { acompanharContagens } from '../services/api';
 import { tempoRelativo } from '../lib/formato';
 import type { Carga } from './useSnapshot';
 import type { Contagem, Snapshot } from '../lib/tipos';
@@ -12,25 +13,22 @@ export function useContagensAoVivo(carga: Carga<Snapshot>) {
 	const doSnapshot = carga.estado === 'pronto' ? carga.dados : null;
 
 	useEffect(() => {
-		const api = import.meta.env.PUBLIC_API_URL;
-		if (!api) return;
 		let lidoEm: Date | null = null;
-		const fonte = new EventSource(new URL('/stream', api));
-		fonte.addEventListener('contagens', (evento) => {
-			const novas = JSON.parse((evento as MessageEvent).data) as Contagem[];
-			lidoEm = new Date();
-			setAviso(undefined);
-			setAoVivo((atuais) => {
-				const porRede = new Map((atuais ?? []).map((c) => [c.rede, c]));
-				// sem número a rede continua com o que já mostrava
-				for (const c of novas) if (c.valor !== null || !porRede.has(c.rede)) porRede.set(c.rede, c);
-				return [...porRede.values()];
-			});
-		});
-		fonte.addEventListener('error', () => {
-			if (lidoEm) setAviso(`último valor · ${tempoRelativo(lidoEm)}`);
-		});
-		return () => fonte.close();
+		return acompanharContagens(
+			(novas) => {
+				lidoEm = new Date();
+				setAviso(undefined);
+				setAoVivo((atuais) => {
+					const porRede = new Map((atuais ?? []).map((c) => [c.rede, c]));
+					// sem número a rede continua com o que já mostrava
+					for (const c of novas) if (c.valor !== null || !porRede.has(c.rede)) porRede.set(c.rede, c);
+					return [...porRede.values()];
+				});
+			},
+			() => {
+				if (lidoEm) setAviso(`último valor · ${tempoRelativo(lidoEm)}`);
+			},
+		);
 	}, []);
 
 	// o SSE é mais novo que o snapshot; enquanto nenhum dos dois chegou, é null (a tela mostra o esqueleto)

@@ -1,0 +1,9 @@
+dist
+dist-ssr
+node_modules
+test-results
+playwright-report
+package-lock.json
+public
+# CSS fica com uma regra por linha (convenção do projeto, ver README): o Prettier quebraria cada declaração
+*.css

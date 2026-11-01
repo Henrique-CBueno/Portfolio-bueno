@@ -11,8 +11,7 @@ type Parar = () => void;
 
 const reduzido = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const todos = <T extends Element = HTMLElement>(seletor: string, raiz: ParentNode = document) =>
-	Array.from(raiz.querySelectorAll<T & Element>(seletor)) as T[];
+const todos = <T extends Element = HTMLElement>(seletor: string, raiz: ParentNode = document) => Array.from(raiz.querySelectorAll<T & Element>(seletor)) as T[];
 
 /** inView só com os elementos que existem nesta página. */
 function aoAparecer(elementos: Element[], aoEntrar: Parameters<typeof inView>[1], opcoes: Parameters<typeof inView>[2], paradas: Parar[]) {
@@ -51,11 +50,19 @@ function abertura(raiz: HTMLElement, paradas: Parar[]) {
 	const [nome, papel] = todos('[data-palavras]', area);
 	if (nome) palavras(nome, 0.15);
 	if (papel) palavras(papel, 0.45);
-	const cards = animate(todos('[data-colado]', area), { opacity: [0, 1], y: [-28, 0], scale: [1.18, 1] }, { ...mola, delay: stagger(0.14, { startDelay: 0.55 }) });
+	const cards = animate(
+		todos('[data-colado]', area),
+		{ opacity: [0, 1], y: [-28, 0], scale: [1.18, 1] },
+		{ ...mola, delay: stagger(0.14, { startDelay: 0.55 }) },
+	);
 	const carimbo = animate(todos('[data-carimbo]', area), { opacity: [0, 1], scale: [1.9, 1] }, { type: 'spring', bounce: 0.5, duration: 0.7, delay: 0.95 });
 	let saiu = false;
-	paradas.push(() => { saiu = true; });
-	Promise.all([cards, carimbo]).then(() => { if (!saiu) flutuar(area, paradas); });
+	paradas.push(() => {
+		saiu = true;
+	});
+	Promise.all([cards, carimbo]).then(() => {
+		if (!saiu) flutuar(area, paradas);
+	});
 	animate(todos('[data-entra]', area), { opacity: [0, 1], y: [16, 0] }, { duration: 0.6, ease: sobe, delay: stagger(0.08, { startDelay: 0.6 }) });
 	todos('[data-conta]', area).forEach((el, i) => contar(el, 0.85 + i * 0.1));
 }
@@ -73,15 +80,21 @@ function flutuar(area: HTMLElement, paradas: Parar[]) {
 		animate(retrato.querySelector('[data-carimbo]')!, { y: [0, -4, 0] }, { duration: 3.4, ease: 'easeInOut', repeat: Infinity, delay: 0.6 }),
 		animate(retrato.querySelector('[data-foto] img')!, { scale: [1, 1.035, 1] }, { duration: 9, ease: 'easeInOut', repeat: Infinity }),
 	];
-	paradas.push(inView(retrato, () => {
-		loops.forEach((a) => a.play());
-		return () => loops.forEach((a) => a.pause());
-	}));
+	paradas.push(
+		inView(retrato, () => {
+			loops.forEach((a) => a.play());
+			return () => loops.forEach((a) => a.pause());
+		}),
+	);
 	paradas.push(() => loops.forEach((a) => a.stop()));
 
 	if (!matchMedia('(pointer: fine)').matches) return;
 	// inclinação 3D: segue o mouse em qualquer ponto da abertura, com suavização
-	let alvoX = 0, alvoY = 0, x = 0, y = 0, quadro = 0;
+	let alvoX = 0,
+		alvoY = 0,
+		x = 0,
+		y = 0,
+		quadro = 0;
 	const passo = () => {
 		x += (alvoX - x) * 0.08;
 		y += (alvoY - y) * 0.08;
@@ -113,40 +126,73 @@ function flutuar(area: HTMLElement, paradas: Parar[]) {
 function revelacoes(raiz: HTMLElement, paradas: Parar[]) {
 	// os títulos da abertura têm a entrada própria
 	const titulos = todos('[data-palavras]', raiz).filter((el) => !el.closest('.abertura'));
-	aoAparecer(titulos, (el) => { palavras(el); }, { amount: 0.6 }, paradas);
-	aoAparecer(todos('[data-revela]', raiz), (el) => { animate(el, { opacity: [0, 1], y: [24, 0] }, { duration: 0.7, ease: sobe }); }, { amount: 0.25 }, paradas);
-	aoAparecer(todos('[data-grupo]', raiz), (el) => {
-		animate(Array.from(el.children), { opacity: [0, 1], y: [20, 0] }, { duration: 0.6, ease: sobe, delay: stagger(0.06) });
-	}, { amount: 0.15 }, paradas);
+	aoAparecer(
+		titulos,
+		(el) => {
+			palavras(el);
+		},
+		{ amount: 0.6 },
+		paradas,
+	);
+	aoAparecer(
+		todos('[data-revela]', raiz),
+		(el) => {
+			animate(el, { opacity: [0, 1], y: [24, 0] }, { duration: 0.7, ease: sobe });
+		},
+		{ amount: 0.25 },
+		paradas,
+	);
+	aoAparecer(
+		todos('[data-grupo]', raiz),
+		(el) => {
+			animate(Array.from(el.children), { opacity: [0, 1], y: [20, 0] }, { duration: 0.6, ease: sobe, delay: stagger(0.06) });
+		},
+		{ amount: 0.15 },
+		paradas,
+	);
 }
 
 /** Cadeias (stacks, "como eu explico"): cada elo acende depois do fio que liga ao anterior. */
 function cadeias(raiz: HTMLElement, paradas: Parar[]) {
-	aoAparecer(todos('[data-cadeia]', raiz), (cadeia) => {
-		todos('[data-elo]', cadeia).forEach((elo, i) => {
-			const atraso = i * 0.12;
-			const fio = elo.querySelector('[data-fio]');
-			if (fio) animate(fio, { scaleY: [0, 1] }, { duration: 0.25, delay: atraso, ease: 'easeOut' });
-			animate(elo, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.5, ease: sobe, delay: atraso + 0.1 });
-			const chips = todos('.chip', elo);
-			if (chips.length) animate(chips, { opacity: [0, 1], y: [6, 0] }, { duration: 0.35, delay: stagger(0.035, { startDelay: atraso + 0.25 }) });
-		});
-	}, { amount: 0.15 }, paradas);
+	aoAparecer(
+		todos('[data-cadeia]', raiz),
+		(cadeia) => {
+			todos('[data-elo]', cadeia).forEach((elo, i) => {
+				const atraso = i * 0.12;
+				const fio = elo.querySelector('[data-fio]');
+				if (fio) animate(fio, { scaleY: [0, 1] }, { duration: 0.25, delay: atraso, ease: 'easeOut' });
+				animate(elo, { opacity: [0, 1], x: [-14, 0] }, { duration: 0.5, ease: sobe, delay: atraso + 0.1 });
+				const chips = todos('.chip', elo);
+				if (chips.length) animate(chips, { opacity: [0, 1], y: [6, 0] }, { duration: 0.35, delay: stagger(0.035, { startDelay: atraso + 0.25 }) });
+			});
+		},
+		{ amount: 0.15 },
+		paradas,
+	);
 }
 
 /** Diagramas: nós e fios aparecem em sequência; depois os pacotes correm enquanto está na tela. */
 function diagramas(raiz: HTMLElement, paradas: Parar[]) {
-	aoAparecer(todos('[data-diagrama]', raiz), (diagrama) => {
-		const nos = todos('[data-no]', diagrama);
-		const fios = todos('[data-fio-h]', diagrama);
-		animate(nos, { opacity: [0, 1], scale: [0.8, 1] }, { ...mola, delay: stagger(0.16) });
-		animate(fios, { opacity: [0, 1], scaleX: [0, 1] }, { duration: 0.3, ease: 'easeOut', delay: stagger(0.16, { startDelay: 0.12 }) });
-		const pacotes = todos('[data-pacote]', diagrama).map((p, i) => {
-			const largura = (p.parentElement?.offsetWidth ?? 26) - 6;
-			return animate(p, { x: [0, largura], opacity: [0, 1, 1, 0] }, { duration: 0.7, ease: 'easeInOut', delay: 0.9 + i * 0.35, repeat: Infinity, repeatDelay: 0.35 * (fios.length - 1) + 0.6 });
-		});
-		return () => pacotes.forEach((a) => a.stop());
-	}, { amount: 0.4 }, paradas);
+	aoAparecer(
+		todos('[data-diagrama]', raiz),
+		(diagrama) => {
+			const nos = todos('[data-no]', diagrama);
+			const fios = todos('[data-fio-h]', diagrama);
+			animate(nos, { opacity: [0, 1], scale: [0.8, 1] }, { ...mola, delay: stagger(0.16) });
+			animate(fios, { opacity: [0, 1], scaleX: [0, 1] }, { duration: 0.3, ease: 'easeOut', delay: stagger(0.16, { startDelay: 0.12 }) });
+			const pacotes = todos('[data-pacote]', diagrama).map((p, i) => {
+				const largura = (p.parentElement?.offsetWidth ?? 26) - 6;
+				return animate(
+					p,
+					{ x: [0, largura], opacity: [0, 1, 1, 0] },
+					{ duration: 0.7, ease: 'easeInOut', delay: 0.9 + i * 0.35, repeat: Infinity, repeatDelay: 0.35 * (fios.length - 1) + 0.6 },
+				);
+			});
+			return () => pacotes.forEach((a) => a.stop());
+		},
+		{ amount: 0.4 },
+		paradas,
+	);
 }
 
 /** Prints dos projetos andam um pouco dentro da janela enquanto a página rola. */
@@ -160,10 +206,15 @@ function paralaxe(raiz: HTMLElement, paradas: Parar[]) {
 
 /** Carimbos de prêmio "batem" no card quando ele aparece. */
 function carimbos(raiz: HTMLElement, paradas: Parar[]) {
-	aoAparecer(todos('.premio', raiz), (card) => {
-		const carimbo = card.querySelector('[data-carimbo]');
-		if (carimbo) animate(carimbo, { opacity: [0, 1], scale: [2, 1] }, { type: 'spring', bounce: 0.45, duration: 0.6, delay: 0.35 });
-	}, { amount: 0.4 }, paradas);
+	aoAparecer(
+		todos('.premio', raiz),
+		(card) => {
+			const carimbo = card.querySelector('[data-carimbo]');
+			if (carimbo) animate(carimbo, { opacity: [0, 1], scale: [2, 1] }, { type: 'spring', bounce: 0.45, duration: 0.6, delay: 0.35 });
+		},
+		{ amount: 0.4 },
+		paradas,
+	);
 }
 
 /** Anima o conteúdo de uma página (o <main> dela). Devolve como parar tudo, pra quando ela sai da tela. */

@@ -23,7 +23,10 @@ const corValida = (cor?: string | null) => !!cor && /^#[0-9a-f]{6}$/i.test(cor);
 /** Só links http(s) viram href (o que vem da API passa por aqui). */
 const seguro = (link: string) => (/^https?:\/\//.test(link) ? link : undefined);
 
-interface Props { carga: Carga<Snapshot>; tentarDeNovo: () => void }
+interface Props {
+	carga: Carga<Snapshot>;
+	tentarDeNovo: () => void;
+}
 
 /**
  * Os destaques que a home mostra: a seleção do painel quando a API respondeu; o padrão (os curados) se ela falhou;
@@ -45,37 +48,64 @@ export function Projetos({ carga, tentarDeNovo }: Props) {
 		<section className="secao projetos" id="projetos">
 			<div className="cab">
 				<Titulo antes="Projetos em" destaque="destaque" />
-				<a href={redes.github.url} target="_blank" rel="noopener noreferrer" data-revela="">ver todo o GitHub <ArrowUpRight /></a>
+				<a href={redes.github.url} target="_blank" rel="noopener noreferrer" data-revela="">
+					ver todo o GitHub <ArrowUpRight />
+				</a>
 			</div>
 
 			{itens === null && (
 				<div className="destaques carrossel" aria-busy="true">
-					<span className="so-leitor" role="status">carregando os projetos em destaque</span>
+					<span className="so-leitor" role="status">
+						carregando os projetos em destaque
+					</span>
 					{Array.from({ length: 2 }, (_, i) => (
 						<Card key={i} className="destaque esqueleto-destaque" aria-hidden="true">
-							<div className="janela"><div className="barra"><i></i><i></i><i></i></div><div className="print esqueleto"></div></div>
-							<div className="corpo"><span className="esqueleto tags-e"></span><span className="esqueleto titulo-e"></span><span className="esqueleto texto-e"></span><span className="esqueleto texto-e curto"></span></div>
+							<div className="janela">
+								<div className="barra">
+									<i></i>
+									<i></i>
+									<i></i>
+								</div>
+								<div className="print esqueleto"></div>
+							</div>
+							<div className="corpo">
+								<span className="esqueleto tags-e"></span>
+								<span className="esqueleto titulo-e"></span>
+								<span className="esqueleto texto-e"></span>
+								<span className="esqueleto texto-e curto"></span>
+							</div>
 						</Card>
 					))}
 				</div>
 			)}
 
 			{itens?.length === 0 && (
-				<p className="sem-repos chega">Nenhum projeto em destaque agora. <a href={redes.github.url} target="_blank" rel="noopener noreferrer">ver o GitHub <ArrowUpRight /></a></p>
+				<p className="sem-repos chega">
+					Nenhum projeto em destaque agora.{' '}
+					<a href={redes.github.url} target="_blank" rel="noopener noreferrer">
+						ver o GitHub <ArrowUpRight />
+					</a>
+				</p>
 			)}
 
 			{itens && itens.length > 0 && (
 				<>
 					<div className="destaques carrossel" data-carrossel="" ref={lista}>
-						{itens.map((item, i) => (item.tipo === 'projeto'
-							? <CardProjeto key={item.chave} projeto={item.projeto} ordem={i} />
-							: <CardRepositorio key={item.chave} repositorio={item.repositorio} ordem={i} />))}
+						{itens.map((item, i) =>
+							item.tipo === 'projeto' ? (
+								<CardProjeto key={item.chave} projeto={item.projeto} ordem={i} />
+							) : (
+								<CardRepositorio key={item.chave} repositorio={item.repositorio} ordem={i} />
+							),
+						)}
 					</div>
 					<Indicador atual={atual} total={itens.length} />
 				</>
 			)}
 
-			<h3 className="subtitulo" data-revela="">Fixados no GitHub</h3>
+			<h3 className="subtitulo" data-revela="">
+				Fixados no GitHub
+			</h3>
 			<Fixados carga={carga} tentarDeNovo={tentarDeNovo} emDestaque={enderecosEmDestaque(itens ?? [])} />
 		</section>
 	);
@@ -87,19 +117,36 @@ function CardProjeto({ projeto: d, ordem }: { projeto: Destaque; ordem: number }
 		<Card as="article" className={d.largo ? 'destaque largo chega' : 'destaque chega'} style={{ animationDelay: `${ordem * 70}ms` }}>
 			{/* o card abre a página do projeto; o site dele fica nos links de baixo */}
 			<Link className="janela" to={caminhoDoProjeto(d.slug)} data-cursor="ver" aria-label={`Ver o projeto ${d.titulo}`}>
-				<div className="barra"><i></i><i></i><i></i><span>{d.endereco}</span></div>
+				<div className="barra">
+					<i></i>
+					<i></i>
+					<i></i>
+					<span>{d.endereco}</span>
+				</div>
 				<div className="print" data-print="">
 					{d.print && <Img imagem={d.print.imagem} alt={d.print.alt} sizes="(max-width: 960px) 92vw, 600px" />}
 					{d.diagrama && <Diagrama {...d.diagrama} />}
 				</div>
 			</Link>
 			<div className="corpo">
-				<div className="tags">{d.tags.map((t) => <Pill key={t.nome} cor={t.cor}>{t.nome}</Pill>)}</div>
+				<div className="tags">
+					{d.tags.map((t) => (
+						<Pill key={t.nome} cor={t.cor}>
+							{t.nome}
+						</Pill>
+					))}
+				</div>
 				<h3>{d.titulo}</h3>
 				<p>{d.descricao}</p>
 				<div className="links">
-					<Link to={caminhoDoProjeto(d.slug)}>detalhes <ArrowRight /></Link>
-					{d.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer">{l.rotulo} {l.icone === 'github' ? <Marca rede="github" /> : <ArrowUpRight />}</a>)}
+					<Link to={caminhoDoProjeto(d.slug)}>
+						detalhes <ArrowRight />
+					</Link>
+					{d.links.map((l) => (
+						<a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer">
+							{l.rotulo} {l.icone === 'github' ? <Marca rede="github" /> : <ArrowUpRight />}
+						</a>
+					))}
 					{d.nota && <small>{d.nota}</small>}
 				</div>
 			</div>
@@ -113,19 +160,35 @@ function CardRepositorio({ repositorio: r, ordem }: { repositorio: Repositorio; 
 	return (
 		<Card as="article" className="destaque chega" style={{ animationDelay: `${ordem * 70}ms` }}>
 			<a className="janela" href={seguro(r.url)} target="_blank" rel="noopener noreferrer" data-cursor="abrir" aria-label={`Abrir ${r.nome} no GitHub`}>
-				<div className="barra"><i></i><i></i><i></i><span>{caminho}</span></div>
+				<div className="barra">
+					<i></i>
+					<i></i>
+					<i></i>
+					<span>{caminho}</span>
+				</div>
 				<div className="print capa-repo">
 					<Marca rede="github" className="logo" />
 					<strong>{r.nome}</strong>
-					{r.linguagens[0] && <span className="linguagem">{corValida(r.corLinguagem) && <i style={{ background: r.corLinguagem! }} aria-hidden="true"></i>}{r.linguagens[0]}</span>}
+					{r.linguagens[0] && (
+						<span className="linguagem">
+							{corValida(r.corLinguagem) && <i style={{ background: r.corLinguagem! }} aria-hidden="true"></i>}
+							{r.linguagens[0]}
+						</span>
+					)}
 				</div>
 			</a>
 			<div className="corpo">
-				<div className="tags">{r.linguagens.map((l) => <Pill key={l}>{l}</Pill>)}</div>
+				<div className="tags">
+					{r.linguagens.map((l) => (
+						<Pill key={l}>{l}</Pill>
+					))}
+				</div>
 				<h3>{r.nome}</h3>
 				{r.descricao ? <p>{r.descricao}</p> : <p className="vazio">sem descrição no GitHub</p>}
 				<div className="links">
-					<a href={seguro(r.url)} target="_blank" rel="noopener noreferrer">ver no GitHub <Marca rede="github" /></a>
+					<a href={seguro(r.url)} target="_blank" rel="noopener noreferrer">
+						ver no GitHub <Marca rede="github" />
+					</a>
 					{r.atualizadoEm && <small>atualizado {tempoRelativo(new Date(r.atualizadoEm))}</small>}
 				</div>
 			</div>
@@ -138,11 +201,20 @@ function Fixados({ carga, tentarDeNovo, emDestaque }: Props & { emDestaque: Set<
 	if (carga.estado === 'carregando') {
 		return (
 			<div className="lista" aria-busy="true">
-				<span className="so-leitor" role="status">carregando os repositórios fixados</span>
+				<span className="so-leitor" role="status">
+					carregando os repositórios fixados
+				</span>
 				{Array.from({ length: 3 }, (_, i) => (
 					<div key={i} className="repo esqueleto-repo" aria-hidden="true">
-						<div><span className="esqueleto nome"></span><span className="esqueleto chips"></span><span className="esqueleto chips"></span></div>
-						<div><span className="esqueleto texto"></span><span className="esqueleto texto curto"></span></div>
+						<div>
+							<span className="esqueleto nome"></span>
+							<span className="esqueleto chips"></span>
+							<span className="esqueleto chips"></span>
+						</div>
+						<div>
+							<span className="esqueleto texto"></span>
+							<span className="esqueleto texto curto"></span>
+						</div>
 						<span className="esqueleto seta"></span>
 					</div>
 				))}
@@ -152,21 +224,36 @@ function Fixados({ carga, tentarDeNovo, emDestaque }: Props & { emDestaque: Set<
 	if (carga.estado === 'erro') {
 		return (
 			<Card className="falha chega" role="alert">
-				<p><strong>Não deu pra carregar os repositórios agora.</strong>Eles continuam todos no GitHub.</p>
+				<p>
+					<strong>Não deu pra carregar os repositórios agora.</strong>Eles continuam todos no GitHub.
+				</p>
 				<div className="redes-vazio">
-					<Botao type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></Botao>
-					<a className="pill verde" href={redes.github.url} target="_blank" rel="noopener noreferrer">github</a>
+					<Botao type="button" onClick={tentarDeNovo}>
+						tentar de novo <RotateCw />
+					</Botao>
+					<a className="pill verde" href={redes.github.url} target="_blank" rel="noopener noreferrer">
+						github
+					</a>
 				</div>
 			</Card>
 		);
 	}
 	const outros = (carga.dados.repositorios ?? []).filter((r) => !emDestaque.has(r.url.toLowerCase()));
 	if (outros.length === 0) {
-		return <p className="sem-repos chega">Nenhum repositório fixado no GitHub agora. <a href={redes.github.url} target="_blank" rel="noopener noreferrer">ver o perfil <ArrowUpRight /></a></p>;
+		return (
+			<p className="sem-repos chega">
+				Nenhum repositório fixado no GitHub agora.{' '}
+				<a href={redes.github.url} target="_blank" rel="noopener noreferrer">
+					ver o perfil <ArrowUpRight />
+				</a>
+			</p>
+		);
 	}
 	return (
 		<div className="lista">
-			{outros.map((r, i) => <Repo key={r.url} repositorio={r} ordem={i} />)}
+			{outros.map((r, i) => (
+				<Repo key={r.url} repositorio={r} ordem={i} />
+			))}
 		</div>
 	);
 }
@@ -185,10 +272,16 @@ function Repo({ repositorio: r, ordem }: { repositorio: Repositorio; ordem: numb
 						</span>
 					))}
 				</div>
-				{r.atualizadoEm && <time className="atualizado" dateTime={r.atualizadoEm}>atualizado {tempoRelativo(new Date(r.atualizadoEm))}</time>}
+				{r.atualizadoEm && (
+					<time className="atualizado" dateTime={r.atualizadoEm}>
+						atualizado {tempoRelativo(new Date(r.atualizadoEm))}
+					</time>
+				)}
 			</div>
 			{r.descricao ? <p>{r.descricao}</p> : <p className="vazio">sem descrição no GitHub</p>}
-			<span className="seta"><ArrowUpRight /></span>
+			<span className="seta">
+				<ArrowUpRight />
+			</span>
 		</a>
 	);
 }

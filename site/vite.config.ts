@@ -22,10 +22,12 @@ async function cssDaPagina(servidor: ViteDevServer): Promise<string> {
 		m.importedModules.forEach(visitar);
 	};
 	visitar(entrada);
-	const estilos = await Promise.all(css.map(async (m) => {
-		const codigo = (await servidor.transformRequest(`${m.url}${m.url.includes('?') ? '&' : '?'}direct`))?.code ?? '';
-		return `<style type="text/css" data-vite-dev-id="${m.id}">${codigo}</style>`;
-	}));
+	const estilos = await Promise.all(
+		css.map(async (m) => {
+			const codigo = (await servidor.transformRequest(`${m.url}${m.url.includes('?') ? '&' : '?'}direct`))?.code ?? '';
+			return `<style type="text/css" data-vite-dev-id="${m.id}">${codigo}</style>`;
+		}),
+	);
 	return estilos.join('\n');
 }
 
@@ -65,8 +67,12 @@ function barraNoAdmin(): Plugin {
 	};
 	return {
 		name: 'barra-no-admin',
-		configureServer: (servidor) => { servidor.middlewares.use(redirecionar); },
-		configurePreviewServer: (servidor) => { servidor.middlewares.use(redirecionar); },
+		configureServer: (servidor) => {
+			servidor.middlewares.use(redirecionar);
+		},
+		configurePreviewServer: (servidor) => {
+			servidor.middlewares.use(redirecionar);
+		},
 	};
 }
 

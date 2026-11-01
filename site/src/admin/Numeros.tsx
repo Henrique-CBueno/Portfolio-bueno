@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { FalhaApi } from '../components/FalhaApi';
-import { chamar, dataBR } from './api';
-import { formatarNumero } from '../lib/formato';
+import { useNumeros } from '../hooks/useNumeros';
+import { dataBR, formatarNumero } from '../lib/formato';
 import type { Contagem } from '../lib/tipos';
 import { Botao } from '../components/Botao';
 import { Card } from '../components/Card';
 
-/** O que o painel recebe: a contagem e se ela é digitada aqui ou lida da rede. */
-type NoPainel = Contagem & { editavel: boolean };
-
 const nomesRede: Record<string, string> = { instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube' };
 
 /** Rede sem API ligada (Instagram sem META_API_KEY): número digitado aqui. */
-function Manual({ contagem: c }: { contagem: Contagem }) {
+function Manual({ contagem: c, salvar: salvarNaApi }: { contagem: Contagem; salvar: (rede: string, valor: number | null) => Promise<boolean> }) {
 	const [valor, setValor] = useState(c.valor === null ? '' : String(c.valor));
 	const [salvo, setSalvo] = useState<boolean>();
 	const [salvando, setSalvando] = useState(false);
@@ -26,11 +23,7 @@ function Manual({ contagem: c }: { contagem: Contagem }) {
 		setSalvando(true);
 		setSalvo(undefined);
 		try {
-			const numero = valor.trim() === '' ? null : Number(valor);
-			const resposta = await chamar(`/contagens/${c.rede}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ valor: numero }) });
-			setSalvo(resposta.ok);
-		} catch {
-			setSalvo(false);
+			setSalvo(await salvarNaApi(c.rede, valor.trim() === '' ? null : Number(valor)));
 		} finally {
 			ocupado.current = false;
 			setSalvando(false);
@@ -42,12 +35,26 @@ function Manual({ contagem: c }: { contagem: Contagem }) {
 			<strong>{nomesRede[c.rede] ?? c.rede}</strong>
 			<div className="linha-numero">
 				<input type="number" min="0" inputMode="numeric" placeholder="seguidores" value={valor} onChange={(e) => setValor(e.target.value)} />
-				<Botao type="submit" disabled={salvando}>{salvando ? <>salvando <LoaderCircle className="gira" aria-hidden="true" /></> : 'salvar'}</Botao>
+				<Botao type="submit" disabled={salvando}>
+					{salvando ? (
+						<>
+							salvando <LoaderCircle className="gira" aria-hidden="true" />
+						</>
+					) : (
+						'salvar'
+					)}
+				</Botao>
 			</div>
 			<small>
-				{salvo === true ? <span className="pill verde">salvo ✓</span>
-					: salvo === false ? <span className="pill vermelho">não deu pra salvar</span>
-					: c.atualizadoEm ? `atualizado em ${dataBR.format(new Date(c.atualizadoEm))}` : 'sem número: o site mostra só o @'}
+				{salvo === true ? (
+					<span className="pill verde">salvo ✓</span>
+				) : salvo === false ? (
+					<span className="pill vermelho">não deu pra salvar</span>
+				) : c.atualizadoEm ? (
+					`atualizado em ${dataBR.format(new Date(c.atualizadoEm))}`
+				) : (
+					'sem número: o site mostra só o @'
+				)}
 			</small>
 		</Card>
 	);
@@ -61,39 +68,46 @@ function lida(c: Contagem) {
 }
 
 export function Numeros() {
-	const [contagens, setContagens] = useState<NoPainel[]>();
-	const [falhou, setFalhou] = useState(false);
+	const { contagens, falhou, carregar, salvar } = useNumeros();
 
-	const carregar = useCallback(() => {
-		setFalhou(false);
-		chamar('/contagens')
-			.then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-			.then(setContagens)
-			.catch(() => setFalhou(true));
-	}, []);
-	useEffect(carregar, [carregar]);
-
-	if (falhou) return <section className="bloco"><FalhaApi oque="os números" tentarDeNovo={carregar} /></section>;
+	if (falhou)
+		return (
+			<section className="bloco">
+				<FalhaApi oque="os números" tentarDeNovo={carregar} />
+			</section>
+		);
 
 	return (
 		<section className="bloco">
-			<div className="cab-bloco"><h2>Números</h2><small className="dica">Redes sem API ligada: digite aqui. Vazio = mostrar só o @.</small></div>
+			<div className="cab-bloco">
+				<h2>Números</h2>
+				<small className="dica">Redes sem API ligada: digite aqui. Vazio = mostrar só o @.</small>
+			</div>
 			<div className="numeros">
 				{contagens === undefined && (
 					<>
-						<span className="so-leitor" role="status">carregando os números</span>
-						{Array.from({ length: 3 }, (_, i) => <Card key={i} className="esqueleto-numero" aria-hidden="true"><span className="esqueleto"></span><span className="esqueleto"></span></Card>)}
+						<span className="so-leitor" role="status">
+							carregando os números
+						</span>
+						{Array.from({ length: 3 }, (_, i) => (
+							<Card key={i} className="esqueleto-numero" aria-hidden="true">
+								<span className="esqueleto"></span>
+								<span className="esqueleto"></span>
+							</Card>
+						))}
 					</>
 				)}
 				{contagens?.length === 0 && <p className="dica">Nenhuma rede pra mostrar agora.</p>}
-				{contagens?.map((c) => c.editavel
-					? <Manual key={c.rede} contagem={c} />
-					: (
+				{contagens?.map((c) =>
+					c.editavel ? (
+						<Manual key={c.rede} contagem={c} salvar={salvar} />
+					) : (
 						<Card key={c.rede}>
 							<strong>{nomesRede[c.rede] ?? c.rede}</strong>
 							<small>{lida(c)}</small>
 						</Card>
-					))}
+					),
+				)}
 			</div>
 		</section>
 	);

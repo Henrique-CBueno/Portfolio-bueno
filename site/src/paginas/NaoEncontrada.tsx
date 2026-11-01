@@ -1,4 +1,3 @@
-import { Link } from 'react-router';
 import { ArrowLeft, ArrowDown } from 'lucide-react';
 import { Diagrama } from '../components/Diagrama';
 import { Titulo } from '../components/Titulo';
@@ -14,18 +13,29 @@ export function NaoEncontrada() {
 		<main ref={raiz} className="nao-encontrada">
 			<section className="secao">
 				<div className="texto">
-					<p className="codigo" data-revela="">404</p>
+					<p className="codigo" data-revela="">
+						404
+					</p>
 					<Titulo tag="h1" antes="Essa página" destaque="não existe" />
-					<p className="explica" data-revela="">O endereço pode ter mudado ou estar com algum erro de digitação. O resto do site continua no ar.</p>
+					<p className="explica" data-revela="">
+						O endereço pode ter mudado ou estar com algum erro de digitação. O resto do site continua no ar.
+					</p>
 					<div className="acoes" data-revela="">
-						<Botao variante="primario" to="/"><ArrowLeft /> voltar pro início</Botao>
-						<Botao to="/#projetos">ver projetos <ArrowDown /></Botao>
+						<Botao variante="primario" to="/">
+							<ArrowLeft /> voltar pro início
+						</Botao>
+						<Botao to="/#projetos">
+							ver projetos <ArrowDown />
+						</Botao>
 					</div>
 				</div>
 				<Card className="quadro" data-revela="">
 					<Diagrama
 						nos={[{ nome: 'navegador' }, { nome: 'servidor', cor: 'azul' }]}
-						saidas={[{ nome: '404 · não achou', cor: 'amarelo' }, { nome: 'início', cor: 'verde' }]}
+						saidas={[
+							{ nome: '404 · não achou', cor: 'amarelo' },
+							{ nome: 'início', cor: 'verde' },
+						]}
 						descricao="O navegador pediu a página ao servidor, que respondeu 404 e aponta o caminho de volta pro início."
 					/>
 				</Card>

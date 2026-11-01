@@ -2,12 +2,26 @@
 // O trecho em `destaque` fica amarelo (uma palavra amarela por título).
 import { Fragment } from 'react';
 
-interface Props { antes?: string; destaque?: string; depois?: string; tag?: 'h1' | 'h2' | 'p'; className?: string; id?: string }
+interface Props {
+	antes?: string;
+	destaque?: string;
+	depois?: string;
+	tag?: 'h1' | 'h2' | 'p';
+	className?: string;
+	id?: string;
+}
 
 function Palavras({ texto }: { texto: string }) {
-	return texto.split(/\s+/).filter(Boolean).map((p, i) => (
-		<Fragment key={i}><span className="palavra"><span>{p}</span></span>{' '}</Fragment>
-	));
+	return texto
+		.split(/\s+/)
+		.filter(Boolean)
+		.map((p, i) => (
+			<Fragment key={i}>
+				<span className="palavra">
+					<span>{p}</span>
+				</span>{' '}
+			</Fragment>
+		));
 }
 
 export function Titulo({ antes = '', destaque = '', depois = '', tag: Tag = 'h2', className, id }: Props) {
@@ -15,7 +29,11 @@ export function Titulo({ antes = '', destaque = '', depois = '', tag: Tag = 'h2'
 		<Tag className={className} id={id} data-palavras="" aria-label={[antes, destaque, depois].filter(Boolean).join(' ')}>
 			<span aria-hidden="true">
 				<Palavras texto={antes} />
-				{destaque && <em><Palavras texto={destaque} /></em>}
+				{destaque && (
+					<em>
+						<Palavras texto={destaque} />
+					</em>
+				)}
 				<Palavras texto={depois} />
 			</span>
 		</Tag>

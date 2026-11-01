@@ -16,7 +16,12 @@ export async function simularApi(page: Page, contato: { status: number; corpo?: 
 		const pedido = rota.request();
 		if (pedido.method() === 'OPTIONS') return rota.fulfill({ status: 204, headers: cors });
 		const caminho = new URL(pedido.url()).pathname;
-		if (caminho === '/snapshot') return rota.fulfill({ status: 200, headers: cors, json: { lidoEm: new Date().toISOString(), videos: [], contagens: [], repositorios: [], publicos: [], destaques: null } });
+		if (caminho === '/snapshot')
+			return rota.fulfill({
+				status: 200,
+				headers: cors,
+				json: { lidoEm: new Date().toISOString(), videos: [], contagens: [], repositorios: [], publicos: [], destaques: null },
+			});
 		if (caminho === '/contato') {
 			recebidas.push(pedido.postDataJSON());
 			return rota.fulfill({ status: contato.status, headers: cors, json: contato.corpo ?? {} });

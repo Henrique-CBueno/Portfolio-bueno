@@ -14,16 +14,18 @@ vi.mock('keycloak-js', () => ({
 		init = kc.init;
 		updateToken = kc.updateToken;
 		login = kc.login;
-		constructor(opcoes: unknown) { kc.opcoes = opcoes; }
+		constructor(opcoes: unknown) {
+			kc.opcoes = opcoes;
+		}
 	},
 }));
 
 const KEYCLOAK = 'http://auth.teste';
 
-/** api.ts guarda o init numa variável do módulo: cada teste carrega o módulo do zero. */
+/** autenticacao.ts guarda o init numa variável do módulo: cada teste carrega os serviços do zero. */
 async function carregar() {
 	vi.resetModules();
-	return import('./api');
+	return { ...(await import('./autenticacao')), ...(await import('./painel')) };
 }
 
 describe('login do painel /admin', () => {

@@ -3,9 +3,11 @@ import { AUTH } from './simulados';
 
 test.describe('painel /admin', () => {
 	test('sem login, quem abre /admin é mandado pra tela de login do Keycloak', async ({ page }) => {
-		await page.route(`${AUTH}/**`, (rota) => (rota.request().url().includes('/protocol/openid-connect/auth')
-			? rota.fulfill({ contentType: 'text/html', body: '<h1>Login do Keycloak (simulado)</h1>' })
-			: rota.fulfill({ status: 200, body: '' })));
+		await page.route(`${AUTH}/**`, (rota) =>
+			rota.request().url().includes('/protocol/openid-connect/auth')
+				? rota.fulfill({ contentType: 'text/html', body: '<h1>Login do Keycloak (simulado)</h1>' })
+				: rota.fulfill({ status: 200, body: '' }),
+		);
 
 		await page.goto('/admin');
 		await page.waitForURL(/\/protocol\/openid-connect\/auth/);

@@ -16,7 +16,9 @@ export function FalhaApi({ oque, tentarDeNovo }: Props) {
 			<span className="pill vermelho">fora do ar</span>
 			<h2>Não deu pra carregar {oque}</h2>
 			<p>O servidor não respondeu agora. Nada se perdeu: os dados continuam salvos. Tente de novo em alguns instantes.</p>
-			<Botao variante="primario" type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></Botao>
+			<Botao variante="primario" type="button" onClick={tentarDeNovo}>
+				tentar de novo <RotateCw />
+			</Botao>
 		</Card>
 	);
 }
