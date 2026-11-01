@@ -1,9 +1,7 @@
-# Só pra rodar na sua máquina (o Coolify usa só o docker-compose.yml e cuida dos domínios):
+# Só pra rodar na sua máquina (o Coolify usa só o docker-compose.yml e cuida dos domínios).
+# O site roda à parte: cd site && npm run dev (porta 4321).
 #   docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
 services:
-  web:
-    ports:
-      - "${PORTA_SITE:-8080}:80"
   api:
     ports:
       - "${PORTA_API:-8082}:8080"

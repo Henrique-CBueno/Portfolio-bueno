@@ -1,36 +1,10 @@
-# Site estático, API, MinIO (capas) e Keycloak (login do painel /admin), cada um no seu domínio.
+# Backend do portfólio: API, MinIO (capas) e Keycloak (login do painel /admin), cada um no seu domínio.
+# O site (front) é estático e vai pra hospedagem da Hostinger, fora daqui (veja o README).
 # Pensado pro Coolify (deploy pelo Git). Em "Domains", um domínio por serviço:
-#   web      → https://henriquebueno.com        (porta 80)
 #   api      → https://api.henriquebueno.com    (porta 8080)
 #   keycloak → https://auth.henriquebueno.com   (porta 8080)
 # As variáveis aparecem na tela do Coolify; rodando local, vêm do .env (veja docker-compose.local.yml).
 services:
-  web:
-    build:
-      context: ./site
-      dockerfile: docker/Dockerfile.web
-    restart: unless-stopped
-    expose:
-      - "80"
-    volumes:
-      - site:/site:ro
-
-  construtor:
-    build: ./site
-    restart: unless-stopped
-    environment:
-      # no build, o site lê a API pela rede interna...
-      API_URL: http://api:8080
-      # ...e no navegador, pelos endereços públicos
-      PUBLIC_API_URL: ${API_URL_PUBLICA:?endereço público da API, ex. https://api.henriquebueno.com}
-      PUBLIC_KEYCLOAK_URL: ${KEYCLOAK_URL_PUBLICA:?endereço público do Keycloak, ex. https://auth.henriquebueno.com}
-    volumes:
-      - site:/site
-      - dados:/dados:ro
-    depends_on:
-      api:
-        condition: service_healthy
-
   api:
     build: ./api
     restart: unless-stopped
@@ -38,8 +12,6 @@ services:
       - "8080"
     environment:
       DADOS: /dados
-      # a API avisa o construtor tocando este arquivo quando o painel muda algo
-      REBUILD_COMANDO: touch /dados/rebuild-pedido
       ORIGENS: ${ORIGENS:-${SITE_URL}}
       MINIO_URL: http://minio:9000
       MINIO_USUARIO: ${MINIO_USUARIO:-portfolio}
@@ -104,6 +76,5 @@ services:
 
 volumes:
   dados:
-  site:
   minio:
   keycloak:
