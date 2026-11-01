@@ -15,6 +15,7 @@ cd site
 npm run dev        # dev server on :4321 (the API's CORS allows this port), page server-rendered like the build
 npm run build      # client build + SSR build + prerender.mjs → site/dist (upload its contents, .htaccess included); URLs from .env.production
 npm run check      # type check (tsc)
+npm run lint       # ESLint (typescript-eslint + react-hooks); npm run format = Prettier (CSS excluded)
 npm test           # Vitest + Testing Library (jsdom): src/**/*.test.ts(x)
 npm run test:e2e   # Playwright on the production build (vite preview :4173), system Chrome, desktop + Pixel 7; API/Keycloak mocked with page.route
 ```
@@ -29,6 +30,13 @@ npm run test:e2e   # Playwright on the production build (vite preview :4173), sy
 - `src/scripts/movimento.ts` holds the animations: `animarMarca` (header, once, from `App`) and `animarPagina(main)`, which each page calls through `usePaginaAnimada` so content animates after client navigation too; `cursor.ts` is started once by `App`. Hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
 - Tests: the contact rules (`lib/contato.test.ts`), the form (`components/Contato.test.tsx`), the admin login and blocking (`admin/api.test.ts`, `admin/Painel.test.tsx`) and the same flows end to end (`e2e/`). The backend side (field errors, 401/403 on `/admin-api`) is in the API's JUnit tests.
 - Env vars keep the `PUBLIC_` prefix (`envPrefix` in `vite.config.ts`). Built against the API with `API_URL=… PUBLIC_API_URL=… npm run build`.
+
+### Site code conventions (also in README "Código do site")
+
+- Folders by responsibility: `paginas/` (one per route), `components/` (presentation only, each with its own `.css`), `hooks/` (screen logic and state), `services/` (every call to the outside: `api.ts` public API, `autenticacao.ts` Keycloak, `painel.ts` admin API), `lib/` (pure functions and types, no React, no network), `dados/` (curated content), `admin/` (panel screens), `scripts/` (imperative animations), `styles/`.
+- Component → hook → service. Never call `fetch`, `EventSource` or keycloak from a component; add a service function and a hook (`useCarregamento` covers load/error/retry). Don't `setState` synchronously in an effect (lint rule `react-hooks/set-state-in-effect`): reset state from the event handler, derive what you can, use `useSyncExternalStore` for state that lives outside React.
+- Names: Portuguese (domain language). PascalCase for components/types (file = export: `Topo.tsx` → `Topo`), `useX` hooks in camelCase files, camelCase functions with verbs (`listarMensagens`), UPPER_CASE module constants, lowercase CSS classes nested under the component's root class. Tests next to the file (`*.test.ts(x)`), e2e in `e2e/*.spec.ts`.
+- Enforced: ESLint + Prettier (tabs, single quotes, 160 cols; CSS keeps one rule per line and is not formatted). Husky (`site/.husky/pre-commit`, installed by `npm install` through `prepare`, `core.hooksPath=site/.husky/_`) runs lint-staged and `npm run check` before any commit touching `site/`; a lint error blocks the commit. Don't bypass it with `--no-verify`.
 
 ## API (`api/`)
 

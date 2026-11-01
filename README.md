@@ -46,6 +46,49 @@ Os vídeos vêm dos Reels do Instagram (com `META_API_KEY`), lidos a cada 5 min:
 
 O Keycloak roda em modo `start-dev` (banco H2 no volume `keycloak`): serve pro começo, mas o ideal em produção é `start` com Postgres e restringir o console de administração.
 
+## Código do site: estrutura e convenções
+
+```
+site/src/
+  paginas/      uma página por rota (Inicio, Projeto, NaoEncontrada): monta as seções
+  components/   peças visuais: só aparência; cada uma com seu .css ao lado (Topo.tsx + Topo.css)
+  hooks/        lógica e estado das telas (useSnapshot, useFormularioContato, useMensagens…)
+  services/     tudo que fala com fora: API pública (api.ts), login (autenticacao.ts), API do painel (painel.ts)
+  lib/          funções puras e tipos, sem React e sem rede (validação do contato, formatos, tema)
+  dados/        conteúdo curado à mão (perfil, projetos, prêmios, stacks)
+  admin/        telas do painel /admin e a entrada dele
+  scripts/      animações (Motion) e cursor, que mexem direto no DOM
+  styles/       tokens de cor e base (global.css)
+site/e2e/       testes de ponta a ponta (Playwright)
+```
+
+**Quem chama quem:** componente → hook → service. Componente visual não chama `fetch` nem o Keycloak: pede a um hook,
+e o hook usa uma função de `services/`. Regra pura (validar, formatar) fica em `lib/`, onde é testada sem React.
+
+**Nomes** (o código é em português, a língua do domínio; só nomes de bibliotecas ficam em inglês):
+- componentes e tipos em PascalCase: `Topo.tsx` exporta `Topo`, `Carga<T>`, `Recebida`;
+- hooks começam com `use`, em camelCase: `useMensagens.ts` exporta `useMensagens`;
+- funções e variáveis em camelCase, com verbo nas ações: `listarMensagens`, `enviarContato`, `aplicarTema`;
+- constantes de módulo em MAIÚSCULAS: `MAXIMO_DESTAQUES`, `MINIMO_MENSAGEM`;
+- classes CSS em minúsculas, aninhadas na classe raiz do componente (`.topo { .marca { … } }`);
+- testes ao lado do arquivo (`contato.test.ts`, `Contato.test.tsx`); de ponta a ponta em `e2e/*.spec.ts`.
+
+**Peças reaproveitadas:** todo botão é `<Botao>` e todo card é `<Card>`; cor só por token (`var(--…)` do `global.css`).
+
+**Padrão verificado:** ESLint (TypeScript + regras dos hooks do React) e Prettier (tabs, aspas simples, 160 colunas).
+Antes de cada commit que mexe em `site/`, o Husky roda o lint-staged (lint e formatação corrigidos nos arquivos do
+commit; erro de lint barra o commit) e a checagem de tipos. O CSS fica fora do Prettier: uma regra por linha é
+convenção do projeto.
+
+```sh
+cd site
+npm run lint            # ESLint
+npm run format          # Prettier (npm run format:check só confere)
+npm run check           # TypeScript
+```
+
+O gancho é instalado pelo `npm install` (script `prepare`).
+
 ## Testes
 
 ```sh
