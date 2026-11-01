@@ -1,0 +1,23 @@
+.secao-videos {
+	.vazio { padding: 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+	.vazio p { color: var(--texto-suave); }
+	.redes-vazio { display: flex; gap: 8px; flex-wrap: wrap; }
+	.videos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+	.video { text-decoration: none; display: block; }
+	.capa { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 9 / 16; transition: border-color .25s, transform .35s var(--sobe); background: var(--painel); }
+	.capa img { width: 100%; height: 100%; object-fit: cover; transition: scale .6s var(--sobe); }
+	.video:hover .capa, .video:focus-visible .capa { border-color: var(--amarelo-texto); transform: translateY(-4px); }
+	.video:hover .capa img { scale: 1.035; }
+	h3 { font-size: 16px; font-weight: 700; line-height: 1.3; margin: 14px 0 10px; text-wrap: balance; }
+	.info { display: flex; justify-content: space-between; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+	time { font: 500 12px var(--mono); color: var(--apagado); white-space: nowrap; }
+	/* esqueleto no mesmo formato do card: nada pula quando os vídeos chegam */
+	.capa.esqueleto { border-color: transparent; border-radius: 14px; }
+	.linha { height: 14px; margin-top: 16px; width: 90%; }
+	.linha.curta { width: 45%; margin-top: 10px; height: 22px; border-radius: 999px; }
+	@media (max-width: 960px) {
+		.videos { display: flex; --item: 46%; }
+		h3 { font-size: 14.5px; margin: 10px 0 8px; }
+		.info { flex-direction: column; align-items: flex-start; gap: 6px; }
+	}
+}

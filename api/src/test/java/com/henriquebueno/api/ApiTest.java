@@ -4,8 +4,8 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -27,7 +27,7 @@ import jakarta.inject.Inject;
 class ApiTest {
 
 	private static final String VALIDA = """
-			{"nome": "Ana", "email": "ana@exemplo.com", "assunto": "Parceria\\r\\nBcc: x@y.com", "mensagem": "Olá!"}""";
+			{"nome": "Ana", "email": "ana@exemplo.com", "assunto": "Parceria\\r\\nBcc: x@y.com", "mensagem": "Olá! Quero conversar sobre uma parceria."}""";
 
 	@Inject
 	MockMailbox caixa;
@@ -45,7 +45,8 @@ class ApiTest {
 		given().get("/snapshot").then()
 				.statusCode(200)
 				.body("contagens.rede", contains("instagram", "tiktok", "youtube"))
-				.body("repositorios.nome", hasItem("ms-kafka"));
+				// a lista vem do GitHub (testado em GitHubTest); aqui só o formato do snapshot
+				.body("repositorios", notNullValue());
 	}
 
 	@Test
@@ -85,14 +86,24 @@ class ApiTest {
 				.post("/contato").then().statusCode(400)
 				.body("ok", equalTo(false))
 				.body("erros.email", equalTo("e-mail inválido"))
-				.body("erros.nome", notNullValue())
-				.body("erros.mensagem", notNullValue());
+				.body("erros.nome", equalTo("conta como posso te chamar"))
+				.body("erros.mensagem", equalTo("falta a mensagem"));
 		assertThat(caixa.getTotalMessagesSent()).isZero();
 	}
 
 	@Test
+	void mensagemCurtaEEmailSemDominioTemMensagemPropria() {
+		// espaço nas pontas não conta pros 20 caracteres
+		given().contentType(ContentType.JSON).body("{\"nome\": \"Ana\", \"email\": \"ana@exemplo\", \"mensagem\": \"   oi, tudo bem?        \"}").header("X-Forwarded-For", "10.0.0.6")
+				.post("/contato").then().statusCode(400)
+				.body("erros.email", equalTo("e-mail inválido"))
+				.body("erros.mensagem", equalTo("mensagem com no mínimo 20 caracteres"))
+				.body("erros.nome", nullValue());
+	}
+
+	@Test
 	void roboRecebeSucessoMasNadaSai() {
-		given().contentType(ContentType.JSON).body("{\"nome\": \"Bot\", \"email\": \"bot@spam.com\", \"mensagem\": \"compre\", \"site\": \"spam.com\"}").header("X-Forwarded-For", "10.0.0.3")
+		given().contentType(ContentType.JSON).body("{\"nome\": \"Bot\", \"email\": \"bot@spam.com\", \"mensagem\": \"compre agora com desconto imperdível\", \"site\": \"spam.com\"}").header("X-Forwarded-For", "10.0.0.3")
 				.post("/contato").then().statusCode(202);
 		assertThat(caixa.getTotalMessagesSent()).isZero();
 	}

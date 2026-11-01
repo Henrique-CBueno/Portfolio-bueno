@@ -1,0 +1,27 @@
+.stacks {
+	.grade { display: grid; grid-template-columns: 7fr 5fr; gap: 28px; align-items: start; }
+	.cadeia { list-style: none; }
+	.camada { display: grid; grid-template-columns: 170px 1fr; gap: 20px; align-items: center; padding: 16px 20px; position: relative; }
+	.camada + .camada { margin-top: 18px; }
+	.camada .pill { justify-self: start; }
+	.fio { position: absolute; left: 50px; top: -19.5px; height: 18px; border-left: 2px solid var(--borda); transform-origin: top; }
+	.camada:first-child .fio { display: none; }
+	.itens { display: flex; gap: 8px; flex-wrap: wrap; }
+	.lado { display: grid; gap: 20px; }
+	.bloco { padding: 24px; }
+	.arquitetura { border-color: var(--amarelo-texto); }
+	h3 { font-size: 20px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+	.bloco p { color: var(--apagado); font-size: 14.5px; margin-bottom: 16px; }
+	.padroes { display: flex; flex-wrap: wrap; gap: 8px; }
+	@media (max-width: 960px) {
+		.grade { grid-template-columns: 1fr; gap: 24px; }
+		/* pill e itens na mesma linha, quebrando quando precisar */
+		.camada { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 12px 14px; }
+		.camada + .camada { margin-top: 12px; }
+		.camada .pill { margin-right: 4px; }
+		.itens { display: contents; }
+		.itens .chip { font-size: 12px; padding: 4px 7px; }
+		.fio { left: 30px; top: -13.5px; height: 12px; }
+		.bloco { padding: 18px; }
+	}
+}

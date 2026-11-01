@@ -1,4 +1,10 @@
-import type { ImageMetadata } from 'astro';
+/** Imagem pronta pra <img>: `srcset` com as larguras geradas no build. */
+export interface Imagem {
+	src: string;
+	srcset?: string;
+	width?: number;
+	height?: number;
+}
 
 export type Cor = 'amarelo' | 'verde' | 'vermelho' | 'azul' | 'roxo' | 'neutro';
 
@@ -10,7 +16,8 @@ export interface Video {
 	/** Pra onde o card leva: Instagram, senão TikTok, senão YouTube. */
 	link: string;
 	links?: { instagram?: string | null; tiktok?: string | null; youtube?: string | null };
-	capa: ImageMetadata | string;
+	/** Caminho na API (/capas/<id>) ou URL; no build vira a capa baixada e convertida. */
+	capa: Imagem | string;
 	publicadoEm: string;
 	/** Categoria escolhida no painel (ex.: "resiliencia"), que vira a pill colorida. */
 	categoria?: string | null;
@@ -25,21 +32,27 @@ export interface Contagem {
 	atualizadoEm?: string | null;
 }
 
-/** O que a API entrega no build e depois por SSE. */
+/** O que a API entrega em GET /snapshot, lido no navegador (as contagens também chegam por SSE). */
 export interface Snapshot {
 	lidoEm: string;
 	videos: Video[];
 	contagens: Contagem[];
-	/** Repositórios fixados no GitHub; sem eles, o site usa a lista de src/dados/projetos.ts. */
+	/** Repositórios do GitHub: os fixados (com token) ou os públicos mais recentes (sem token). */
 	repositorios?: Repositorio[];
+	/** Todos os repositórios públicos (candidatos a destaque no painel). */
+	publicos?: Repositorio[];
+	/** Seleção do painel pra "Projetos em destaque", em ordem; nulo = padrão (os curados). Ver lib/destaques.ts. */
+	destaques?: string[] | null;
 }
 
 export interface Destaque {
+	/** Endereço da página do projeto: /projetos/<slug>. Não mude depois de publicado (quebra links compartilhados). */
+	slug: string;
 	titulo: string;
 	descricao: string;
 	tags: { nome: string; cor: Cor }[];
 	endereco: string;
-	print?: { imagem: ImageMetadata; alt: string };
+	print?: { imagem: Imagem; alt: string };
 	diagrama?: { nos: { nome: string; cor?: Cor }[]; saidas: { nome: string; cor?: Cor }[]; descricao: string };
 	links: { rotulo: string; href: string; icone: 'externo' | 'github' }[];
 	nota?: string;
@@ -47,11 +60,17 @@ export interface Destaque {
 	largo?: boolean;
 }
 
+/** Repositório do GitHub, como a API entrega (lido da API do GitHub, nada cadastrado à mão). */
 export interface Repositorio {
 	nome: string;
 	descricao?: string | null;
+	/** Da maior pra menor. */
 	linguagens: string[];
 	url: string;
+	/** Cor que o GitHub dá à primeira linguagem (nula sem token). */
+	corLinguagem?: string | null;
+	/** Último push. */
+	atualizadoEm?: string | null;
 }
 
 export interface Premio {
@@ -62,5 +81,11 @@ export interface Premio {
 	projeto?: { nome?: string; descricao: string };
 	contexto?: { texto: string; destaque?: string; depois?: string };
 	organizadores: { nome: string; cor: Cor }[];
-	foto?: { imagem: ImageMetadata; alt: string };
+	foto?: { imagem: Imagem; alt: string };
+}
+
+/** O que a página recebe do build (o mesmo valor no HTML e na hidratação). Os dados da API chegam depois, no navegador. */
+export interface Dados {
+	/** Quando a página foi gerada: anos de experiência e o ano do rodapé saem daqui. */
+	geradoEm: string;
 }

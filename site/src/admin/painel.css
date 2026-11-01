@@ -1,0 +1,69 @@
+/* Painel /admin (só esta página carrega este arquivo). */
+.topo { max-width: var(--largura); margin: 0 auto; padding: 18px var(--margem); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.marca { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.marca .nome { font: 800 17px var(--sans); letter-spacing: -.02em; text-transform: uppercase; }
+.marca .tag { font: 700 17px var(--mono); color: var(--amarelo-texto); }
+.quem { display: flex; align-items: center; gap: 12px; font: 500 13px var(--mono); color: var(--apagado); }
+.quem .botao { padding: 8px 14px; font-size: 12px; }
+.painel-admin { max-width: var(--largura); margin: 0 auto; padding: 16px var(--margem) 96px; }
+.aviso { font: 500 14px var(--mono); color: var(--apagado); padding: 40px 0; }
+.bloco + .bloco { margin-top: 56px; }
+.cab-bloco { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.cab-bloco h2 { font-size: 28px; }
+.cab-bloco h2 em { font-style: normal; color: var(--amarelo-texto); }
+.dica { font: 500 12px var(--mono); color: var(--apagado); }
+p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
+
+.numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.numeros .painel { padding: 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.numeros strong { font-size: 16px; }
+.numeros .linha-numero { display: flex; gap: 8px; }
+.numeros input { flex: 1; width: 100%; font: 700 18px var(--mono); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 9px 12px; min-width: 0; }
+.numeros input:focus { outline: none; border-color: var(--amarelo-texto); }
+.numeros small { font: 500 12px var(--mono); color: var(--apagado); }
+
+.numeros .esqueleto-numero .esqueleto:first-child { width: 40%; height: 16px; }
+.numeros .esqueleto-numero .esqueleto:last-child { width: 80%; height: 40px; }
+.numeros .botao { display: inline-flex; align-items: center; gap: 8px; }
+
+/* mensagens do formulário de contato */
+.mensagens { display: grid; gap: 14px; }
+.mensagem { padding: 20px 22px; display: grid; gap: 10px; }
+.mensagem.nova { border-color: color-mix(in srgb, var(--amarelo) 60%, var(--borda)); }
+.mensagem header { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.mensagem header strong { font-size: 16px; margin-right: 10px; }
+.mensagem header a, .mensagem header span { font: 500 13px var(--mono); color: var(--apagado); }
+.mensagem .lado { display: flex; gap: 10px; align-items: center; }
+.mensagem time { font: 500 12px var(--mono); color: var(--apagado); }
+.mensagem .assunto { font-weight: 700; }
+.mensagem .texto { color: var(--texto-suave); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.acoes-mensagem { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+.acoes-mensagem .botao { padding: 8px 12px; font-size: 12px; gap: 6px; }
+.acoes-mensagem .botao.perigo { border-color: var(--erro); color: var(--erro); }
+.vazio-mensagens { padding: 22px; color: var(--apagado); font: 500 13px var(--mono); }
+.esqueleto-mensagem .esqueleto:nth-child(1) { width: 30%; height: 16px; }
+.esqueleto-mensagem .esqueleto:nth-child(2) { width: 90%; height: 14px; }
+.esqueleto-mensagem .esqueleto:nth-child(3) { width: 60%; height: 14px; }
+
+/* destaques na home */
+.destaques-painel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.destaques-painel .coluna { padding: 20px; display: grid; gap: 14px; }
+.destaques-painel h3 { font-size: 16px; }
+.escolhidos, .disponiveis { list-style: none; display: grid; gap: 8px; }
+.escolhidos li, .disponiveis li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--borda); border-radius: 10px; background: var(--fundo); }
+.escolhidos .ordem { font: 700 13px var(--mono); color: var(--amarelo-texto); width: 18px; }
+.destaques-painel .nome { flex: 1; min-width: 0; display: grid; }
+.destaques-painel .nome strong { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.destaques-painel .nome small { font: 500 11.5px var(--mono); color: var(--apagado); }
+.destaques-painel .icone { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; border: 1.5px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; }
+.destaques-painel .icone:disabled { opacity: .35; cursor: default; }
+.destaques-painel .icone svg { width: 14px; height: 14px; }
+.disponiveis { max-height: 360px; overflow-y: auto; }
+.disponiveis .botao { padding: 6px 10px; font-size: 12px; gap: 6px; }
+.filtro { font: 500 14px var(--sans); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 9px 12px; }
+.filtro:focus { outline: none; border-color: var(--amarelo-texto); }
+.acoes-destaques { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 760px) { .destaques-painel { grid-template-columns: 1fr; } }
+
+.mensagem.respondida { opacity: .8; }
+.acoes-mensagem .marcar-respondida { border-color: color-mix(in srgb, var(--ok) 55%, var(--borda)); color: var(--ok); }

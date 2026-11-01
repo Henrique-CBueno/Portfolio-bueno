@@ -1,0 +1,10 @@
+# Antes de cada commit: lint e formatação nos arquivos do site que vão no commit (corrigidos e readicionados
+# pelo lint-staged) e a checagem de tipos. Commit só da API ou dos docs não passa por aqui.
+git diff --cached --name-only | grep -q '^site/' || exit 0
+
+cd site || exit 1
+# o Node do projeto (.nvmrc); o do sistema pode ser antigo demais
+if [ -s "$HOME/.nvm/nvm.sh" ]; then . "$HOME/.nvm/nvm.sh" >/dev/null 2>&1 && nvm use --silent >/dev/null 2>&1; fi
+
+npx lint-staged
+npm run check

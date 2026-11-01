@@ -1,0 +1,23 @@
+/* o fundo ocupa a largura toda; o conteúdo fica centralizado como o resto da página.
+   Ao rolar só o fundo muda, então nada se mexe de lugar. */
+.topo {
+	position: sticky; top: 0; z-index: 20; transition: background .3s, border-color .3s, backdrop-filter .3s; border-bottom: 1.5px solid transparent;
+	&.rolou { background: color-mix(in srgb, var(--fundo) 86%, transparent); backdrop-filter: blur(10px); border-bottom-color: var(--borda); }
+	.dentro { max-width: var(--largura); margin: 0 auto; padding: 18px var(--margem); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+	/* o botão de tema fica sempre (no celular os links somem) */
+	nav { margin-left: auto; }
+	/* < HENRIQUE BUENO /> : o nome como uma tag, os sinais em amarelo */
+	.marca { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; line-height: 1; }
+	.nome { font: 800 19px var(--sans); letter-spacing: -.02em; text-transform: uppercase; white-space: nowrap; }
+	.tag { font: 700 19px var(--mono); color: var(--amarelo-texto); transition: translate .35s var(--sobe); }
+	.marca:hover [data-marca-esq], .marca:focus-visible [data-marca-esq] { translate: -5px 0; }
+	.marca:hover [data-marca-dir], .marca:focus-visible [data-marca-dir] { translate: 5px 0; }
+	nav { display: flex; gap: 6px; position: relative; }
+	nav a { position: relative; z-index: 1; font: 500 13px var(--mono); color: var(--apagado); text-decoration: none; padding: 8px 12px; border-radius: 8px; transition: color .2s; }
+	nav a:hover, nav a.ativo { color: var(--texto); }
+	.marcador { position: absolute; left: 0; top: 0; height: 100%; width: 0; border-radius: 8px; background: var(--painel); border: 1.5px solid var(--borda); opacity: 0; pointer-events: none; }
+	@media (max-width: 960px) {
+		.nome, .tag { font-size: 17px; }
+		nav { display: none; }
+	}
+}

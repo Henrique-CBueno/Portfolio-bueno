@@ -183,6 +183,78 @@
           "#CACFD8",
           "#F0F2F4"
         ]
+      },
+      "light-ground": {
+        "role": "light-theme",
+        "displayName": "Paper Ground",
+        "canonical": "#F4F1EA",
+        "usage": "page background in the light theme (the videos' paper)"
+      },
+      "light-panel": {
+        "role": "light-theme",
+        "displayName": "Paper Panel",
+        "canonical": "#FBF9F4",
+        "usage": "cards and panels in the light theme"
+      },
+      "light-panel-raised": {
+        "role": "light-theme",
+        "displayName": "Paper Raised",
+        "canonical": "#ECE7DC",
+        "usage": "chips, icon tiles and browser bars in the light theme"
+      },
+      "light-wire": {
+        "role": "light-theme",
+        "displayName": "Paper Wire",
+        "canonical": "#D6CFC0",
+        "usage": "borders and dividers in the light theme"
+      },
+      "light-text": {
+        "role": "light-theme",
+        "displayName": "Ink",
+        "canonical": "#1A1A1A",
+        "usage": "text in the light theme (the videos' ink)"
+      },
+      "light-text-soft": {
+        "role": "light-theme",
+        "displayName": "Ink Soft",
+        "canonical": "#3D3A35",
+        "usage": "body copy in the light theme"
+      },
+      "light-muted": {
+        "role": "light-theme",
+        "displayName": "Ink Muted",
+        "canonical": "#66625A",
+        "usage": "metadata and neutral pills in the light theme"
+      },
+      "light-amber": {
+        "role": "light-theme",
+        "displayName": "Signal Amber",
+        "canonical": "#7D4F00",
+        "usage": "yellow words, yellow pills and the focus ring in the light theme (signal yellow is only a fill there)"
+      },
+      "light-ok-green": {
+        "role": "light-theme",
+        "displayName": "Ok Green (light)",
+        "canonical": "#17703D",
+        "usage": "ok in the light theme"
+      },
+      "light-failure-red": {
+        "role": "light-theme",
+        "displayName": "Failure Red (light)",
+        "canonical": "#A8262C",
+        "usage": "failure in the light theme"
+      },
+      "light-diagram-blue": {
+        "role": "light-theme",
+        "displayName": "Diagram Blue (light)",
+        "canonical": "#2459B8",
+        "usage": "blue pills in the light theme"
+      },
+      "light-diagram-purple": {
+        "role": "light-theme",
+        "displayName": "Diagram Purple (light)",
+        "canonical": "#6B3FC0",
+        "usage": "purple pills in the light theme"
       }
     },
     "typographyMeta": {

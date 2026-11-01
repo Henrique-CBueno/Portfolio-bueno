@@ -1,9 +1,0 @@
----
-// Barrinhas + "1 / N" embaixo de um carrossel (só aparece no celular).
-interface Props { de: string; total: number }
-const { de, total } = Astro.props;
----
-<div class="indicador" data-indicador={de} aria-hidden="true">
-	{Array.from({ length: total }, (_, i) => <i class:list={{ ativo: i === 0 }}></i>)}
-	<span>1 / {total}</span>
-</div>

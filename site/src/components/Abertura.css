@@ -1,0 +1,60 @@
+.abertura {
+	max-width: var(--largura); margin: 0 auto; padding: 40px var(--margem) 96px; display: grid; grid-template-columns: 460px 1fr; gap: 72px; align-items: center;
+	.retrato { position: relative; }
+	.foto { border-radius: 18px; overflow: hidden; border: 1.5px solid var(--borda); aspect-ratio: 1; box-shadow: 0 30px 70px var(--sombra); }
+	.foto img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.06) saturate(1.08); }
+	.colado { position: absolute; padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: color-mix(in srgb, var(--painel) 94%, transparent); box-shadow: 0 12px 30px var(--sombra); }
+	.colado .ic { width: 30px; height: 30px; border-radius: 8px; color: var(--amarelo-texto); }
+	.colado strong { display: block; font: 700 14px var(--mono); }
+	.colado small { display: block; font: 500 11px var(--mono); color: var(--apagado); }
+	/* inclinação no `rotate`, separada do `transform` que o Motion anima */
+	/* --px/--py (-1 a 1) vêm do mouse sobre a foto: os cards mexem mais que a foto, como se estivessem colados por cima */
+	.retrato { transform-style: preserve-3d; will-change: transform; }
+	.colado, .carimbo { translate: calc(var(--px, 0) * 14px) calc(var(--py, 0) * 10px); }
+	.colado.java { top: 28px; left: -34px; rotate: -3deg; border-color: var(--amarelo-texto); }
+	.colado.aws { bottom: 64px; right: -38px; rotate: 5deg; border-color: var(--ok); }
+	.colado.aws .ic { color: var(--ok); }
+	.carimbo { position: absolute; bottom: -22px; left: 40px; rotate: -2deg; background: var(--amarelo); color: var(--sobre-amarelo); border-radius: 12px; padding: 8px 16px; font: 700 13px var(--mono); box-shadow: 0 10px 30px rgba(255, 194, 71, .25), 0 10px 24px var(--sombra); display: flex; align-items: center; gap: 8px; }
+
+	.texto h1 { font-size: clamp(48px, 6vw, 84px); font-weight: 800; letter-spacing: -.035em; line-height: 1; }
+	.texto .papel { font-size: clamp(26px, 2.8vw, 38px); font-weight: 800; letter-spacing: -.025em; line-height: 1.15; margin-top: 14px; }
+	.texto .papel em { font-style: normal; color: var(--amarelo-texto); }
+	.bio { font-size: 18px; color: var(--apagado); max-width: 46ch; margin-top: 24px; }
+	.bio b { color: var(--texto); font-weight: 700; }
+	.acoes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+	.numeros { display: flex; margin-top: 30px; border-top: 1.5px solid var(--borda); border-bottom: 1.5px solid var(--borda); }
+	.numeros > div { flex: 1; padding: 14px 18px 14px 0; }
+	.numeros > div + div { padding-left: 18px; border-left: 1.5px solid var(--borda); }
+	.numeros strong { display: block; font: 700 30px/1.1 var(--mono); letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+	.numeros em { font-style: normal; color: var(--amarelo-texto); }
+	.numeros > div > span { display: block; font: 500 12px var(--mono); color: var(--apagado); margin-top: 4px; }
+	.redes { display: grid; grid-template-columns: repeat(2, minmax(0, 260px)); gap: 10px; margin-top: 32px; }
+	.rede { display: flex; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; text-decoration: none; transition: border-color .25s, transform .3s var(--sobe); }
+	.rede:hover, .rede:focus-visible { border-color: var(--apagado); transform: translateY(-2px); }
+	.rede .ic { width: 32px; height: 32px; border-radius: 9px; }
+	.rede strong { display: block; font-size: 14px; line-height: 1.2; }
+	.rede small { display: block; font: 500 12px var(--mono); color: var(--apagado); font-variant-numeric: tabular-nums; }
+	.rede small.mudou { color: var(--ok); transition: color 1.2s; }
+	.rede small.carregando .esqueleto { width: 104px; height: 12px; margin-top: 4px; border-radius: 4px; }
+	.local { display: flex; align-items: center; gap: 8px; margin-top: 22px; font: 500 13px var(--mono); color: var(--apagado); }
+
+	/* até 1344px a foto encosta na margem da página (32px): o card do Java, a -34px, saía 2–3px da tela */
+	@media (min-width: 961px) and (max-width: 1344px) {
+		.colado.java { left: -22px; }
+	}
+
+	@media (max-width: 960px) {
+		& { grid-template-columns: 1fr; gap: 48px; padding: 16px var(--margem) 64px; }
+		.retrato { max-width: 340px; margin: 0 18px; }
+		/* no celular o card do Java fica menor, no canto superior esquerdo do rosto, sem cobri-lo */
+		.colado.java { left: -14px; top: -12px; padding: 7px 10px; gap: 8px; }
+		.colado.java .ic { width: 24px; height: 24px; border-radius: 7px; }
+		.colado.java svg { width: 14px; height: 14px; }
+		.colado.java strong { font-size: 12.5px; }
+		.colado.java small { font-size: 10px; }
+		.colado.aws { right: -14px; bottom: 54px; }
+		.numeros strong { font-size: 24px; }
+		.numeros > div { padding-right: 10px; }
+		.numeros > div + div { padding-left: 12px; }
+	}
+}

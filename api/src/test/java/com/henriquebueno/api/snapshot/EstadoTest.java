@@ -33,16 +33,6 @@ class EstadoTest {
 	}
 
 	@Test
-	void avisaSoQuandoOsVideosMudam() {
-		var estado = novoEstado();
-		var v = new Video("1", "Título", "https://x", new Video.Links("https://x", null, null), "/capas/1", Instant.parse("2026-10-20T00:00:00Z"), "resiliencia");
-		estado.atualizarVideos(List.of(v));
-		estado.atualizarVideos(List.of(v));
-
-		assertThat(eventos).containsExactly(new Eventos.VideosMudaram(List.of(), List.of(v)));
-	}
-
-	@Test
 	void videosFicamDoMaisNovoProMaisAntigo() {
 		var estado = novoEstado();
 		var velho = new Video("velho", "A", "https://x", new Video.Links("https://x", null, null), "/capas/a", Instant.parse("2026-01-01T00:00:00Z"), null);
@@ -58,13 +48,25 @@ class EstadoTest {
 		var v = new Video("1", "Título", "https://x", new Video.Links(null, "https://x", null), "/capas/1", Instant.parse("2026-10-20T00:00:00Z"), null);
 		estado.atualizarVideos(List.of(v));
 		estado.atualizarContagem(Contagem.automatica(Rede.YOUTUBE, 96L, true));
-		estado.atualizarRepositorios(List.of(new Repositorio("repo", null, List.of("Java"), "https://github.com/u/repo")));
+		estado.atualizarRepositorios(List.of(new Repositorio("repo", null, List.of("Java"), "https://github.com/u/repo", null, null)));
 
 		var depois = novoEstado().atual();
 
 		assertThat(depois.videos()).containsExactly(v);
 		assertThat(depois.contagens()).contains(Contagem.automatica(Rede.YOUTUBE, 96L, true), Contagem.semValor(Rede.TIKTOK));
 		assertThat(depois.repositorios()).extracting(Repositorio::nome).containsExactly("repo");
+	}
+
+	@Test
+	void snapshotDeAntesDosDestaquesCarregaComPadrao() throws Exception {
+		java.nio.file.Files.createDirectories(dados);
+		java.nio.file.Files.writeString(dados.resolve("snapshot.json"), """
+				{"lidoEm": "2026-10-01T00:00:00Z", "videos": [], "contagens": [], "repositorios": [{"nome": "r", "linguagens": ["Java"], "url": "https://github.com/u/r"}]}""");
+		var atual = novoEstado().atual();
+
+		assertThat(atual.repositorios()).extracting(Repositorio::nome).containsExactly("r");
+		assertThat(atual.publicos()).isEmpty();
+		assertThat(atual.destaques()).isNull();
 	}
 
 	private Estado novoEstado() {

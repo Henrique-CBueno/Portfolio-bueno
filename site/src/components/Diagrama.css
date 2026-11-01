@@ -1,0 +1,18 @@
+.fluxo {
+	height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; background-color: var(--fundo-print); background-image: linear-gradient(var(--grade-forte) 1px, transparent 1px), linear-gradient(90deg, var(--grade-forte) 1px, transparent 1px); background-size: 24px 24px;
+	.no { font: 700 12px var(--mono); padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--borda); background: var(--painel); white-space: nowrap; }
+	.no.amarelo { border-color: var(--amarelo-texto); color: var(--amarelo-texto); }
+	.no.verde { border-color: var(--ok); color: var(--ok); }
+	.no.azul { border-color: var(--azul); color: var(--azul); }
+	.fio { width: 26px; height: 2px; background: var(--borda); position: relative; flex: none; transform-origin: left; }
+	.fio::after { content: ''; position: absolute; right: -1px; top: -3px; border: 4px solid transparent; border-left: 6px solid var(--borda); border-right: 0; }
+	.fio i { position: absolute; top: -2px; left: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--amarelo); box-shadow: 0 0 8px rgba(255, 194, 71, .7); opacity: 0; }
+	.saidas { display: grid; gap: 10px; }
+	@media (max-width: 960px) {
+		& { padding: 10px; }
+		.no { font-size: 9.5px; padding: 5px 6px; border-radius: 7px; }
+		.fio { width: 9px; }
+		.fio::after { border-width: 3px; border-left-width: 4px; top: -2px; }
+		.saidas { gap: 6px; }
+	}
+}

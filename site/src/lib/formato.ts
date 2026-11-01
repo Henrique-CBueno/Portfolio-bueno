@@ -1,6 +1,9 @@
 const numero = new Intl.NumberFormat('pt-BR');
 const relativo = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'auto' });
 
+/** "01 de nov. de 2026" no fuso de São Paulo (datas do painel). */
+export const dataBR = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'America/Sao_Paulo' });
+
 export function formatarNumero(valor: number): string {
 	return numero.format(valor);
 }

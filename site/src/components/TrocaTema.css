@@ -1,0 +1,13 @@
+.troca-tema {
+	width: 38px; height: 38px; flex: none; display: grid; place-items: center; cursor: pointer;
+	border-radius: 10px; border: 1.5px solid var(--borda); background: var(--painel); color: var(--texto);
+	transition: border-color .2s, transform .3s var(--sobe);
+	svg.lucide { width: 17px; height: 17px; }
+	&:hover { border-color: var(--apagado); transform: translateY(-2px); }
+	/* no escuro, o sol (vai pro claro); no claro, a lua */
+	.lua { display: none; }
+}
+:root[data-tema="claro"] .troca-tema {
+	.sol { display: none; }
+	.lua { display: block; }
+}

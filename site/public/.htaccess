@@ -1,0 +1,25 @@
+# Site estático na Hostinger (Apache/LiteSpeed). Vai junto no dist/ (o Vite copia a pasta public/).
+Options -MultiViews -Indexes
+DirectoryIndex index.html
+RewriteEngine On
+
+# Cada página é um arquivo: /projetos/revi → projetos/revi.html.
+# Link compartilhado e F5 caem direto na página certa, já renderizada.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.+?)/?$ /$1.html [L]
+
+# Endereço que não existe: a página 404 do site, com status 404 de verdade
+ErrorDocument 404 /404.html
+
+<IfModule mod_headers.c>
+	# arquivos com hash no nome (pasta assets) nunca mudam: cache longo
+	<FilesMatch "-[A-Za-z0-9_-]{8}\.(js|css|woff2?|webp|png|jpe?g|svg)$">
+		Header set Cache-Control "public, max-age=31536000, immutable"
+	</FilesMatch>
+	# as páginas sempre conferem se há versão nova
+	<FilesMatch "\.html$">
+		Header set Cache-Control "no-cache"
+	</FilesMatch>
+</IfModule>

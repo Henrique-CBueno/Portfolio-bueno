@@ -20,7 +20,7 @@ import jakarta.inject.Inject;
 
 /**
  * O último snapshot conhecido. Sobrevive a reinícios (dados/snapshot.json) e dispara um evento
- * quando as contagens ou a lista de vídeos mudam.
+ * quando as contagens mudam (o SSE empurra pro navegador).
  */
 @ApplicationScoped
 public class Estado {
@@ -59,13 +59,17 @@ public class Estado {
 		if (!antes.contagens().equals(depois.contagens())) publicar.accept(new Eventos.ContagensMudaram(depois.contagens()));
 	}
 
-	public void atualizarVideos(List<Video> novos) {
-		Snapshot antes, depois;
-		synchronized (this) {
-			antes = atual;
-			depois = trocar(s -> s.comVideos(novos, relogio.instant()));
-		}
-		if (!antes.videos().equals(depois.videos())) publicar.accept(new Eventos.VideosMudaram(antes.videos(), depois.videos()));
+	public synchronized void atualizarVideos(List<Video> novos) {
+		trocar(s -> s.comVideos(novos, relogio.instant()));
+	}
+
+	public synchronized void atualizarPublicos(List<Repositorio> novos) {
+		trocar(s -> s.comPublicos(novos, relogio.instant()));
+	}
+
+	/** {@code null} volta ao padrão (os projetos curados do site). */
+	public synchronized void atualizarDestaques(List<String> novos) {
+		trocar(s -> s.comDestaques(novos, relogio.instant()));
 	}
 
 	public synchronized void atualizarRepositorios(List<Repositorio> novos) {

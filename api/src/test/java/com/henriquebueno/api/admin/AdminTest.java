@@ -1,91 +1,113 @@
 package com.henriquebueno.api.admin;
 
 import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
-import com.henriquebueno.api.capas.CapasEmMemoria;
+import com.henriquebueno.api.snapshot.Estado;
+import com.henriquebueno.api.snapshot.Repositorio;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 
 @QuarkusTest
 class AdminTest {
 
-	/** Os primeiros bytes de um JPEG bastam pra validação. */
-	static final byte[] JPEG = { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0, 0, 0x10, 'J', 'F', 'I', 'F', 0, 1 };
-
-	@Inject
-	CapasEmMemoria capas;
-
 	@Test
 	void semLoginNaoEntra() {
-		given().get("/admin-api/videos").then().statusCode(401);
+		given().get("/admin-api/contagens").then().statusCode(401);
 	}
 
 	@Test
 	@TestSecurity(user = "visitante", roles = "leitor")
 	void semOPapelAdminNaoEntra() {
-		given().get("/admin-api/videos").then().statusCode(403);
+		given().get("/admin-api/contagens").then().statusCode(403);
 	}
 
 	@Test
 	@TestSecurity(user = "henrique", roles = "admin")
-	void cadastraEditaEApagaUmVideo() {
-		String id = novo("Circuit breaker na prática", "resiliencia", "2026-10-20")
-				.multiPart("instagram", "https://www.instagram.com/reel/abc123/")
-				.multiPart("tiktok", "https://www.tiktok.com/@bueno_dev0/video/1")
-				.multiPart("capa", "capa.jpg", JPEG, "image/jpeg")
-				.post("/admin-api/videos").then()
-				.statusCode(201)
-				.body("link", equalTo("https://www.instagram.com/reel/abc123/"))
-				.body("links.tiktok", equalTo("https://www.tiktok.com/@bueno_dev0/video/1"))
-				.body("categoria", equalTo("resiliencia"))
-				.extract().path("id");
-		String capa = given().get("/snapshot").then().body("videos.id", hasItem(id)).extract().path("videos.find { it.id == '" + id + "' }.capa");
-		given().get(capa).then().statusCode(200).contentType("image/jpeg").header("Cache-Control", "public, max-age=31536000, immutable");
+	void mensagemDoFormularioApareceNoPainelEPodeSerLidaEApagada() {
+		given().contentType(ContentType.JSON).header("X-Forwarded-For", "10.9.0.1")
+				.body("{\"nome\": \"Bia\", \"email\": \"bia@empresa.com\", \"assunto\": \"Vaga\", \"mensagem\": \"Vi seus vídeos e queria conversar sobre uma vaga.\"}")
+				.post("/contato").then().statusCode(202);
 
-		// troca a capa e tira o Instagram: o card passa a levar pro TikTok
-		given().multiPart("titulo", "Circuit breaker, de novo").multiPart("categoria", "").multiPart("publicadoEm", "2026-10-21")
-				.multiPart("tiktok", "https://www.tiktok.com/@bueno_dev0/video/1")
-				.multiPart("capa", "nova.jpg", JPEG, "image/jpeg")
-				.put("/admin-api/videos/" + id).then()
-				.statusCode(200)
-				.body("link", equalTo("https://www.tiktok.com/@bueno_dev0/video/1"))
-				.body("categoria", nullValue())
-				.body("capa", not(equalTo(capa)));
-		assertThat(capas.tem(capa.substring("/capas/".length()))).as("a capa antiga sai do MinIO").isFalse();
+		String id = given().get("/admin-api/mensagens").then().statusCode(200)
+				.body("[0].nome", equalTo("Bia"))
+				.body("[0].email", equalTo("bia@empresa.com"))
+				.body("[0].assunto", equalTo("Vaga"))
+				.body("[0].lida", equalTo(false))
+				.body("[0].recebidaEm", notNullValue())
+				.extract().path("[0].id");
 
-		given().delete("/admin-api/videos/" + id).then().statusCode(204);
-		given().get("/snapshot").then().body("videos.id", not(hasItem(id)));
-		given().delete("/admin-api/videos/" + id).then().statusCode(404);
+		given().contentType(ContentType.JSON).body("{\"lida\": true}").put("/admin-api/mensagens/" + id + "/lida").then()
+				.statusCode(200).body("lida", equalTo(true));
+		given().contentType(ContentType.JSON).body("{\"respondida\": true}").put("/admin-api/mensagens/" + id + "/respondida").then()
+				.statusCode(200).body("respondida", equalTo(true)).body("respondidaEm", notNullValue());
+		given().delete("/admin-api/mensagens/" + id).then().statusCode(204);
+		given().get("/admin-api/mensagens").then().body("id", not(hasItem(id)));
+		given().delete("/admin-api/mensagens/" + id).then().statusCode(404);
+	}
+
+	@Inject
+	Estado estado;
+
+	@Test
+	@TestSecurity(user = "henrique", roles = "admin")
+	void escolheOsDestaquesEntreCuradosERepositoriosPublicos() {
+		estado.atualizarPublicos(List.of(new Repositorio("Cinema-API", "Reservas.", List.of("Java"), "https://github.com/u/Cinema-API", null, null)));
+
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"github:Cinema-API\", \"projeto:revi\"]}").put("/admin-api/destaques").then().statusCode(200);
+		given().get("/snapshot").then().body("destaques", contains("github:Cinema-API", "projeto:revi"));
+		given().get("/admin-api/destaques").then()
+				.body("selecao", contains("github:Cinema-API", "projeto:revi"))
+				.body("repositorios.nome", hasItem("Cinema-API"));
+
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"github:nao-existe\"]}").put("/admin-api/destaques").then()
+				.statusCode(400).body("erros.selecao", equalTo("repositório não encontrado no GitHub: nao-existe"));
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"projeto:revi\", \"projeto:revi\"]}").put("/admin-api/destaques").then().statusCode(400);
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"<script>\"]}").put("/admin-api/destaques").then().statusCode(400);
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"projeto:a\", \"projeto:b\", \"projeto:c\", \"projeto:d\", \"projeto:e\", \"projeto:f\", \"projeto:g\"]}").put("/admin-api/destaques").then()
+				.statusCode(400).body("erros.selecao", equalTo("no máximo 6 projetos em destaque"));
+
+		// nulo volta ao padrão (os curados do site)
+		given().contentType(ContentType.JSON).body("{\"selecao\": null}").put("/admin-api/destaques").then().statusCode(200);
+		given().get("/snapshot").then().body("destaques", nullValue());
+	}
+
+	@Test
+	void semLoginNaoMexeNosDestaques() {
+		given().contentType(ContentType.JSON).body("{\"selecao\": []}").put("/admin-api/destaques").then().statusCode(401);
+	}
+
+	@Test
+	void semLoginNaoVeAsMensagens() {
+		given().get("/admin-api/mensagens").then().statusCode(401);
 	}
 
 	@Test
 	@TestSecurity(user = "henrique", roles = "admin")
-	void recusaDadosRuinsDizendoOQueCorrigir() {
-		given().multiPart("titulo", "").multiPart("categoria", "inventada").multiPart("publicadoEm", "ontem")
-				.multiPart("instagram", "http://site-qualquer.com/x")
-				.multiPart("capa", "capa.txt", "não sou imagem".getBytes(), "image/jpeg")
-				.post("/admin-api/videos").then()
-				.statusCode(400)
-				.body("erros.titulo", equalTo("falta o título"))
-				.body("erros.categoria", equalTo("categoria desconhecida"))
-				.body("erros.publicadoEm", notNullValue())
-				.body("erros.instagram", notNullValue())
-				.body("erros.capa", equalTo("a capa precisa ser JPEG, PNG ou WebP"));
+	void videosNaoSaoMaisCadastradosNoPainel() {
+		given().get("/admin-api/videos").then().statusCode(404);
+	}
 
-		novo("Sem link nenhum", "", "2026-10-20").multiPart("capa", "capa.jpg", JPEG, "image/jpeg")
-				.post("/admin-api/videos").then().statusCode(400).body("erros.links", notNullValue());
+	@Test
+	@TestSecurity(user = "henrique", roles = "admin")
+	void semTokenDaMetaOInstagramEDigitadoNoPainelEOTikTokNemAparece() {
+		// nos testes não há META_API_KEY
+		given().get("/admin-api/contagens").then()
+				.body("find { it.rede == 'instagram' }.editavel", equalTo(true))
+				.body("find { it.rede == 'tiktok' }", nullValue())
+				.body("find { it.rede == 'youtube' }.editavel", equalTo(false));
 	}
 
 	@Test
@@ -101,10 +123,9 @@ class AdminTest {
 		given().get("/snapshot").then().body("contagens.find { it.rede == 'instagram' }.valor", nullValue());
 
 		given().contentType(ContentType.JSON).body("{\"valor\": 5}").put("/admin-api/contagens/youtube").then().statusCode(400);
-		given().contentType(ContentType.JSON).body("{\"valor\": -1}").put("/admin-api/contagens/tiktok").then().statusCode(400);
-	}
-
-	private static RequestSpecification novo(String titulo, String categoria, String data) {
-		return given().multiPart("titulo", titulo).multiPart("categoria", categoria).multiPart("publicadoEm", data);
+		given().contentType(ContentType.JSON).body("{\"valor\": -1}").put("/admin-api/contagens/instagram").then().statusCode(400);
+		// o TikTok mostra só o @: nem dá pra digitar o número
+		given().contentType(ContentType.JSON).body("{\"valor\": 90}").put("/admin-api/contagens/tiktok").then().statusCode(400);
+		given().get("/snapshot").then().body("contagens.find { it.rede == 'tiktok' }.valor", nullValue());
 	}
 }

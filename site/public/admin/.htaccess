@@ -1,0 +1,8 @@
+# O painel não deve aparecer em busca nem ficar em cache. FilesMatch (e não Header solto) porque a
+# regra de .html do .htaccess da raiz é do mesmo tipo e venceria; a desta pasta é aplicada depois.
+<IfModule mod_headers.c>
+	<FilesMatch "\.html$">
+		Header set Cache-Control "no-store"
+	</FilesMatch>
+	Header set X-Robots-Tag "noindex"
+</IfModule>

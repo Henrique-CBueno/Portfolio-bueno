@@ -1,15 +1,24 @@
 package com.henriquebueno.api.fontes;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.henriquebueno.api.snapshot.Repositorio;
 
 /**
- * Repositórios fixados no perfil (GraphQL, exige token). Texto do card: a descrição do repo;
- * sem descrição, o primeiro parágrafo do README; sem README, só nome e linguagens.
+ * Repositórios do perfil, direto da API do GitHub (nada cadastrado à mão):
+ * - com token: os fixados no perfil (GraphQL, que exige token). Texto do card: a descrição do repo;
+ *   sem descrição, o primeiro parágrafo do README; sem README, só nome e linguagens.
+ * - sem token: os 6 públicos com push mais recente (REST, sem login; 60 chamadas por hora por IP).
+ * Além disso, {@link #publicos()} lista todos os públicos (REST), que o painel oferece como destaque da home.
+ * Se o GitHub disser que a cota acabou, nenhuma chamada sai até o horário que ele informou; a última lista fica.
  */
 public class GitHub implements Fontes.DeRepositorios {
 
@@ -22,7 +31,8 @@ public class GitHub implements Fontes.DeRepositorios {
 			          name
 			          url
 			          description
-			          languages(first: 3, orderBy: {field: SIZE, direction: DESC}) { nodes { name } }
+			          pushedAt
+			          languages(first: 3, orderBy: {field: SIZE, direction: DESC}) { nodes { name color } }
 			          readme: object(expression: "HEAD:README.md") { ... on Blob { text } }
 			        }
 			      }
@@ -31,7 +41,7 @@ public class GitHub implements Fontes.DeRepositorios {
 			}""";
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	record Nome(String name) {
+	record Nome(String name, String color) {
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -43,7 +53,13 @@ public class GitHub implements Fontes.DeRepositorios {
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	record Repo(String name, String url, String description, Linguagens languages, Blob readme) {
+	record Repo(String name, String url, String description, Linguagens languages, Blob readme, Instant pushedAt) {
+	}
+
+	/** Um repositório na API REST (sem token). */
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	record RepoPublico(String name, @JsonProperty("html_url") String url, String description, String language,
+			@JsonProperty("pushed_at") Instant pushedAt, boolean fork, boolean archived) {
 	}
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -65,25 +81,77 @@ public class GitHub implements Fontes.DeRepositorios {
 	private static final int MAX_DESCRICAO = 280;
 	private static final Pattern MARCACAO = Pattern.compile("!\\[[^]]*]\\([^)]*\\)|\\[([^]]*)]\\([^)]*\\)|<[^>]+>|[*_`]");
 
+	static final int QUANTOS_SEM_TOKEN = 6;
+
 	private final Http http;
 	private final String usuario;
+	private final boolean comToken;
+	private final Clock relogio;
+	/** Até quando o GitHub mandou esperar (cota de requisições acabou). */
+	private volatile Instant pausaAte;
 
-	/** {@code http} já leva o cabeçalho Authorization com o token. */
-	public GitHub(Http http, String usuario) {
+	/** {@code comToken}: o {@code http} leva o cabeçalho Authorization e dá pra ler os fixados. */
+	public GitHub(Http http, String usuario, boolean comToken) {
+		this(http, usuario, comToken, Clock.systemUTC());
+	}
+
+	GitHub(Http http, String usuario, boolean comToken, Clock relogio) {
 		this.http = http;
 		this.usuario = usuario;
+		this.comToken = comToken;
+		this.relogio = relogio;
 	}
 
 	@Override
 	public List<Repositorio> fixados() {
+		return respeitandoOLimite(() -> comToken ? fixadosNoPerfil() : publicosMaisRecentes().stream().limit(QUANTOS_SEM_TOKEN).toList());
+	}
+
+	@Override
+	public List<Repositorio> publicos() {
+		return respeitandoOLimite(this::publicosMaisRecentes);
+	}
+
+	/** Se o GitHub disse que a cota acabou, nada sai até o horário que ele informou (vale pras duas leituras). */
+	private List<Repositorio> respeitandoOLimite(Supplier<List<Repositorio>> leitura) {
+		var agora = relogio.instant();
+		if (pausaAte != null && agora.isBefore(pausaAte)) {
+			throw new IllegalStateException("limite de requisições do GitHub até " + pausaAte + "; fica a última lista");
+		}
+		try {
+			return leitura.get();
+		} catch (Http.LimiteAtingido e) {
+			pausaAte = e.ate;
+			throw e;
+		}
+	}
+
+	private List<Repositorio> fixadosNoPerfil() {
 		var resposta = http.post("/graphql", Map.of("query", CONSULTA, "variables", Map.of("login", usuario)), Resposta.class);
 		if (resposta.data() == null || resposta.data().user() == null) {
 			throw new IllegalStateException("GitHub não devolveu os fixados: " + resposta.errors());
 		}
 		return resposta.data().user().pinnedItems().nodes().stream()
 				.filter(r -> r.name() != null)
-				.map(r -> new Repositorio(r.name(), descricao(r), r.languages().nodes().stream().map(Nome::name).toList(), r.url()))
+				.map(r -> {
+					var linguagens = r.languages() == null || r.languages().nodes() == null ? List.<Nome>of() : r.languages().nodes();
+					var cor = linguagens.isEmpty() ? null : linguagens.getFirst().color();
+					return new Repositorio(r.name(), descricao(r), linguagens.stream().map(Nome::name).toList(), r.url(), cor, r.pushedAt());
+				})
 				.toList();
+	}
+
+	/** Os públicos do perfil, do push mais recente pro mais antigo (sem forks nem arquivados). Sem token, também viram os "fixados". */
+	private List<Repositorio> publicosMaisRecentes() {
+		var repos = http.get("/users/" + usuario + "/repos", Map.of("type", "owner", "sort", "pushed", "per_page", 100), RepoPublico[].class);
+		return Arrays.stream(repos)
+				.filter(r -> !r.fork() && !r.archived())
+				.map(r -> new Repositorio(r.name(), limpo(r.description()), r.language() == null ? List.of() : List.of(r.language()), r.url(), null, r.pushedAt()))
+				.toList();
+	}
+
+	private static String limpo(String s) {
+		return s == null || s.isBlank() ? null : s.strip();
 	}
 
 	private static String descricao(Repo r) {
