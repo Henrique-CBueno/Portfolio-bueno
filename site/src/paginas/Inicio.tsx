@@ -6,17 +6,19 @@ import { Stacks } from '../components/Stacks';
 import { Premiacoes } from '../components/Premiacoes';
 import { Contato } from '../components/Contato';
 import { usePaginaAnimada } from '../hooks/usePaginaAnimada';
-import type { Dados, Snapshot } from '../lib/tipos';
+import type { Carga } from '../hooks/useSnapshot';
+import type { Snapshot } from '../lib/tipos';
 
-export function Inicio({ dados, daApi }: { dados: Dados; daApi: Snapshot | null }) {
-	const { snapshot, geradoEm } = dados;
+interface Props { geradoEm: string; carga: Carga<Snapshot>; tentarDeNovo: () => void }
+
+export function Inicio({ geradoEm, carga, tentarDeNovo }: Props) {
 	const raiz = usePaginaAnimada();
 	return (
 		<main ref={raiz}>
-			<Abertura contagens={snapshot.contagens} lidoEm={snapshot.lidoEm} geradoEm={geradoEm} />
+			<Abertura carga={carga} geradoEm={geradoEm} />
 			<Sobre />
-			<Videos videos={snapshot.videos} assinatura={dados.assinatura} geradoEm={geradoEm} daApi={daApi} />
-			<Projetos repositorios={snapshot.repositorios} daApi={daApi} />
+			<Videos carga={carga} tentarDeNovo={tentarDeNovo} />
+			<Projetos carga={carga} tentarDeNovo={tentarDeNovo} />
 			<Stacks />
 			<Premiacoes />
 			<Contato />

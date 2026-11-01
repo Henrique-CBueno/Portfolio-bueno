@@ -1,33 +1,31 @@
 import { Link } from 'react-router';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, RotateCw } from 'lucide-react';
 import { Diagrama } from './Diagrama';
 import { Img } from './Img';
 import { Indicador } from './Indicador';
 import { Marca } from './Marca';
 import { Pill } from './Pill';
 import { Titulo } from './Titulo';
-import { destaques, fixados } from '../dados/projetos';
+import { destaques } from '../dados/projetos';
 import { redes } from '../dados/perfil';
 import { useCarrossel } from '../hooks/useCarrossel';
 import { caminhoDoProjeto } from '../lib/cabecalho';
+import { tempoRelativo } from '../lib/formato';
+import type { Carga } from '../hooks/useSnapshot';
 import type { Repositorio, Snapshot } from '../lib/tipos';
 import './Projetos.css';
+
+/** Cor no formato #rrggbb (o que vem da API vira estilo, então só isso passa). */
+const corValida = (cor?: string | null) => !!cor && /^#[0-9a-f]{6}$/i.test(cor);
 
 /** Só links http(s) viram href (o que vem da API passa por aqui). */
 const seguro = (link: string) => (/^https?:\/\//.test(link) ? link : undefined);
 
 const emDestaque = new Set(destaques.flatMap((d) => d.links.map((l) => l.href.toLowerCase())));
 
-interface Props { repositorios?: Repositorio[]; daApi: Snapshot | null }
+interface Props { carga: Carga<Snapshot>; tentarDeNovo: () => void }
 
-export function Projetos({ repositorios, daApi }: Props) {
-	// fixados no GitHub: os do build até a API responder; se ela tiver outros, entram os dela
-	const doBuild = repositorios ?? fixados;
-	const atuais = daApi?.repositorios;
-	const trocou = !!atuais && JSON.stringify(atuais) !== JSON.stringify(doBuild);
-	const outros = (trocou ? atuais : doBuild).filter((r) => !emDestaque.has(r.url.toLowerCase()));
-	// os itens do grupo começam escondidos pra animação de entrada; os que chegam depois já entram visíveis
-	const visivel = trocou ? { opacity: 1 } : undefined;
+export function Projetos({ carga, tentarDeNovo }: Props) {
 	const [lista, atual] = useCarrossel(destaques.length);
 
 	return (
@@ -63,20 +61,68 @@ export function Projetos({ repositorios, daApi }: Props) {
 			</div>
 			<Indicador atual={atual} total={destaques.length} />
 
-			{outros.length > 0 && (
-				<>
-					<h3 className="subtitulo" data-revela="" style={visivel}>Fixados no GitHub</h3>
-					<div className="lista" data-grupo="">
-						{outros.map((r) => (
-							<a key={r.url} className="repo" href={seguro(r.url)} target="_blank" rel="noopener noreferrer" data-cursor="abrir" style={visivel}>
-								<div><h4>{r.nome}</h4><div className="linguas">{r.linguagens.map((l) => <span key={l} className="chip">{l}</span>)}</div></div>
-								{r.descricao ? <p>{r.descricao}</p> : <p className="vazio">sem descrição no GitHub</p>}
-								<span className="seta"><ArrowUpRight /></span>
-							</a>
-						))}
-					</div>
-				</>
-			)}
+			<h3 className="subtitulo" data-revela="">Fixados no GitHub</h3>
+			<Fixados carga={carga} tentarDeNovo={tentarDeNovo} />
 		</section>
+	);
+}
+
+/** Repositórios fixados, lidos da API no navegador (os que já estão em destaque ficam de fora). */
+function Fixados({ carga, tentarDeNovo }: Props) {
+	if (carga.estado === 'carregando') {
+		return (
+			<div className="lista" aria-busy="true">
+				<span className="so-leitor" role="status">carregando os repositórios fixados</span>
+				{Array.from({ length: 3 }, (_, i) => (
+					<div key={i} className="repo esqueleto-repo" aria-hidden="true">
+						<div><span className="esqueleto nome"></span><span className="esqueleto chips"></span><span className="esqueleto chips"></span></div>
+						<div><span className="esqueleto texto"></span><span className="esqueleto texto curto"></span></div>
+						<span className="esqueleto seta"></span>
+					</div>
+				))}
+			</div>
+		);
+	}
+	if (carga.estado === 'erro') {
+		return (
+			<div className="painel falha chega" role="alert">
+				<p><strong>Não deu pra carregar os repositórios agora.</strong>Eles continuam todos no GitHub.</p>
+				<div className="redes-vazio">
+					<button className="botao" type="button" onClick={tentarDeNovo}>tentar de novo <RotateCw /></button>
+					<a className="pill verde" href={redes.github.url} target="_blank" rel="noopener noreferrer">github</a>
+				</div>
+			</div>
+		);
+	}
+	const outros = (carga.dados.repositorios ?? []).filter((r) => !emDestaque.has(r.url.toLowerCase()));
+	if (outros.length === 0) {
+		return <p className="sem-repos chega">Nenhum repositório fixado no GitHub agora. <a href={redes.github.url} target="_blank" rel="noopener noreferrer">ver o perfil <ArrowUpRight /></a></p>;
+	}
+	return (
+		<div className="lista">
+			{outros.map((r, i) => <Repo key={r.url} repositorio={r} ordem={i} />)}
+		</div>
+	);
+}
+
+function Repo({ repositorio: r, ordem }: { repositorio: Repositorio; ordem: number }) {
+	return (
+		<a className="repo chega" style={{ animationDelay: `${ordem * 50}ms` }} href={seguro(r.url)} target="_blank" rel="noopener noreferrer" data-cursor="abrir">
+			<div>
+				<h4>{r.nome}</h4>
+				<div className="linguas">
+					{r.linguagens.map((l, i) => (
+						<span key={l} className="chip">
+							{/* a bolinha da linguagem principal, na cor que o GitHub usa */}
+							{i === 0 && corValida(r.corLinguagem) && <i className="cor" style={{ background: r.corLinguagem! }} aria-hidden="true"></i>}
+							{l}
+						</span>
+					))}
+				</div>
+				{r.atualizadoEm && <time className="atualizado" dateTime={r.atualizadoEm}>atualizado {tempoRelativo(new Date(r.atualizadoEm))}</time>}
+			</div>
+			{r.descricao ? <p>{r.descricao}</p> : <p className="vazio">sem descrição no GitHub</p>}
+			<span className="seta"><ArrowUpRight /></span>
+		</a>
 	);
 }

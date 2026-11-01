@@ -1,12 +1,15 @@
 // Renderização das páginas fora do navegador: usada pelo prerender.mjs no build e pelo Vite no dev.
+// Só o que é fixo vai no HTML; vídeos, repositórios e seguidores aparecem como esqueleto e vêm da API no navegador.
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router';
 import { App } from './App';
 import { cabecalho } from './lib/cabecalho';
 import type { Dados } from './lib/tipos';
 
-export { carregarDados } from './lib/snapshot';
 export { paginasDoBuild } from './lib/cabecalho';
+
+/** O que o build grava em cada página. */
+export const dadosDoBuild = (): Dados => ({ geradoEm: new Date().toISOString() });
 
 const escapar = (texto: string) => texto.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 

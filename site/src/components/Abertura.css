@@ -35,6 +35,7 @@
 	.rede strong { display: block; font-size: 14px; line-height: 1.2; }
 	.rede small { display: block; font: 500 12px var(--mono); color: var(--apagado); font-variant-numeric: tabular-nums; }
 	.rede small.mudou { color: var(--ok); transition: color 1.2s; }
+	.rede small.carregando .esqueleto { width: 104px; height: 12px; margin-top: 4px; border-radius: 4px; }
 	.local { display: flex; align-items: center; gap: 8px; margin-top: 22px; font: 500 13px var(--mono); color: var(--apagado); }
 
 	@media (max-width: 960px) {

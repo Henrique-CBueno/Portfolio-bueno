@@ -10,13 +10,14 @@ import { premios } from '../dados/premios';
 import { anosDesde, textoContagem } from '../lib/formato';
 import { imagem } from '../lib/imagem';
 import { useContagensAoVivo } from '../hooks/useContagensAoVivo';
-import type { Contagem, Rede } from '../lib/tipos';
+import type { Carga } from '../hooks/useSnapshot';
+import type { Rede, Snapshot } from '../lib/tipos';
 import './Abertura.css';
 
 const foto = imagem(fotoPicture);
 const ordem: Rede[] = ['instagram', 'tiktok', 'youtube', 'github'];
 
-interface Props { contagens: Contagem[]; lidoEm: string; geradoEm: string }
+interface Props { carga: Carga<Snapshot>; geradoEm: string }
 
 /** Número de seguidores; quando muda ao vivo, pisca verde e desce um pouco. */
 function Legenda({ texto, aviso }: { texto: string; aviso?: string }) {
@@ -34,8 +35,8 @@ function Legenda({ texto, aviso }: { texto: string; aviso?: string }) {
 	return <small ref={el} className={mudou ? 'mudou' : undefined} title={aviso}>{texto}</small>;
 }
 
-export function Abertura({ contagens: doBuild, lidoEm, geradoEm }: Props) {
-	const [contagens, aviso] = useContagensAoVivo(doBuild, lidoEm);
+export function Abertura({ carga, geradoEm }: Props) {
+	const { contagens, aviso } = useContagensAoVivo(carga);
 
 	// anos de experiência contados no dia do build
 	const anos = Math.max(1, anosDesde(perfil.inicioCarreira, new Date(geradoEm)));
@@ -46,11 +47,13 @@ export function Abertura({ contagens: doBuild, lidoEm, geradoEm }: Props) {
 		{ valor: vitorias, sufixo: '×', rotulo: '1º lugar em hackathon' },
 	];
 
-	function legenda(rede: Rede) {
-		const c = contagens.find((x) => x.rede === rede);
+	/** Sem unidade (GitHub, TikTok) é sempre o @. Com unidade: o número; sem número ou se a API falhou, o @. */
+	function legenda(rede: Rede): string | null {
 		const info = redes[rede];
-		if (!c || !info.unidade) return info.usuario;
-		return textoContagem(c, info.unidade) ?? info.usuario;
+		if (!info.unidade) return info.usuario;
+		if (!contagens) return carga.estado === 'erro' ? info.usuario : null;
+		const c = contagens.find((x) => x.rede === rede);
+		return (c && textoContagem(c, info.unidade)) ?? info.usuario;
 	}
 
 	return (
@@ -81,7 +84,12 @@ export function Abertura({ contagens: doBuild, lidoEm, geradoEm }: Props) {
 					{ordem.map((rede) => (
 						<a key={rede} className="painel rede" href={redes[rede].url} target="_blank" rel="me noopener noreferrer">
 							<span className="ic"><Marca rede={rede} /></span>
-							<span><strong>{redes[rede].nome}</strong><Legenda texto={legenda(rede)} aviso={redes[rede].unidade ? aviso : undefined} /></span>
+							<span>
+								<strong>{redes[rede].nome}</strong>
+								{legenda(rede) === null
+									? <small className="carregando"><span className="esqueleto" aria-hidden="true"></span><span className="so-leitor">carregando seguidores</span></small>
+									: <Legenda texto={legenda(rede)!} aviso={redes[rede].unidade ? aviso : undefined} />}
+							</span>
 						</a>
 					))}
 				</div>

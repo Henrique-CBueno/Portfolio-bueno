@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { animate } from 'motion';
-import { Copy, Check, Send } from 'lucide-react';
+import { Copy, Check, LoaderCircle, Send } from 'lucide-react';
 import { Marca } from './Marca';
 import { Titulo } from './Titulo';
 import { perfil, redes } from '../dados/perfil';
@@ -41,6 +41,8 @@ type Estado = { cor: Cor; texto: string; vez: number };
 function Formulario() {
 	const [estado, setEstado] = useState<Estado>();
 	const [enviando, setEnviando] = useState(false);
+	// trava síncrona: o estado do React só atualiza no próximo desenho, e um clique duplo cairia nesse intervalo
+	const ocupado = useRef(false);
 	const pill = useRef<HTMLSpanElement>(null);
 	const avisar = (cor: Cor, texto: string) => setEstado((e) => ({ cor, texto, vez: (e?.vez ?? 0) + 1 }));
 
@@ -50,6 +52,7 @@ function Formulario() {
 
 	async function enviar(evento: FormEvent<HTMLFormElement>) {
 		evento.preventDefault();
+		if (ocupado.current) return;
 		const form = evento.currentTarget;
 		if (!form.checkValidity()) { form.reportValidity(); return; }
 		const dados = Object.fromEntries(new FormData(form)) as Record<string, string>;
@@ -57,6 +60,7 @@ function Formulario() {
 		if (dados.site) { avisar('verde', 'mensagem enviada ✓'); form.reset(); return; }
 
 		const api = import.meta.env.PUBLIC_API_URL;
+		ocupado.current = true;
 		setEnviando(true);
 		avisar('amarelo', 'enviando…');
 		try {
@@ -74,12 +78,13 @@ function Formulario() {
 		} catch {
 			avisar('vermelho', 'não foi agora · use o e-mail ao lado');
 		} finally {
+			ocupado.current = false;
 			setEnviando(false);
 		}
 	}
 
 	return (
-		<form className="painel formulario acompanha" noValidate onSubmit={enviar} data-revela="">
+		<form className="painel formulario acompanha" noValidate onSubmit={enviar} aria-busy={enviando} data-revela="">
 			<div className="linha">
 				<div className="campo"><label htmlFor="nome">nome</label><input id="nome" name="nome" autoComplete="name" required maxLength={120} placeholder="Como posso te chamar?" /></div>
 				<div className="campo"><label htmlFor="email">e-mail</label><input id="email" name="email" type="email" autoComplete="email" required maxLength={200} placeholder="voce@empresa.com" /></div>
@@ -89,7 +94,9 @@ function Formulario() {
 			<div className="armadilha" aria-hidden="true"><label htmlFor="site">site</label><input id="site" name="site" tabIndex={-1} autoComplete="off" /></div>
 			<div className="enviar">
 				<small aria-live="polite">{estado ? <span key={estado.vez} ref={pill} className={`pill ${estado.cor}`}>{estado.texto}</span> : 'vai direto pro meu e-mail'}</small>
-				<button className="botao primario" type="submit" disabled={enviando}>enviar mensagem <Send /></button>
+				<button className="botao primario" type="submit" disabled={enviando}>
+					{enviando ? <>enviando… <LoaderCircle className="gira" aria-hidden="true" /></> : <>enviar mensagem <Send /></>}
+				</button>
 			</div>
 		</form>
 	);

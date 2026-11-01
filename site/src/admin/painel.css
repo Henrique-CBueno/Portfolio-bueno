@@ -22,3 +22,6 @@ p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 .numeros input:focus { outline: none; border-color: var(--amarelo); }
 .numeros small { font: 500 12px var(--mono); color: var(--apagado); }
 
+.numeros .esqueleto-numero .esqueleto:first-child { width: 40%; height: 16px; }
+.numeros .esqueleto-numero .esqueleto:last-child { width: 80%; height: 40px; }
+.numeros .botao { display: inline-flex; align-items: center; gap: 8px; }
