@@ -51,8 +51,26 @@ function paginaNoDev(): Plugin {
 	};
 }
 
+/**
+ * /admin sem a barra final: o Vite só acha admin/index.html em /admin/, e sem ela entregava o site (o roteador
+ * mostrava o 404). Redireciona como o Apache da Hostinger faz em produção (DirectorySlash).
+ */
+function barraNoAdmin(): Plugin {
+	const redirecionar = (req: { url?: string }, res: { writeHead: (s: number, h: Record<string, string>) => void; end: () => void }, next: () => void) => {
+		const url = new URL(req.url ?? '/', 'http://local');
+		if (url.pathname !== '/admin') return next();
+		res.writeHead(301, { Location: `/admin/${url.search}` });
+		res.end();
+	};
+	return {
+		name: 'barra-no-admin',
+		configureServer: (servidor) => { servidor.middlewares.use(redirecionar); },
+		configurePreviewServer: (servidor) => { servidor.middlewares.use(redirecionar); },
+	};
+}
+
 export default defineConfig(({ isSsrBuild, isPreview }) => ({
-	plugins: [react(), imagetools(), paginaNoDev()],
+	plugins: [react(), imagetools(), paginaNoDev(), barraNoAdmin()],
 	// no preview, como no Nginx: /projetos/revi → projetos/revi.html, sem cair no index.html
 	appType: isPreview ? 'mpa' : 'spa',
 	// mantém os nomes que o docker-compose já passa (PUBLIC_API_URL, PUBLIC_KEYCLOAK_URL…)
