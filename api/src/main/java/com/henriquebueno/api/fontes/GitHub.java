@@ -4,6 +4,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ import com.henriquebueno.api.snapshot.Repositorio;
  * - com token: os fixados no perfil (GraphQL, que exige token). Texto do card: a descrição do repo;
  *   sem descrição, o primeiro parágrafo do README; sem README, só nome e linguagens.
  * - sem token: os 6 públicos com push mais recente (REST, sem login; 60 chamadas por hora por IP).
+ * Além disso, {@link #publicos()} lista todos os públicos (REST), que o painel oferece como destaque da home.
  * Se o GitHub disser que a cota acabou, nenhuma chamada sai até o horário que ele informou; a última lista fica.
  */
 public class GitHub implements Fontes.DeRepositorios {
@@ -102,12 +104,22 @@ public class GitHub implements Fontes.DeRepositorios {
 
 	@Override
 	public List<Repositorio> fixados() {
+		return respeitandoOLimite(() -> comToken ? fixadosNoPerfil() : publicosMaisRecentes().stream().limit(QUANTOS_SEM_TOKEN).toList());
+	}
+
+	@Override
+	public List<Repositorio> publicos() {
+		return respeitandoOLimite(this::publicosMaisRecentes);
+	}
+
+	/** Se o GitHub disse que a cota acabou, nada sai até o horário que ele informou (vale pras duas leituras). */
+	private List<Repositorio> respeitandoOLimite(Supplier<List<Repositorio>> leitura) {
 		var agora = relogio.instant();
 		if (pausaAte != null && agora.isBefore(pausaAte)) {
 			throw new IllegalStateException("limite de requisições do GitHub até " + pausaAte + "; fica a última lista");
 		}
 		try {
-			return comToken ? fixadosNoPerfil() : recentes();
+			return leitura.get();
 		} catch (Http.LimiteAtingido e) {
 			pausaAte = e.ate;
 			throw e;
@@ -129,12 +141,11 @@ public class GitHub implements Fontes.DeRepositorios {
 				.toList();
 	}
 
-	/** Sem token não dá pra ler os fixados: vão os públicos com push mais recente (sem forks nem arquivados). */
-	private List<Repositorio> recentes() {
-		var repos = http.get("/users/" + usuario + "/repos", Map.of("type", "owner", "sort", "pushed", "per_page", 30), RepoPublico[].class);
+	/** Os públicos do perfil, do push mais recente pro mais antigo (sem forks nem arquivados). Sem token, também viram os "fixados". */
+	private List<Repositorio> publicosMaisRecentes() {
+		var repos = http.get("/users/" + usuario + "/repos", Map.of("type", "owner", "sort", "pushed", "per_page", 100), RepoPublico[].class);
 		return Arrays.stream(repos)
 				.filter(r -> !r.fork() && !r.archived())
-				.limit(QUANTOS_SEM_TOKEN)
 				.map(r -> new Repositorio(r.name(), limpo(r.description()), r.language() == null ? List.of() : List.of(r.language()), r.url(), null, r.pushedAt()))
 				.toList();
 	}

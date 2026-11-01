@@ -60,6 +60,23 @@ class CaixaTest {
 	}
 
 	@Test
+	void respondidaTambemFicaLidaEGuardaQuando() throws Exception {
+		var caixa = new Caixa(Files.createTempDirectory("caixa").resolve("mensagens.json"), json, relogio);
+		var m = caixa.guardar(mensagem("ana"));
+
+		var respondida = caixa.marcarRespondida(m.id(), true).orElseThrow();
+		assertThat(respondida.respondida()).isTrue();
+		assertThat(respondida.lida()).isTrue();
+		assertThat(respondida.respondidaEm()).isEqualTo(Instant.parse("2026-11-01T12:00:00Z"));
+		// "não lida" numa respondida não desfaz a leitura
+		assertThat(caixa.marcarLida(m.id(), false).orElseThrow().lida()).isTrue();
+
+		var desfeita = caixa.marcarRespondida(m.id(), false).orElseThrow();
+		assertThat(desfeita.respondida()).isFalse();
+		assertThat(desfeita.respondidaEm()).isNull();
+	}
+
+	@Test
 	void marcaComoLidaEApaga() throws Exception {
 		var caixa = new Caixa(Files.createTempDirectory("caixa").resolve("mensagens.json"), json, relogio);
 		var m = caixa.guardar(mensagem("ana"));

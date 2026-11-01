@@ -57,6 +57,18 @@ class EstadoTest {
 		assertThat(depois.repositorios()).extracting(Repositorio::nome).containsExactly("repo");
 	}
 
+	@Test
+	void snapshotDeAntesDosDestaquesCarregaComPadrao() throws Exception {
+		java.nio.file.Files.createDirectories(dados);
+		java.nio.file.Files.writeString(dados.resolve("snapshot.json"), """
+				{"lidoEm": "2026-10-01T00:00:00Z", "videos": [], "contagens": [], "repositorios": [{"nome": "r", "linguagens": ["Java"], "url": "https://github.com/u/r"}]}""");
+		var atual = novoEstado().atual();
+
+		assertThat(atual.repositorios()).extracting(Repositorio::nome).containsExactly("r");
+		assertThat(atual.publicos()).isEmpty();
+		assertThat(atual.destaques()).isNull();
+	}
+
 	private Estado novoEstado() {
 		return new Estado(dados, json, Clock.systemUTC(), eventos::add);
 	}

@@ -63,6 +63,15 @@ public class Estado {
 		trocar(s -> s.comVideos(novos, relogio.instant()));
 	}
 
+	public synchronized void atualizarPublicos(List<Repositorio> novos) {
+		trocar(s -> s.comPublicos(novos, relogio.instant()));
+	}
+
+	/** {@code null} volta ao padrão (os projetos curados do site). */
+	public synchronized void atualizarDestaques(List<String> novos) {
+		trocar(s -> s.comDestaques(novos, relogio.instant()));
+	}
+
 	public synchronized void atualizarRepositorios(List<Repositorio> novos) {
 		trocar(s -> s.comRepositorios(novos, relogio.instant()));
 	}

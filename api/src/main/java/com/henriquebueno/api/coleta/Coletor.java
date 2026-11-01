@@ -58,6 +58,7 @@ public class Coletor {
 	@Scheduled(every = "${portfolio.github.intervalo}", concurrentExecution = ConcurrentExecution.SKIP)
 	void lerRepositorios() {
 		tentar("repositórios", () -> estado.atualizarRepositorios(fontes.repositorios().fixados()));
+		tentar("repositórios públicos", () -> estado.atualizarPublicos(fontes.repositorios().publicos()));
 	}
 
 	/** Erro repetido a cada rodada (ex.: falta de permissão) só aparece uma vez no log, até mudar ou a leitura voltar. */

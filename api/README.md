@@ -6,11 +6,11 @@ os inscritos do YouTube e os repositórios fixados do GitHub, guarda o número d
 
 | Endpoint | Pra quê |
 |---|---|
-| `GET /snapshot` | Lido pelo navegador a cada visita: vídeos (mais novo primeiro), contagens e repositórios fixados. |
+| `GET /snapshot` | Lido pelo navegador a cada visita: vídeos (mais novo primeiro), contagens, repositórios fixados, todos os públicos (`publicos`) e a seleção de destaques da home (`destaques`, nula = padrão). |
 | `GET /capas/<id>` | Capa de cada vídeo, servida do MinIO (cache longo: capa nova ganha id novo). |
 | `GET /stream` | SSE: evento `contagens` ao conectar e sempre que um número muda. |
 | `POST /contato` | Formulário do site: guarda a mensagem (`dados/mensagens.json`, as últimas 500, pro painel) e manda por e-mail, com o visitante no "responder para". Campo inválido → 400 com uma mensagem por campo. 3 mensagens por IP a cada 10 min. |
-| `/admin-api/*` | Painel: `GET /mensagens`, `PUT /mensagens/<id>/lida` (`{"lida": true}`) e `DELETE /mensagens/<id>` pras mensagens do formulário; `GET /contagens` (com `editavel`) e `PUT /contagens/instagram` quando não há `META_API_KEY` (o TikTok não tem número, só o @). Exige token do Keycloak com o papel `admin`. |
+| `/admin-api/*` | Painel (token do Keycloak com o papel `admin`): mensagens do formulário (`GET /mensagens`, `PUT /mensagens/<id>/lida` e `/respondida`, `DELETE /mensagens/<id>`); destaques da home (`GET /destaques`, `PUT /destaques` com `{"selecao": [...]}` ou `null` pro padrão); `GET /contagens` e `PUT /contagens/instagram` quando não há `META_API_KEY` (o TikTok não tem número, só o @). |
 | `GET /q/health` | Saúde. |
 
 O site é estático e lê `GET /snapshot` no navegador a cada visita, então qualquer mudança aparece sem publicar o site de novo.
@@ -84,3 +84,10 @@ espaço nas pontas não conta. Um campo que quebra mais de uma regra recebe a ma
 A mensagem é guardada antes do e-mail: se o e-mail falhar, ela continua no painel e o visitante recebe sucesso
 (não precisa mandar de novo). Se não der pra guardar, a resposta é 503. A armadilha (`site` preenchido) recebe
 sucesso e nada é guardado nem enviado.
+
+## Destaques da home
+
+O painel escolhe, em ordem, até 6 itens de "Projetos em destaque": `projeto:<slug>` (um dos curados do site, em
+`site/src/dados/projetos.ts`) ou `github:<nome>` (um repositório público). A API confere o formato do slug (ela não
+conhece os curados) e que o repositório existe entre os públicos. Sem seleção salva, o site mostra todos os curados.
+A seleção fica no `snapshot.json`.

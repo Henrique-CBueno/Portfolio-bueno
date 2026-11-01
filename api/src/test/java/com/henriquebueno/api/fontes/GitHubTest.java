@@ -42,6 +42,20 @@ class GitHubTest {
 	}
 
 	@Test
+	void publicosTrazTodosOsReposProprios() throws Exception {
+		try (var servidor = new Servidor()) {
+			var muitos = new StringBuilder("[");
+			for (int i = 0; i < 9; i++) muitos.append(i == 0 ? "" : ",").append("{\"name\": \"r").append(i).append("\", \"html_url\": \"https://github.com/u/r").append(i).append("\", \"fork\": false, \"archived\": false}");
+			muitos.append(",{\"name\": \"copia\", \"html_url\": \"https://github.com/u/copia\", \"fork\": true, \"archived\": false}]");
+			servidor.responder("/users/u/repos", muitos.toString());
+			var github = new GitHub(new Http(JSON, servidor.base(), Map.of("Authorization", "Bearer tk")), "u", true);
+
+			assertThat(github.publicos()).hasSize(9).extracting(Repositorio::nome).doesNotContain("copia");
+			assertThat(servidor.pedidos.getFirst().uri().getQuery()).contains("per_page=100");
+		}
+	}
+
+	@Test
 	void limiteDoGitHubPausaAsChamadasAteOHorarioQueEleInformou() throws Exception {
 		try (var servidor = new Servidor()) {
 			var reset = Instant.parse("2026-11-01T13:00:00Z");

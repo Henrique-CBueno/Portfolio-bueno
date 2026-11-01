@@ -11,6 +11,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.UnaryOperator;
 
 import org.jboss.logging.Logger;
 
@@ -51,7 +52,7 @@ public class Caixa {
 	}
 
 	public synchronized Recebida guardar(Mensagem m) {
-		var nova = new Recebida(novoId(), relogio.instant(), m.nome(), m.email(), vazioViraNulo(m.assunto()), m.mensagem(), false);
+		var nova = new Recebida(novoId(), relogio.instant(), m.nome(), m.email(), vazioViraNulo(m.assunto()), m.mensagem(), false, false, null);
 		var lista = new ArrayList<Recebida>(mensagens.size() + 1);
 		lista.add(nova);
 		lista.addAll(mensagens.subList(0, Math.min(mensagens.size(), MAXIMO - 1)));
@@ -64,9 +65,18 @@ public class Caixa {
 	}
 
 	public synchronized Optional<Recebida> marcarLida(String id, boolean lida) {
-		var alvo = mensagens.stream().filter(m -> m.id().equals(id)).findFirst();
-		alvo.ifPresent(a -> salvar(mensagens.stream().map(m -> m.id().equals(id) ? m.comLida(lida) : m).toList()));
-		return alvo.map(a -> a.comLida(lida));
+		return trocar(id, m -> m.comLida(lida));
+	}
+
+	public synchronized Optional<Recebida> marcarRespondida(String id, boolean respondida) {
+		var agora = relogio.instant();
+		return trocar(id, m -> m.comRespondida(respondida, agora));
+	}
+
+	private Optional<Recebida> trocar(String id, UnaryOperator<Recebida> mudanca) {
+		var alvo = mensagens.stream().filter(m -> m.id().equals(id)).findFirst().map(mudanca);
+		alvo.ifPresent(nova -> salvar(mensagens.stream().map(m -> m.id().equals(id) ? nova : m).toList()));
+		return alvo;
 	}
 
 	public synchronized boolean apagar(String id) {

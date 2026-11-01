@@ -22,7 +22,7 @@ import jakarta.ws.rs.core.Response;
 
 /**
  * Rotas do painel /admin do site. Só com token do Keycloak e o papel "admin".
- * Os vídeos vêm do Instagram; o painel cuida das mensagens do formulário e dos números sem API ligada.
+ * Os vídeos vêm do Instagram; o painel cuida das mensagens do formulário, dos projetos em destaque e dos números sem API ligada.
  */
 @Path("/admin-api")
 @RolesAllowed("admin")
@@ -35,12 +35,35 @@ public class AdminRecurso {
 	public record Lida(boolean lida) {
 	}
 
+	public record Respondida(boolean respondida) {
+	}
+
+	public record Selecao(List<String> selecao) {
+	}
+
 	private final Numeros numeros;
 	private final Caixa caixa;
+	private final Destaques destaques;
 
-	AdminRecurso(Numeros numeros, Caixa caixa) {
+	AdminRecurso(Numeros numeros, Caixa caixa, Destaques destaques) {
 		this.numeros = numeros;
 		this.caixa = caixa;
+		this.destaques = destaques;
+	}
+
+	/** Seleção atual dos projetos em destaque e os repositórios do GitHub que podem entrar nela. */
+	@GET
+	@Path("/destaques")
+	public Destaques.NoPainel destaques() {
+		return destaques.noPainel();
+	}
+
+	/** {"selecao": ["projeto:revi", "github:Cinema-API"]}; {"selecao": null} volta ao padrão. */
+	@PUT
+	@Path("/destaques")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Selecao escolherDestaques(Selecao corpo) {
+		return new Selecao(destaques.escolher(corpo == null ? null : corpo.selecao()));
 	}
 
 	/** Mensagens do formulário de contato, a mais nova primeiro. */
@@ -55,6 +78,15 @@ public class AdminRecurso {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response marcarLida(@PathParam("id") String id, Lida corpo) {
 		return caixa.marcarLida(id, corpo == null || corpo.lida())
+				.map(m -> Response.ok(m).build())
+				.orElse(Response.status(Response.Status.NOT_FOUND).build());
+	}
+
+	@PUT
+	@Path("/mensagens/{id}/respondida")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response marcarRespondida(@PathParam("id") String id, Respondida corpo) {
+		return caixa.marcarRespondida(id, corpo == null || corpo.respondida())
 				.map(m -> Response.ok(m).build())
 				.orElse(Response.status(Response.Status.NOT_FOUND).build());
 	}

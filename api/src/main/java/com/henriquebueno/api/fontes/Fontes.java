@@ -21,6 +21,9 @@ public final class Fontes {
 
 	public interface DeRepositorios {
 		List<Repositorio> fixados();
+
+		/** Todos os repositórios públicos do perfil (sem forks nem arquivados): os candidatos a destaque no painel. */
+		List<Repositorio> publicos();
 	}
 
 	/** Um vídeo publicado numa rede, como veio dela: a legenda ainda não virou título nem categoria. */

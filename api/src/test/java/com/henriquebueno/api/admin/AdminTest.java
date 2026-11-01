@@ -1,17 +1,24 @@
 package com.henriquebueno.api.admin;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+
+import com.henriquebueno.api.snapshot.Estado;
+import com.henriquebueno.api.snapshot.Repositorio;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import io.restassured.http.ContentType;
+import jakarta.inject.Inject;
 
 @QuarkusTest
 class AdminTest {
@@ -44,9 +51,42 @@ class AdminTest {
 
 		given().contentType(ContentType.JSON).body("{\"lida\": true}").put("/admin-api/mensagens/" + id + "/lida").then()
 				.statusCode(200).body("lida", equalTo(true));
+		given().contentType(ContentType.JSON).body("{\"respondida\": true}").put("/admin-api/mensagens/" + id + "/respondida").then()
+				.statusCode(200).body("respondida", equalTo(true)).body("respondidaEm", notNullValue());
 		given().delete("/admin-api/mensagens/" + id).then().statusCode(204);
 		given().get("/admin-api/mensagens").then().body("id", not(hasItem(id)));
 		given().delete("/admin-api/mensagens/" + id).then().statusCode(404);
+	}
+
+	@Inject
+	Estado estado;
+
+	@Test
+	@TestSecurity(user = "henrique", roles = "admin")
+	void escolheOsDestaquesEntreCuradosERepositoriosPublicos() {
+		estado.atualizarPublicos(List.of(new Repositorio("Cinema-API", "Reservas.", List.of("Java"), "https://github.com/u/Cinema-API", null, null)));
+
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"github:Cinema-API\", \"projeto:revi\"]}").put("/admin-api/destaques").then().statusCode(200);
+		given().get("/snapshot").then().body("destaques", contains("github:Cinema-API", "projeto:revi"));
+		given().get("/admin-api/destaques").then()
+				.body("selecao", contains("github:Cinema-API", "projeto:revi"))
+				.body("repositorios.nome", hasItem("Cinema-API"));
+
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"github:nao-existe\"]}").put("/admin-api/destaques").then()
+				.statusCode(400).body("erros.selecao", equalTo("repositório não encontrado no GitHub: nao-existe"));
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"projeto:revi\", \"projeto:revi\"]}").put("/admin-api/destaques").then().statusCode(400);
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"<script>\"]}").put("/admin-api/destaques").then().statusCode(400);
+		given().contentType(ContentType.JSON).body("{\"selecao\": [\"projeto:a\", \"projeto:b\", \"projeto:c\", \"projeto:d\", \"projeto:e\", \"projeto:f\", \"projeto:g\"]}").put("/admin-api/destaques").then()
+				.statusCode(400).body("erros.selecao", equalTo("no máximo 6 projetos em destaque"));
+
+		// nulo volta ao padrão (os curados do site)
+		given().contentType(ContentType.JSON).body("{\"selecao\": null}").put("/admin-api/destaques").then().statusCode(200);
+		given().get("/snapshot").then().body("destaques", nullValue());
+	}
+
+	@Test
+	void semLoginNaoMexeNosDestaques() {
+		given().contentType(ContentType.JSON).body("{\"selecao\": []}").put("/admin-api/destaques").then().statusCode(401);
 	}
 
 	@Test
