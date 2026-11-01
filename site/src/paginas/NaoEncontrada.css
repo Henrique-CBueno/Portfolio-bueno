@@ -1,0 +1,13 @@
+.nao-encontrada {
+	.secao { display: grid; grid-template-columns: 6fr 5fr; gap: 56px; align-items: center; min-height: calc(100vh - 220px); padding-top: 40px; padding-bottom: 96px; }
+	.codigo { display: inline-block; font: 700 14px var(--mono); color: var(--fundo); background: var(--amarelo); padding: 6px 12px; border-radius: 8px; rotate: -2deg; margin-bottom: 22px; }
+	h1 { font-size: clamp(40px, 5.4vw, 72px); font-weight: 800; letter-spacing: -.035em; line-height: 1.02; }
+	h1 em { font-style: normal; color: var(--amarelo); }
+	.explica { margin-top: 20px; font-size: 18px; color: var(--apagado); max-width: 44ch; }
+	.acoes { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+	.quadro { height: 260px; overflow: hidden; }
+	@media (max-width: 960px) {
+		.secao { grid-template-columns: 1fr; gap: 36px; min-height: 0; padding-top: 24px; }
+		.quadro { height: 180px; }
+	}
+}

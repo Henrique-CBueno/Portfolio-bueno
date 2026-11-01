@@ -1,4 +1,5 @@
-import { ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { Diagrama } from './Diagrama';
 import { Img } from './Img';
 import { Indicador } from './Indicador';
@@ -8,13 +9,25 @@ import { Titulo } from './Titulo';
 import { destaques, fixados } from '../dados/projetos';
 import { redes } from '../dados/perfil';
 import { useCarrossel } from '../hooks/useCarrossel';
-import type { Repositorio } from '../lib/tipos';
+import { caminhoDoProjeto } from '../lib/cabecalho';
+import type { Repositorio, Snapshot } from '../lib/tipos';
 import './Projetos.css';
+
+/** Só links http(s) viram href (o que vem da API passa por aqui). */
+const seguro = (link: string) => (/^https?:\/\//.test(link) ? link : undefined);
 
 const emDestaque = new Set(destaques.flatMap((d) => d.links.map((l) => l.href.toLowerCase())));
 
-export function Projetos({ repositorios }: { repositorios?: Repositorio[] }) {
-	const outros = (repositorios ?? fixados).filter((r) => !emDestaque.has(r.url.toLowerCase()));
+interface Props { repositorios?: Repositorio[]; daApi: Snapshot | null }
+
+export function Projetos({ repositorios, daApi }: Props) {
+	// fixados no GitHub: os do build até a API responder; se ela tiver outros, entram os dela
+	const doBuild = repositorios ?? fixados;
+	const atuais = daApi?.repositorios;
+	const trocou = !!atuais && JSON.stringify(atuais) !== JSON.stringify(doBuild);
+	const outros = (trocou ? atuais : doBuild).filter((r) => !emDestaque.has(r.url.toLowerCase()));
+	// os itens do grupo começam escondidos pra animação de entrada; os que chegam depois já entram visíveis
+	const visivel = trocou ? { opacity: 1 } : undefined;
 	const [lista, atual] = useCarrossel(destaques.length);
 
 	return (
@@ -27,18 +40,20 @@ export function Projetos({ repositorios }: { repositorios?: Repositorio[] }) {
 			<div className="destaques carrossel" data-carrossel="" data-grupo="" ref={lista}>
 				{destaques.map((d) => (
 					<article key={d.titulo} className={d.largo ? 'painel destaque largo' : 'painel destaque'}>
-						<a className="janela" href={d.links[0].href} target="_blank" rel="noopener noreferrer" data-cursor="abrir" aria-label={`${d.links[0].rotulo}: ${d.titulo}`}>
+						{/* o card abre a página do projeto; o site dele fica nos links de baixo */}
+						<Link className="janela" to={caminhoDoProjeto(d.slug)} data-cursor="ver" aria-label={`Ver o projeto ${d.titulo}`}>
 							<div className="barra"><i></i><i></i><i></i><span>{d.endereco}</span></div>
 							<div className="print" data-print="">
 								{d.print && <Img imagem={d.print.imagem} alt={d.print.alt} sizes="(max-width: 960px) 92vw, 600px" data-paralaxe="" />}
 								{d.diagrama && <Diagrama {...d.diagrama} />}
 							</div>
-						</a>
+						</Link>
 						<div className="corpo">
 							<div className="tags">{d.tags.map((t) => <Pill key={t.nome} cor={t.cor}>{t.nome}</Pill>)}</div>
 							<h3>{d.titulo}</h3>
 							<p>{d.descricao}</p>
 							<div className="links">
+								<Link to={caminhoDoProjeto(d.slug)}>detalhes <ArrowRight /></Link>
 								{d.links.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer">{l.rotulo} {l.icone === 'github' ? <Marca rede="github" /> : <ArrowUpRight />}</a>)}
 								{d.nota && <small>{d.nota}</small>}
 							</div>
@@ -50,10 +65,10 @@ export function Projetos({ repositorios }: { repositorios?: Repositorio[] }) {
 
 			{outros.length > 0 && (
 				<>
-					<h3 className="subtitulo" data-revela="">Fixados no GitHub</h3>
+					<h3 className="subtitulo" data-revela="" style={visivel}>Fixados no GitHub</h3>
 					<div className="lista" data-grupo="">
 						{outros.map((r) => (
-							<a key={r.url} className="repo" href={r.url} target="_blank" rel="noopener noreferrer" data-cursor="abrir">
+							<a key={r.url} className="repo" href={seguro(r.url)} target="_blank" rel="noopener noreferrer" data-cursor="abrir" style={visivel}>
 								<div><h4>{r.nome}</h4><div className="linguas">{r.linguagens.map((l) => <span key={l} className="chip">{l}</span>)}</div></div>
 								{r.descricao ? <p>{r.descricao}</p> : <p className="vazio">sem descrição no GitHub</p>}
 								<span className="seta"><ArrowUpRight /></span>

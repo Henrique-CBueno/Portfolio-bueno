@@ -42,6 +42,8 @@ export interface Snapshot {
 }
 
 export interface Destaque {
+	/** Endereço da página do projeto: /projetos/<slug>. Não mude depois de publicado (quebra links compartilhados). */
+	slug: string;
 	titulo: string;
 	descricao: string;
 	tags: { nome: string; cor: Cor }[];

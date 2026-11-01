@@ -9,15 +9,15 @@ import { categoria } from '../lib/categorias';
 import { tempoRelativo } from '../lib/formato';
 import { assinatura, ULTIMOS } from '../lib/videos';
 import { useCarrossel } from '../hooks/useCarrossel';
-import type { Video } from '../lib/tipos';
+import type { Snapshot, Video } from '../lib/tipos';
 import './Videos.css';
 
-interface Props { videos: Video[]; assinatura: string; geradoEm: string }
+interface Props { videos: Video[]; assinatura: string; geradoEm: string; daApi: Snapshot | null }
 
 /** Só links http(s) viram href (o que vem da API passa por aqui). */
 const seguro = (link: string) => (/^https?:\/\//.test(link) ? link : undefined);
 
-export function Videos({ videos: doBuild, assinatura: assinaturaDoBuild, geradoEm }: Props) {
+export function Videos({ videos: doBuild, assinatura: assinaturaDoBuild, geradoEm, daApi }: Props) {
 	const [videos, setVideos] = useState(() => doBuild.slice(0, ULTIMOS));
 	// lista trocada depois do carregamento: os cards novos já entram visíveis
 	const [trocou, setTrocou] = useState(false);
@@ -25,27 +25,19 @@ export function Videos({ videos: doBuild, assinatura: assinaturaDoBuild, geradoE
 	const [agora, setAgora] = useState(() => new Date(geradoEm));
 	const [lista, atual] = useCarrossel(videos.length);
 
-	// O HTML traz os vídeos do último build; aqui a lista é conferida com a API e trocada se mudou,
-	// pra um vídeo novo no /admin aparecer sem esperar um novo build do site.
+	useEffect(() => setAgora(new Date()), []);
+
+	// O HTML traz os vídeos do último build; a lista atual da API entra no lugar se mudou,
+	// pra um Reel novo aparecer sem esperar um novo build do site.
 	useEffect(() => {
-		setAgora(new Date());
 		const api = import.meta.env.PUBLIC_API_URL;
-		if (!api) return;
-		let ativo = true;
-		fetch(new URL('/snapshot', api))
-			.then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-			.then((snapshot: { videos: Video[] }) => {
-				const novos = snapshot.videos.slice(0, ULTIMOS);
-				if (!ativo || assinatura(novos) === assinaturaDoBuild) return;
-				setVideos(novos.map((v) => ({ ...v, capa: new URL(v.capa as string, api).href })));
-				setTrocou(true);
-				if (lista.current) lista.current.scrollLeft = 0;
-			})
-			.catch(() => {
-				// API fora do ar: fica a lista do build
-			});
-		return () => { ativo = false; };
-	}, [assinaturaDoBuild, lista]);
+		if (!daApi || !api) return;
+		const novos = daApi.videos.slice(0, ULTIMOS);
+		if (assinatura(novos) === assinaturaDoBuild) return;
+		setVideos(novos.map((v) => ({ ...v, capa: new URL(v.capa as string, api).href })));
+		setTrocou(true);
+		if (lista.current) lista.current.scrollLeft = 0;
+	}, [daApi, assinaturaDoBuild, lista]);
 
 	const visivel = trocou ? { opacity: 1 } : undefined;
 

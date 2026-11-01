@@ -1,0 +1,6 @@
+.falha-api {
+	display: grid; justify-items: start; gap: 12px; padding: 28px; max-width: 560px; border-color: var(--erro);
+	h2 { font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+	p { color: var(--texto-suave); font-size: 15.5px; }
+	.botao { margin-top: 6px; }
+}

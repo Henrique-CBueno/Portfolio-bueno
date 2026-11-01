@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { animate } from 'motion';
+import { Link, useLocation } from 'react-router';
 import { movimentoReduzido } from '../lib/movimento-reduzido';
 import './Topo.css';
 
@@ -13,16 +14,24 @@ const secoes = [
 ] as const;
 
 export function Topo() {
+	const { pathname } = useLocation();
 	const [rolou, setRolou] = useState(false);
 	const [ativa, setAtiva] = useState<string | null>(null);
 	const links = useRef(new Map<string, HTMLAnchorElement>());
 	const marcador = useRef<HTMLSpanElement>(null);
 
-	/* fundo ao rolar e seção atual */
+	/* fundo ao rolar */
 	useEffect(() => {
 		const aoRolar = () => setRolou(scrollY > 8);
 		addEventListener('scroll', aoRolar, { passive: true });
 		aoRolar();
+		return () => removeEventListener('scroll', aoRolar);
+	}, []);
+
+	/* seção atual: só existe no início; em outra página nenhum link fica marcado */
+	useEffect(() => {
+		setAtiva(null);
+		if (pathname !== '/') return;
 		const margem = { rootMargin: '-45% 0px -50% 0px' };
 		const observador = new IntersectionObserver((entradas) => {
 			for (const e of entradas) if (e.isIntersecting) setAtiva(e.target.id);
@@ -31,8 +40,8 @@ export function Topo() {
 		const inicio = new IntersectionObserver(([e]) => { if (e.isIntersecting) setAtiva(null); }, margem);
 		const abertura = document.getElementById('inicio');
 		if (abertura) inicio.observe(abertura);
-		return () => { removeEventListener('scroll', aoRolar); observador.disconnect(); inicio.disconnect(); };
-	}, []);
+		return () => { observador.disconnect(); inicio.disconnect(); };
+	}, [pathname]);
 
 	/* marcador desliza até o link da seção atual */
 	useEffect(() => {
@@ -50,12 +59,12 @@ export function Topo() {
 	return (
 		<header className={rolou ? 'topo rolou' : 'topo'}>
 			<div className="dentro">
-				<a className="marca" href="#inicio" aria-label="Henrique Bueno, voltar ao início" data-marca="">
+				<Link className="marca" to="/#inicio" aria-label="Henrique Bueno, voltar ao início" data-marca="">
 					<span className="tag" aria-hidden="true" data-marca-esq="">&lt;</span><span className="nome" data-marca-nome="">Henrique Bueno</span><span className="tag" aria-hidden="true" data-marca-dir="">/&gt;</span>
-				</a>
+				</Link>
 				<nav aria-label="Seções">
 					{secoes.map(([id, rotulo]) => (
-						<a key={id} href={`#${id}`} className={ativa === id ? 'ativo' : undefined} ref={(a) => { if (a) links.current.set(id, a); else links.current.delete(id); }}>{rotulo}</a>
+						<Link key={id} to={`/#${id}`} className={ativa === id ? 'ativo' : undefined} ref={(a) => { if (a) links.current.set(id, a); else links.current.delete(id); }}>{rotulo}</Link>
 					))}
 					<span className="marcador" aria-hidden="true" ref={marcador}></span>
 				</nav>

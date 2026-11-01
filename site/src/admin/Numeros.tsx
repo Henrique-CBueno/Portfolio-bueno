@@ -1,11 +1,15 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { FalhaApi } from '../components/FalhaApi';
 import { chamar, dataBR } from './api';
 import { formatarNumero } from '../lib/formato';
 import type { Contagem } from '../lib/tipos';
 
+/** O que o painel recebe: a contagem e se ela é digitada aqui ou lida da rede. */
+type NoPainel = Contagem & { editavel: boolean };
+
 const nomesRede: Record<string, string> = { instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube' };
 
-/** Instagram e TikTok: número digitado aqui. */
+/** Rede sem API ligada (Instagram sem META_API_KEY): número digitado aqui. */
 function Manual({ contagem: c }: { contagem: Contagem }) {
 	const [valor, setValor] = useState(c.valor === null ? '' : String(c.valor));
 	const [salvo, setSalvo] = useState<boolean>();
@@ -33,25 +37,41 @@ function Manual({ contagem: c }: { contagem: Contagem }) {
 	);
 }
 
-export function Numeros() {
-	const [contagens, setContagens] = useState<Contagem[]>([]);
+/** Número lido pela API da rede (YouTube; Instagram com META_API_KEY). */
+function lida(c: Contagem) {
+	const unidade = c.rede === 'youtube' ? 'inscritos' : 'seguidores';
+	if (c.valor === null) return c.rede === 'youtube' ? 'sem YOUTUBE_CHAVE: o site mostra só o @' : 'ainda não lido: o site mostra só o @';
+	return `${c.aproximado ? '~' : ''}${formatarNumero(c.valor)} ${unidade} · lido pela API`;
+}
 
-	useEffect(() => {
-		chamar('/contagens').then((r) => r.json()).then(setContagens);
+export function Numeros() {
+	const [contagens, setContagens] = useState<NoPainel[]>();
+	const [falhou, setFalhou] = useState(false);
+
+	const carregar = useCallback(() => {
+		setFalhou(false);
+		chamar('/contagens')
+			.then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+			.then(setContagens)
+			.catch(() => setFalhou(true));
 	}, []);
+	useEffect(carregar, [carregar]);
+
+	if (falhou) return <section className="bloco"><FalhaApi oque="os números" tentarDeNovo={carregar} /></section>;
 
 	return (
 		<section className="bloco">
-			<div className="cab-bloco"><h2>Números</h2><small className="dica">Instagram e TikTok não têm API ligada: digite aqui. Vazio = mostrar só o @.</small></div>
+			<div className="cab-bloco"><h2>Números</h2><small className="dica">Redes sem API ligada: digite aqui. Vazio = mostrar só o @.</small></div>
 			<div className="numeros">
-				{contagens.map((c) => c.rede === 'youtube'
-					? (
+				{contagens === undefined && <p className="dica">carregando…</p>}
+				{contagens?.map((c) => c.editavel
+					? <Manual key={c.rede} contagem={c} />
+					: (
 						<div key={c.rede} className="painel">
-							<strong>YouTube</strong>
-							<small>{c.valor === null ? 'sem YOUTUBE_CHAVE: o site mostra só o @' : `${c.aproximado ? '~' : ''}${formatarNumero(c.valor)} inscritos · lido pela API`}</small>
+							<strong>{nomesRede[c.rede] ?? c.rede}</strong>
+							<small>{lida(c)}</small>
 						</div>
-					)
-					: <Manual key={c.rede} contagem={c} />)}
+					))}
 			</div>
 		</section>
 	);

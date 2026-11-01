@@ -1,38 +1,40 @@
 import { useEffect } from 'react';
+import { Route, Routes } from 'react-router';
 import { Topo } from './components/Topo';
-import { Abertura } from './components/Abertura';
-import { Sobre } from './components/Sobre';
-import { Videos } from './components/Videos';
-import { Projetos } from './components/Projetos';
-import { Stacks } from './components/Stacks';
-import { Premiacoes } from './components/Premiacoes';
-import { Contato } from './components/Contato';
 import { Rodape } from './components/Rodape';
-import { iniciarMovimento } from './scripts/movimento';
+import { Inicio } from './paginas/Inicio';
+import { Projeto } from './paginas/Projeto';
+import { NaoEncontrada } from './paginas/NaoEncontrada';
+import { animarMarca } from './scripts/movimento';
 import { iniciarCursor } from './scripts/cursor';
+import { useNavegacao } from './hooks/useNavegacao';
+import { useSnapshotDaApi } from './hooks/useSnapshotDaApi';
 import type { Dados } from './lib/tipos';
 
+/**
+ * Rotas: / (início), /projetos/:slug (projeto em destaque) e qualquer outra coisa → 404.
+ * Cada uma é gerada como HTML no build (prerender.mjs); o roteador assume a partir daí.
+ */
 export function App({ dados }: { dados: Dados }) {
-	const { snapshot, geradoEm } = dados;
+	const { geradoEm } = dados;
+	// lido uma vez por visita, mesmo navegando entre páginas
+	const daApi = useSnapshotDaApi();
+	useNavegacao();
 
-	// animações e cursor são decoração sobre o HTML já hidratado (efeitos dos filhos rodam antes deste)
+	// marca do topo e cursor são do site todo, não de uma página
 	useEffect(() => {
-		iniciarMovimento();
+		animarMarca();
 		iniciarCursor();
 	}, []);
 
 	return (
 		<>
 			<Topo />
-			<main>
-				<Abertura contagens={snapshot.contagens} lidoEm={snapshot.lidoEm} geradoEm={geradoEm} />
-				<Sobre />
-				<Videos videos={snapshot.videos} assinatura={dados.assinatura} geradoEm={geradoEm} />
-				<Projetos repositorios={snapshot.repositorios} />
-				<Stacks />
-				<Premiacoes />
-				<Contato />
-			</main>
+			<Routes>
+				<Route index element={<Inicio dados={dados} daApi={daApi} />} />
+				<Route path="projetos/:slug" element={<Projeto />} />
+				<Route path="*" element={<NaoEncontrada />} />
+			</Routes>
 			<Rodape geradoEm={geradoEm} />
 		</>
 	);

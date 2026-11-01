@@ -1,29 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
-import { chamar, entrar, keycloak } from './api';
-import { FormVideo } from './FormVideo';
-import { ListaVideos } from './ListaVideos';
+import { useEffect, useState } from 'react';
+import { entrar, keycloak } from './api';
 import { Numeros } from './Numeros';
-import type { Video } from '../lib/tipos';
+import { FalhaApi } from '../components/FalhaApi';
 
-type Fase = { tipo: 'entrando' } | { tipo: 'aviso'; texto: string } | { tipo: 'pronto' };
+type Fase = { tipo: 'entrando' } | { tipo: 'sem-login' } | { tipo: 'aviso'; texto: string } | { tipo: 'pronto' };
 
 export function Painel() {
 	const [fase, setFase] = useState<Fase>({ tipo: 'entrando' });
 	const [usuario, setUsuario] = useState<string>();
-	const [categorias, setCategorias] = useState<string[]>([]);
-	const [videos, setVideos] = useState<Video[]>([]);
-	const [editando, setEditando] = useState<Video | null>(null);
-
-	const carregarVideos = useCallback(async () => {
-		setVideos(await (await chamar('/videos')).json());
-	}, []);
 
 	useEffect(() => {
 		(async () => {
 			try {
 				await entrar();
 			} catch {
-				setFase({ tipo: 'aviso', texto: 'não consegui falar com o login (Keycloak). Tente de novo em instantes.' });
+				setFase({ tipo: 'sem-login' });
 				return;
 			}
 			setUsuario(String(keycloak.tokenParsed?.preferred_username ?? ''));
@@ -31,11 +22,9 @@ export function Painel() {
 				setFase({ tipo: 'aviso', texto: 'sua conta entrou, mas não tem o papel "admin" no Keycloak.' });
 				return;
 			}
-			const [lista] = await Promise.all([(await chamar('/categorias')).json(), carregarVideos()]);
-			setCategorias(lista);
 			setFase({ tipo: 'pronto' });
 		})();
-	}, [carregarVideos]);
+	}, []);
 
 	return (
 		<>
@@ -50,21 +39,15 @@ export function Painel() {
 
 			<main className="painel-admin">
 				{fase.tipo === 'entrando' && <p className="aviso">entrando…</p>}
+				{fase.tipo === 'sem-login' && <FalhaApi oque="o login" tentarDeNovo={() => location.reload()} />}
 				{fase.tipo === 'aviso' && <p className="aviso">{fase.texto}</p>}
 				{fase.tipo === 'pronto' && (
 					<>
-						<FormVideo
-							categorias={categorias}
-							editando={editando}
-							aoSalvar={async () => { setEditando(null); await carregarVideos(); }}
-							aoCancelar={() => setEditando(null)}
-						/>
-						<ListaVideos
-							videos={videos}
-							aoEditar={setEditando}
-							aoApagar={async (v) => { if (editando?.id === v.id) setEditando(null); await carregarVideos(); }}
-						/>
 						<Numeros />
+						<section className="bloco">
+							<div className="cab-bloco"><h2>Vídeos</h2></div>
+							<p className="dica">Os vídeos vêm dos Reels do Instagram: título da primeira linha da legenda, categoria da hashtag (#resiliencia, #concorrencia, #consistencia, #seguranca, #arquitetura). O site se atualiza sozinho alguns minutos depois de postar.</p>
+						</section>
 					</>
 				)}
 			</main>

@@ -12,35 +12,7 @@
 .cab-bloco h2 { font-size: 28px; }
 .cab-bloco h2 em { font-style: normal; color: var(--amarelo); }
 .dica { font: 500 12px var(--mono); color: var(--apagado); }
-
-.form-video { padding: 24px; display: grid; grid-template-columns: 220px 1fr; gap: 28px; }
-.capa-campo { position: relative; aspect-ratio: 9 / 16; border: 1.5px dashed var(--borda); border-radius: 14px; display: grid; place-items: center; text-align: center; cursor: pointer; overflow: hidden; background: var(--fundo); font: 700 13px var(--mono); color: var(--apagado); transition: border-color .2s; }
-.capa-campo:hover, .capa-campo:focus-within { border-color: var(--amarelo); }
-.capa-campo small { font-weight: 500; font-size: 11px; }
-.capa-campo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.capa-campo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.campos { display: grid; gap: 14px; align-content: start; }
-.linha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.campo { display: grid; gap: 6px; }
-.campo label { font: 700 12px var(--mono); color: var(--apagado); }
-.campo input, .campo select { font: 500 15px var(--sans); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 11px 12px; width: 100%; }
-.campo input:focus, .campo select:focus { outline: none; border-color: var(--amarelo); }
-.campo input.erro, .campo select.erro { border-color: var(--erro); }
-.campo small, .erro-geral { font: 500 12px var(--mono); color: var(--erro); min-height: 0; }
-.campo small:empty, .erro-geral:empty { display: none; }
-.enviar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
-.enviar small { font: 500 12px var(--mono); color: var(--apagado); }
-
-.lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
-.lista .item { display: grid; gap: 8px; }
-.lista .item img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 12px; border: 1.5px solid var(--borda); background: var(--painel); }
-.lista .item strong { font-size: 14.5px; line-height: 1.3; }
-.lista .item .meta { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font: 500 11.5px var(--mono); color: var(--apagado); }
-.lista .item .acoes { display: flex; gap: 6px; }
-.lista .item .acoes button { flex: 1; font: 700 12px var(--mono); padding: 8px; border-radius: 9px; border: 1.5px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; }
-.lista .item .acoes button:hover { border-color: var(--apagado); }
-.lista .item .acoes button.confirmar { border-color: var(--erro); color: var(--erro); }
-.lista .vazio { font: 500 13px var(--mono); color: var(--apagado); }
+p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 
 .numeros { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 .numeros .painel { padding: 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
@@ -50,9 +22,3 @@
 .numeros input:focus { outline: none; border-color: var(--amarelo); }
 .numeros small { font: 500 12px var(--mono); color: var(--apagado); }
 
-@media (max-width: 760px) {
-	.form-video { grid-template-columns: 1fr; }
-	.capa-campo { max-width: 200px; }
-	.linha { grid-template-columns: 1fr; }
-	.lista { grid-template-columns: 1fr 1fr; }
-}

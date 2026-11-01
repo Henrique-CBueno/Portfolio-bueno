@@ -1,11 +1,12 @@
-// Último passo do "npm run build": renderiza a página com o snapshot da API (ou os dados de exemplo)
-// e grava em dist/index.html. As capas dos vídeos são baixadas da API e convertidas pra WebP aqui,
+// Último passo do "npm run build": renderiza cada página com o snapshot da API (ou os dados de exemplo):
+// / → dist/index.html, /projetos/<slug> → dist/projetos/<slug>.html e o 404 → dist/404.html. As capas dos vídeos são baixadas da API e convertidas pra WebP aqui,
 // então o site publicado não depende da API pra mostrar imagens.
 import { createHash } from 'node:crypto';
+import { dirname } from 'node:path';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import sharp from 'sharp';
 
-const { carregarDados, montar } = await import('./dist-ssr/entry-server.js');
+const { carregarDados, montar, paginasDoBuild } = await import('./dist-ssr/entry-server.js');
 const dados = await carregarDados();
 
 const larguras = [300, 540];
@@ -44,6 +45,10 @@ await cp('dist-ssr/assets', 'dist/assets', { recursive: true, force: false, filt
 });
 
 const modelo = await readFile('dist/index.html', 'utf8');
-await writeFile('dist/index.html', montar(modelo, dados));
+const arquivo = (caminho) => (caminho === '/' ? 'dist/index.html' : `dist${caminho}.html`);
+for (const caminho of paginasDoBuild) {
+	await mkdir(dirname(arquivo(caminho)), { recursive: true });
+	await writeFile(arquivo(caminho), montar(modelo, dados, caminho));
+}
 await rm('dist-ssr', { recursive: true, force: true });
-console.log(`[prerender] dist/index.html com ${dados.snapshot.videos.length} vídeo(s)`);
+console.log(`[prerender] ${paginasDoBuild.length} páginas (${paginasDoBuild.join(', ')}) com ${dados.snapshot.videos.length} vídeo(s)`);

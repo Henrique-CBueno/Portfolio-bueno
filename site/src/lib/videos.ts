@@ -8,5 +8,5 @@ export function assinatura(videos: Video[]): string {
 	return JSON.stringify(videos.map((v) => [v.id, v.titulo, v.link, v.categoria ?? null, v.publicadoEm, typeof v.capa === 'string' ? v.capa : null]));
 }
 
-/** A home mostra só os últimos 8. */
-export const ULTIMOS = 8;
+/** A home mostra só os últimos 4 (uma linha no desktop). */
+export const ULTIMOS = 4;
