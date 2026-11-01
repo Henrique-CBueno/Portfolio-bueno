@@ -89,6 +89,50 @@ npm run check           # TypeScript
 
 O gancho é instalado pelo `npm install` (script `prepare`).
 
+## Versionamento
+
+**Branches (GitHub Flow).** A `main` está sempre pronta pra publicar. Cada mudança nasce da `main` numa branch
+própria, com o nome `<tipo>/<assunto-curto>` (o mesmo tipo da mensagem de commit):
+
+```sh
+git switch main && git pull
+git switch -c feat/painel-mensagens        # ou fix/admin-404, docs/readme-testes, chore/versionamento…
+# … commits pequenos …
+git push -u origin feat/painel-mensagens   # e abrir o pull request pra main
+```
+
+A branch volta pra `main` por pull request (ou, sem GitHub, `git merge --no-ff` na `main`, que mantém o histórico
+dela visível) e depois é apagada. **Commit direto na `main` é barrado pelo gancho** (só o commit que fecha um merge com
+conflito passa).
+
+**Mensagens (Conventional Commits).** Em inglês, no imperativo, conferidas pelo commitlint a cada commit:
+
+```
+<tipo>(<escopo>): <o que muda>
+
+<por quê, quando não for óbvio>
+```
+
+| Tipo | Quando |
+|---|---|
+| `feat` | funcionalidade nova pra quem usa o site, a API ou o painel |
+| `fix` | correção de defeito |
+| `refactor` | mudança de código sem mudar comportamento |
+| `test` | testes |
+| `docs` | documentação (README, CLAUDE.md, PRODUCT.md, DESIGN.md) |
+| `build` | dependências, build, Docker |
+| `chore` | manutenção que não entra nos outros (configuração, ganchos) |
+| `ci`, `perf`, `style`, `revert` | integração contínua, desempenho, só formatação, reverter |
+
+Escopo (opcional): `site`, `api`, `docker`, `keycloak` ou `deps`. Exemplos: `feat(site): add the light theme`,
+`fix(api): keep the last repo list on rate limit`, `docs: describe the GitHub Flow`. Título com até 100 caracteres.
+
+**Ganchos** (instalados pelo `npm install` em `site/`, valem pro repositório todo):
+- `pre-commit`: barra commit na `main`; se o commit mexe em `site/`, lint e formatação nos arquivos do commit e checagem de tipos;
+- `commit-msg`: confere a mensagem (regras em `site/commitlint.config.js`).
+
+Não pule os ganchos com `--no-verify`. No GitHub, vale proteger a `main` (Settings → Branches: exigir pull request).
+
 ## Testes
 
 ```sh

@@ -1,0 +1,6 @@
+# Toda mensagem de commit segue Conventional Commits (regras em site/commitlint.config.js).
+# Merge e revert com a mensagem padrão do git passam (o commitlint os reconhece).
+mensagem="$(pwd)/$1"
+cd site || exit 1
+if [ -s "$HOME/.nvm/nvm.sh" ]; then . "$HOME/.nvm/nvm.sh" >/dev/null 2>&1 && nvm use --silent >/dev/null 2>&1; fi
+npx --no -- commitlint --edit "$mensagem"
