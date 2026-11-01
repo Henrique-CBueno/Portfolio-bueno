@@ -20,8 +20,8 @@ O `docker-compose.local.yml` só publica essas portas; no servidor quem cuida di
 | Serviço | O que faz |
 |---|---|
 | `web` | Nginx servindo só o site estático (arquivos). |
-| `construtor` | Faz o build do site lendo a API e publica no volume `site`. Quando o painel muda algo, a API toca `/dados/rebuild-pedido` e ele refaz o build (o site no ar só troca quando o build novo termina; se falhar, fica o anterior). |
-| `api` | Quarkus, só a API: vídeos e números do painel, YouTube, GitHub, formulário e SSE. Detalhes em `api/README.md`. |
+| `construtor` | Faz o build do site lendo a API e publica no volume `site`. Quando os vídeos, os repositórios fixados ou o painel mudam algo, a API toca `/dados/rebuild-pedido` e ele refaz o build (o site no ar só troca quando o build novo termina; se falhar, fica o anterior). |
+| `api` | Quarkus, só a API: Reels e seguidores do Instagram, YouTube, GitHub, números do painel, formulário e SSE. Detalhes em `api/README.md`. |
 | `minio` | Guarda as capas dos vídeos (imagem do MinIO mantida pelo Coolify; a oficial não é mais publicada). Só na rede interna. |
 | `keycloak` | Login do painel `/admin`. Importa o realm `portfolio` (papel `admin` e o client do painel) na primeira subida. |
 
@@ -35,7 +35,9 @@ docker compose exec api touch /dados/rebuild-pedido  # forçar um rebuild
 1. Abra o console do Keycloak (`${KEYCLOAK_URL_PUBLICA}/admin`), entre com `KEYCLOAK_ADMIN` / `KEYCLOAK_ADMIN_SENHA` e troque pro realm **portfolio**.
 2. **Users → Create new user** (seu usuário e e-mail) → aba **Credentials → Set password** (desmarque *Temporary*).
 3. Aba **Role mapping → Assign role → admin**.
-4. Entre em `${SITE_URL}/admin`: cadastre vídeos (capa, título, categoria, data e links) e os números do Instagram e do TikTok. O site se atualiza sozinho em alguns segundos.
+4. Entre em `${SITE_URL}/admin` pra digitar o número de seguidores do Instagram, se não tiver `META_API_KEY` (o TikTok mostra só o @, sem número).
+
+Os vídeos vêm dos Reels do Instagram (com `META_API_KEY`), lidos a cada 5 min: o título é a primeira linha da legenda e a categoria, a hashtag (`#resiliencia`, `#concorrencia`, `#consistencia`, `#seguranca`, `#arquitetura`, com ou sem acento). Reel novo, editado ou apagado faz o site se refazer sozinho.
 
 O Keycloak roda em modo `start-dev` (banco H2 no volume `keycloak`): serve pro começo, mas o ideal em produção é `start` com Postgres e restringir o console de administração.
 
@@ -51,9 +53,9 @@ O Keycloak roda em modo `start-dev` (banco H2 no volume `keycloak`): serve pro c
    - `SITE_URL=https://henriquebueno.com`, `API_URL_PUBLICA=https://api.henriquebueno.com`, `KEYCLOAK_URL_PUBLICA=https://auth.henriquebueno.com` (obrigatórias)
    - `ORIGENS=https://henriquebueno.com,https://www.henriquebueno.com` (se usar www)
    - `MINIO_SENHA` e `KEYCLOAK_ADMIN_SENHA` (obrigatórias, invente senhas longas)
-   - `YOUTUBE_CHAVE`, `GITHUB_TOKEN`
+   - `YOUTUBE_CHAVE`, `GITHUB_TOKEN`, `META_API_KEY`
    - `MAIL_MOCK=false`, `MAIL_USUARIO`, `MAIL_SENHA` (SMTP da Hostinger: `smtp.hostinger.com`, porta 465)
-5. **Deploy.** Os volumes (`dados`, `site`, `minio`, `keycloak`) ficam entre deploys: vídeos, capas e usuários não se perdem.
+5. **Deploy.** Os volumes (`dados`, `site`, `minio`, `keycloak`) ficam entre deploys: vídeos, capas, o token renovado da Meta e usuários não se perdem.
 6. Crie seu usuário no Keycloak (veja **Painel `/admin`** acima).
 7. No DNS, aponte `henriquebueno.com`, `api.henriquebueno.com` e `auth.henriquebueno.com` (registros A) pro IP da VPS.
 

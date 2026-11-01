@@ -17,12 +17,13 @@ npm run build      # client build + SSR build + prerender.mjs → static output 
 npm run check      # type check (tsc)
 ```
 
-- `index.html` (template with `<!--app-->`/`<!--dados-->`) → `src/main.tsx` hydrates `src/App.tsx`, which composes the page from `src/components/*` (one component + one `.css` per section, CSS nested under the section's root class).
-- `src/entry-server.tsx` renders the page; `prerender.mjs` uses it at build (and downloads each video cover from the API, converting it to WebP in `dist/capas/`), the `paginaNoDev` plugin in `vite.config.ts` uses it in dev. The snapshot travels to the browser as JSON in `<script id="dados">`.
+- Routes (React Router 7, declarative): `/` (`src/paginas/Inicio.tsx`), `/projetos/:slug` (`Projeto.tsx`, the featured projects from `src/dados/projetos.ts`; a slug is a published URL, don't change it) and anything else → `NaoEncontrada.tsx` (404). Per-route `<title>`/description live in `src/lib/cabecalho.ts`, which also lists the pages to prerender (`paginasDoBuild`).
+- `index.html` (template with `<!--cabecalho-->`/`<!--app-->`/`<!--dados-->`) → `src/main.tsx` hydrates `src/App.tsx` inside `BrowserRouter`; pages are composed from `src/components/*` (one component + one `.css` per section, CSS nested under the section's root class). `useNavegacao` updates the tab title and scrolls to the `#hash`/top on client navigation.
+- `src/entry-server.tsx` renders a route inside `StaticRouter`; `prerender.mjs` writes every page at build (`dist/index.html`, `dist/projetos/<slug>.html`, `dist/404.html`) and downloads each video cover from the API, converting it to WebP in `dist/capas/`; the `paginaNoDev` plugin in `vite.config.ts` renders whatever URL is requested in dev. Nginx serves `$uri.html` (shared links and refresh land on the right page) and `404.html` with a real 404 status. The snapshot travels to the browser as JSON in `<script id="dados">`.
 - `src/dados/` holds curated content; `src/lib/snapshot.ts` loads videos and follower counts from the API (`API_URL`, else `PUBLIC_API_URL`) or from `src/dados/exemplo.ts`. Local images are imported with `?w=…&format=webp&as=picture` (vite-imagetools).
-- After hydration, `Videos` re-checks `/snapshot` and swaps the list if its `assinatura` changed; `useContagensAoVivo` follows the counts over SSE.
-- `admin/index.html` + `src/admin/*`: the admin panel (React, keycloak-js with PKCE) calling `/admin-api`; client-rendered only.
-- `src/scripts/movimento.ts` holds the scroll/entrance animations and `cursor.ts` the cursor; `App` starts both once after hydration. Hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
+- After hydration, `App` reads `/snapshot` once (`useSnapshotDaApi`) and hands it to `Videos` (swaps the list if its `assinatura` changed) and `Projetos` (swaps the pinned repos if they changed); `useContagensAoVivo` follows the counts over SSE.
+- `admin/index.html` + `src/admin/*`: the admin panel (React, keycloak-js with PKCE) calling `/admin-api` for the typed-in counts; client-rendered only, outside the router. When the API or Keycloak doesn't answer it shows `components/FalhaApi` (friendly message + retry); Keycloak is pinged first because keycloak-js would otherwise redirect to a dead login page.
+- `src/scripts/movimento.ts` holds the animations: `animarMarca` (header, once, from `App`) and `animarPagina(main)`, which each page calls through `usePaginaAnimada` so content animates after client navigation too; `cursor.ts` is started once by `App`. Hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
 - Env vars keep the `PUBLIC_` prefix (`envPrefix` in `vite.config.ts`). Built against the API with `API_URL=… PUBLIC_API_URL=… npm run build`.
 
 ## API (`api/`)
@@ -36,8 +37,9 @@ cd api
 ./mvnw package && java -jar target/quarkus-app/quarkus-run.jar
 ```
 
-- Videos and the Instagram/TikTok counts come from the site's `/admin` panel: `admin/AdminRecurso` (`/admin-api/*`, `@RolesAllowed("admin")`, Keycloak tokens via quarkus-oidc) → `admin/Catalogo` (validation, covers in MinIO via `capas/CapasMinio`, rebuild request). Tests swap MinIO for `CapasEmMemoria` (`@Mock`) and use `@TestSecurity`.
-- `fontes/` holds the automatic sources (`YouTube`, `GitHub`, plus `Exemplo` with the copied pinned repos); `Conjunto` picks which; `coleta/Coletor` reads them with `@Scheduled`. Numbers are never invented: no source = handle only.
+- Videos are the Instagram Reels (`META_API_KEY`): `fontes/Instagram` (Graph API; the token type is probed on first use, not guessed from its text: Facebook tokens go through the linked Page, Instagram-login tokens are renewed daily via `fontes/TokenMeta` into `dados/meta-token.json`) → `videos/Reels` (cover copied to MinIO via `capas/CapasMinio`, title/category from the caption in `videos/Legenda`). A video list change fires `Eventos.VideosMudaram` and a pinned-repo change `Eventos.RepositoriosMudaram`; `rebuild/Rebuild` observes both.
+- The `/admin` panel only types Instagram's count when there's no Meta token (TikTok shows the handle only, never a count): `admin/AdminRecurso` (`/admin-api/*`, `@RolesAllowed("admin")`, Keycloak tokens via quarkus-oidc) → `admin/Numeros`. Tests swap MinIO for `CapasEmMemoria` (`@Mock`) and use `@TestSecurity`.
+- `fontes/` holds the automatic sources (`YouTube`, `GitHub`, `Instagram`, plus `Exemplo` with the copied pinned repos); `Conjunto` picks which; `coleta/Coletor` reads them with `@Scheduled` (Instagram every 5 min, its own rate limit; a repeated read error is logged once). Numbers are never invented: no source = handle only.
 - `snapshot/Estado` keeps the last snapshot in `dados/snapshot.json` and fires CDI events (`Eventos`); `web/Transmissor` (SSE) observes count changes.
 - Keep it simple: no virtual threads, no circuit breaker (user decision).
 
