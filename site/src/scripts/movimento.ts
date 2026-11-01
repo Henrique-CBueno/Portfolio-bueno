@@ -1,5 +1,6 @@
 // Animações com Motion. Tudo aqui é decoração: sem JS, ou com
 // prefers-reduced-motion, a página aparece inteira e parada (ver global.css).
+// Roda uma vez, depois que o React hidrata a página (ver App.tsx), sobre o HTML já pronto.
 import { animate, inView, scroll, stagger } from 'motion';
 
 const sobe = [0.2, 0.8, 0.2, 1] as const;
@@ -138,7 +139,11 @@ function carimbos() {
 	}, { amount: 0.4 });
 }
 
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+export function iniciarMovimento() {
+	const raiz = document.documentElement;
+	// o Fast Refresh do dev pode rodar o efeito de novo
+	if (raiz.dataset.movimento || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+	raiz.dataset.movimento = 'ligado';
 	marca();
 	abertura();
 	revelacoes();

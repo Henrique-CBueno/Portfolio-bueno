@@ -1,4 +1,10 @@
-import type { ImageMetadata } from 'astro';
+/** Imagem pronta pra <img>: `srcset` com as larguras geradas no build. */
+export interface Imagem {
+	src: string;
+	srcset?: string;
+	width?: number;
+	height?: number;
+}
 
 export type Cor = 'amarelo' | 'verde' | 'vermelho' | 'azul' | 'roxo' | 'neutro';
 
@@ -10,7 +16,8 @@ export interface Video {
 	/** Pra onde o card leva: Instagram, senão TikTok, senão YouTube. */
 	link: string;
 	links?: { instagram?: string | null; tiktok?: string | null; youtube?: string | null };
-	capa: ImageMetadata | string;
+	/** Caminho na API (/capas/<id>) ou URL; no build vira a capa baixada e convertida. */
+	capa: Imagem | string;
 	publicadoEm: string;
 	/** Categoria escolhida no painel (ex.: "resiliencia"), que vira a pill colorida. */
 	categoria?: string | null;
@@ -25,7 +32,7 @@ export interface Contagem {
 	atualizadoEm?: string | null;
 }
 
-/** O que a API entrega no build e depois por SSE. */
+/** O que a API entrega em GET /snapshot (as contagens também chegam por SSE). */
 export interface Snapshot {
 	lidoEm: string;
 	videos: Video[];
@@ -39,7 +46,7 @@ export interface Destaque {
 	descricao: string;
 	tags: { nome: string; cor: Cor }[];
 	endereco: string;
-	print?: { imagem: ImageMetadata; alt: string };
+	print?: { imagem: Imagem; alt: string };
 	diagrama?: { nos: { nome: string; cor?: Cor }[]; saidas: { nome: string; cor?: Cor }[]; descricao: string };
 	links: { rotulo: string; href: string; icone: 'externo' | 'github' }[];
 	nota?: string;
@@ -62,5 +69,14 @@ export interface Premio {
 	projeto?: { nome?: string; descricao: string };
 	contexto?: { texto: string; destaque?: string; depois?: string };
 	organizadores: { nome: string; cor: Cor }[];
-	foto?: { imagem: ImageMetadata; alt: string };
+	foto?: { imagem: Imagem; alt: string };
+}
+
+/** O que a página recebe: renderizada no build e reaproveitada no navegador (hidratação). */
+export interface Dados {
+	/** Quando a página foi gerada; datas relativas usam isso até o navegador assumir. */
+	geradoEm: string;
+	snapshot: Snapshot;
+	/** assinatura() dos vídeos como vieram da API, pra saber se a lista mudou depois do build. */
+	assinatura: string;
 }

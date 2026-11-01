@@ -1,15 +1,15 @@
-import type { Snapshot } from './tipos';
+import type { Dados, Snapshot } from './tipos';
 import { exemplo } from '../dados/exemplo';
+import { assinatura, ULTIMOS } from './videos';
 
 /**
- * Últimos números e vídeos gravados no build. Com API_URL definido, lê da API
- * (que consulta Instagram e YouTube); sem ela, usa os dados de exemplo.
+ * Lê o snapshot da API pra gravar na página (roda no build e no dev, nunca no navegador).
+ * Com API_URL (rede interna, no Docker) ou PUBLIC_API_URL, lê da API; sem nenhuma, usa os dados de exemplo.
  */
-export async function carregarSnapshot(): Promise<Snapshot> {
-	// no build do Docker vem API_URL (rede interna); no "npm run dev" o Astro só entrega as
-	// variáveis PUBLIC_ do .env.development, então usa o endereço público da API
-	const api = import.meta.env.API_URL ?? import.meta.env.PUBLIC_API_URL;
-	if (!api) return exemplo;
+export async function carregarDados(): Promise<Dados> {
+	const geradoEm = new Date().toISOString();
+	const api = process.env.API_URL ?? import.meta.env.PUBLIC_API_URL;
+	if (!api) return { geradoEm, snapshot: exemplo, assinatura: assinatura(exemplo.videos.slice(0, ULTIMOS)) };
 	let resposta: Response;
 	try {
 		resposta = await fetch(new URL('/snapshot', api));
@@ -18,12 +18,14 @@ export async function carregarSnapshot(): Promise<Snapshot> {
 		// no "npm run dev" sem o docker compose de pé, segue com os dados de exemplo
 		if (import.meta.env.DEV) {
 			console.warn(`[snapshot] API em ${api} fora do ar (${erro}); usando dados de exemplo`);
-			return exemplo;
+			return { geradoEm, snapshot: exemplo, assinatura: assinatura(exemplo.videos.slice(0, ULTIMOS)) };
 		}
 		throw erro;
 	}
 	const snapshot = (await resposta.json()) as Snapshot;
-	// a API devolve a capa como caminho dela mesma (/capas/<id>.jpg)
+	snapshot.videos = snapshot.videos.slice(0, ULTIMOS);
+	const assinado = assinatura(snapshot.videos);
+	// a API devolve a capa como caminho dela mesma (/capas/<id>); o prerender baixa daqui
 	snapshot.videos = snapshot.videos.map((v) => ({ ...v, capa: new URL(v.capa as string, api).href }));
-	return snapshot;
+	return { geradoEm, snapshot, assinatura: assinado };
 }

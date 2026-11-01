@@ -2,9 +2,10 @@
 // um anel que vem atrás com atraso, e a grade do fundo acendendo em volta.
 // Só com mouse de verdade e sem preferência por menos movimento.
 
-const ligar = matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+export function iniciarCursor() {
+	const ligar = matchMedia('(pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+	if (!ligar || document.querySelector('.cursor')) return;
 
-if (ligar) {
 	const cursor = document.createElement('div');
 	cursor.className = 'cursor fora';
 	cursor.setAttribute('aria-hidden', 'true');

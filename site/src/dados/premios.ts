@@ -1,5 +1,6 @@
 import type { Premio } from '../lib/tipos';
-import tresCoracoes from '../assets/premios/tres-coracoes.jpg';
+import { imagem } from '../lib/imagem';
+import tresCoracoesPicture from '../assets/premios/tres-coracoes.jpg?w=400;700&format=webp&as=picture';
 
 /** Prêmio com foto vira card grande; sem foto, vira faixa. */
 export const premios: Premio[] = [
@@ -13,7 +14,7 @@ export const premios: Premio[] = [
 		},
 		contexto: { texto: 'desafio CORA Vendas · nota', destaque: '4,62', depois: 'de 5' },
 		organizadores: [{ nome: 'AWS', cor: 'verde' }, { nome: 'Três Corações', cor: 'vermelho' }, { nome: 'FIAP', cor: 'roxo' }],
-		foto: { imagem: tresCoracoes, alt: 'Henrique e o time no palco segurando os shapes de skate do prêmio, com o telão anunciando o Grupo 4 em primeiro lugar' },
+		foto: { imagem: imagem(tresCoracoesPicture), alt: 'Henrique e o time no palco segurando os shapes de skate do prêmio, com o telão anunciando o Grupo 4 em primeiro lugar' },
 	},
 	{
 		evento: 'Hackathon CREA JR-DF',
