@@ -60,6 +60,12 @@ cd api
 
 `docker-compose.yml` runs the backend on the user's VPS through Coolify: `api`, `minio` (Coolify's image; the official one is no longer published) and `keycloak` (`keycloak/Dockerfile` + `keycloak/realm-portfolio.json`, which uses `${SITE_URL}` for redirect URIs). The site is not in Docker: it's static files on Hostinger (`henriquebueno.com`); API and Keycloak are `api.` and `auth.` subdomains on the VPS. Coolify owns the domains/HTTPS and the env vars, so the main compose file publishes no ports and reads no `.env` file; locally add `-f docker-compose.local.yml` (API :8082, Keycloak :8180; :8081 is taken on this machine), use `.env` (template `.env.example`, never committed) and pass `-p portfolio` (the folder is named `portifolio`, so without it Compose starts a second, empty project). Deploy steps for both parts are in `README.md`.
 
+## Git workflow
+
+- GitHub Flow: `main` is always releasable. Before changing anything, branch off `main` as `<type>/<short-topic>` (`feat/…`, `fix/…`, `docs/…`, `refactor/…`, `test/…`, `build/…`, `chore/…`). Integrate with a pull request, or locally with `git merge --no-ff <branch>` on `main`, then delete the branch. The `pre-commit` hook rejects commits on `main` (except the commit that concludes a merge).
+- Conventional Commits, in English, imperative: `<type>(<scope>): <subject>`, scope optional and one of `site`, `api`, `docker`, `keycloak`, `deps`; header ≤ 100 chars; body explains why. Checked by commitlint in the `commit-msg` hook (`site/commitlint.config.js`). Split commits by area (api, site, docs) and stage with `git add -A <path>`; check `git diff --cached` first, since earlier `git rm`/`git mv` are already staged.
+- Never bypass hooks with `--no-verify`. Commit, merge into `main` or push only when the user asks.
+
 ## Prompt log
 
 Every user prompt is saved automatically to `prompts/NNN.md` (001, 002, ...) by a `UserPromptSubmit` hook (`.claude/settings.json` → `.claude/hooks/save-prompt.sh`). The next number is the highest existing `NNN.md` + 1. Don't rename or renumber files in `prompts/`, and don't write to it by hand.
