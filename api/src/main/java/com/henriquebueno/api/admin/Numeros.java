@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.henriquebueno.api.fontes.Conjunto;
-import com.henriquebueno.api.rebuild.Rebuild;
 import com.henriquebueno.api.snapshot.Contagem;
 import com.henriquebueno.api.snapshot.Estado;
 import com.henriquebueno.api.snapshot.Rede;
@@ -19,7 +18,6 @@ import jakarta.inject.Inject;
 /**
  * Os números que não têm API ligada, digitados no painel: hoje só o Instagram, e só sem META_API_KEY.
  * O TikTok não mostra número no site, então não entra no painel e o valor guardado é apagado ao iniciar.
- * Toda mudança pede um rebuild do site.
  */
 @ApplicationScoped
 public class Numeros {
@@ -29,18 +27,16 @@ public class Numeros {
 	}
 
 	private final Estado estado;
-	private final Rebuild rebuild;
 	private final boolean instagramAutomatico;
 	private final Clock relogio;
 
 	@Inject
-	Numeros(Estado estado, Rebuild rebuild, Conjunto fontes) {
-		this(estado, rebuild, fontes.instagram().isPresent(), Clock.systemUTC());
+	Numeros(Estado estado, Conjunto fontes) {
+		this(estado, fontes.instagram().isPresent(), Clock.systemUTC());
 	}
 
-	Numeros(Estado estado, Rebuild rebuild, boolean instagramAutomatico, Clock relogio) {
+	Numeros(Estado estado, boolean instagramAutomatico, Clock relogio) {
 		this.estado = estado;
-		this.rebuild = rebuild;
 		this.instagramAutomatico = instagramAutomatico;
 		this.relogio = relogio;
 	}
@@ -66,7 +62,6 @@ public class Numeros {
 		if (valor != null && valor < 0) throw new Invalido(Map.of("valor", "não pode ser negativo"));
 		var contagem = Contagem.manual(rede, valor, relogio.instant());
 		estado.atualizarContagem(contagem);
-		rebuild.pedir();
 		return contagem;
 	}
 

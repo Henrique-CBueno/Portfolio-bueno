@@ -6,14 +6,14 @@ os inscritos do YouTube e os repositórios fixados do GitHub, guarda o número d
 
 | Endpoint | Pra quê |
 |---|---|
-| `GET /snapshot` | Lido no build do site: vídeos (mais novo primeiro), contagens e repositórios fixados. |
+| `GET /snapshot` | Lido pelo navegador a cada visita: vídeos (mais novo primeiro), contagens e repositórios fixados. |
 | `GET /capas/<id>` | Capa de cada vídeo, servida do MinIO (cache longo: capa nova ganha id novo). |
 | `GET /stream` | SSE: evento `contagens` ao conectar e sempre que um número muda. |
 | `POST /contato` | Formulário do site → e-mail, com o visitante no "responder para". 3 mensagens por IP a cada 10 min. |
 | `/admin-api/*` | Painel: `GET /contagens` (com `editavel`) e `PUT /contagens/instagram` quando não há `META_API_KEY`. O TikTok não tem número (só o @). Exige token do Keycloak com o papel `admin`. |
 | `GET /q/health` | Saúde. |
 
-Toda mudança na lista de vídeos, nos repositórios fixados ou feita pelo painel roda o `REBUILD_COMANDO` (no Docker: avisa o construtor do site).
+O site é estático e lê `GET /snapshot` no navegador a cada visita, então qualquer mudança aparece sem publicar o site de novo.
 
 ## Vídeos do Instagram
 
@@ -48,20 +48,29 @@ O jeito mais simples de ter tudo junto (API, MinIO, Keycloak e site) é o `docke
 |---|---|---|
 | `PORTA` | `8080` | Porta HTTP. |
 | `DADOS` | `./dados` | Onde fica o `snapshot.json` (vídeos, contagens, repositórios). |
-| `ORIGENS` | localhost:4321 e henriquebueno.com | Origens liberadas no CORS (o site, que chama a API de outro domínio). |
+| `ORIGENS` | localhost:4321 e henriquebueno.com | Origens liberadas no CORS (o site na Hostinger, que chama a API de outro domínio). |
 | `MINIO_URL`, `MINIO_USUARIO`, `MINIO_SENHA` | `http://localhost:9000`, … | MinIO das capas: endereço, access key e secret key. |
 | `MINIO_BUCKET` | `capas` | Bucket das capas (criado sozinho se não existir). |
 | `KEYCLOAK_URL` | `http://localhost:8180/realms/portfolio` | Realm do Keycloak, pelo endereço interno. |
 | `KEYCLOAK_EMISSOR` | `any` | Emissor dos tokens como o navegador vê (ex.: `https://auth.henriquebueno.com/realms/portfolio`). |
 | `YOUTUBE_CHAVE` | — | Chave da YouTube Data API v3. Sem ela, o site mostra só o @. |
 | `YOUTUBE_CANAL` | `@bueno_dev` | Handle (`@...`) ou id (`UC...`) do canal. |
-| `GITHUB_TOKEN` | — | Token só de leitura, pros repositórios fixados (GraphQL). Sem ele, usa a lista copiada no código. |
+| `GITHUB_TOKEN` | — | Token só de leitura, pros repositórios fixados (GraphQL). Sem ele, a API pública do GitHub (sem login, 60 chamadas/hora) dá os 6 repositórios públicos com push mais recente. |
 | `GITHUB_USUARIO` | `Henrique-CBueno` | Perfil do GitHub. |
 | `META_API_KEY` | — | Token da Meta pro Instagram (veja acima). Sem ele, os seguidores são digitados no painel e a lista de vídeos fica como está. |
 | `INSTAGRAM_CONTA` | `17841421020065645` (@bueno_dev) | Id da conta do Instagram, usado com token do Facebook. Vazio: descoberto pela Página ligada. |
 | `MAIL_MOCK` | `true` | Com `true`, os e-mails do formulário só vão pro log. Em produção: `false`. |
 | `MAIL_HOST`, `MAIL_PORTA`, `MAIL_USUARIO`, `MAIL_SENHA` | —, `465` | SMTP (TLS). Na Hostinger: `smtp.hostinger.com`, porta 465, usuário = o e-mail. |
 | `CONTATO_PARA`, `CONTATO_DE` | `contato@henriquebueno.com` | Destino e remetente do formulário. |
-| `REBUILD_COMANDO` | — | Comando rodado quando o painel muda algo. Saída em `dados/rebuild.log`. |
 
 As categorias dos vídeos (a pill colorida, vinda da hashtag) ficam em `portfolio.categorias`, no `application.properties`.
+
+## Repositórios do GitHub
+
+Lidos a cada 10 min direto da API do GitHub (nada cadastrado à mão): com `GITHUB_TOKEN`, os fixados no perfil;
+sem ele, os 6 públicos com push mais recente (sem forks nem arquivados). Cada um leva nome, descrição (ou o primeiro
+parágrafo do README, só com token), linguagens, a cor da principal e a data do último push.
+
+O navegador nunca chama o GitHub: lê o `GET /snapshot` daqui, então visitas não gastam a cota. Se o GitHub responder
+que a cota acabou (403 com `x-ratelimit-remaining: 0`, ou 429/`retry-after`), a API não chama de novo até o horário
+que ele informou (`x-ratelimit-reset`/`retry-after`), mantém a última lista e avisa uma vez no log.

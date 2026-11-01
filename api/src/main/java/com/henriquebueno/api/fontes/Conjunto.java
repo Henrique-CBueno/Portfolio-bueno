@@ -16,7 +16,7 @@ import jakarta.inject.Singleton;
 
 /**
  * As fontes automáticas em uso. Sem credencial, a rede fica de fora (YouTube; Instagram, que aí é digitado
- * no painel) ou usa a lista copiada (GitHub). O Instagram tem ritmo próprio, por isso fica separado.
+ * no painel) ou usa a API pública (GitHub: os repositórios mais recentes em vez dos fixados). O Instagram tem ritmo próprio, por isso fica separado.
  */
 public record Conjunto(List<Fontes.DeContagem> contagens, Fontes.DeRepositorios repositorios, Optional<Instagram> instagram) {
 
@@ -40,10 +40,10 @@ public record Conjunto(List<Fontes.DeContagem> contagens, Fontes.DeRepositorios 
 			var tokenGitHub = config.github().token().filter(t -> !t.isBlank());
 			Fontes.DeRepositorios repositorios;
 			if (tokenGitHub.isPresent()) {
-				repositorios = new GitHub(new Http(json, config.github().base(), Map.of("Authorization", "Bearer " + tokenGitHub.get())), config.github().usuario());
+				repositorios = new GitHub(new Http(json, config.github().base(), Map.of("Authorization", "Bearer " + tokenGitHub.get())), config.github().usuario(), true);
 			} else {
-				log.warn("GITHUB_TOKEN ausente: repositórios fixados da lista copiada");
-				repositorios = new Exemplo.Repositorios();
+				log.warn("GITHUB_TOKEN ausente: em vez dos fixados, os repositórios públicos mais recentes (API pública, 60 chamadas/hora)");
+				repositorios = new GitHub(new Http(json, config.github().base(), Map.of()), config.github().usuario(), false);
 			}
 			Optional<Instagram> instagram = config.instagram().token().filter(t -> !t.isBlank()).map(t -> {
 				var token = new TokenMeta(t, config.dados().resolve("meta-token.json"), json);

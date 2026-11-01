@@ -25,8 +25,6 @@ public interface PortfolioConfig {
 
 	Contato contato();
 
-	Rebuild rebuild();
-
 	interface Minio {
 		String url();
 
@@ -83,9 +81,5 @@ public interface PortfolioConfig {
 		int limite();
 
 		Duration janela();
-	}
-
-	interface Rebuild {
-		Optional<String> comando();
 	}
 }

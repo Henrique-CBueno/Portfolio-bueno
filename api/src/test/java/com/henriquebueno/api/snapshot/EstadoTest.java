@@ -33,28 +33,6 @@ class EstadoTest {
 	}
 
 	@Test
-	void avisaSoQuandoOsVideosMudam() {
-		var estado = novoEstado();
-		var v = new Video("1", "Título", "https://x", new Video.Links("https://x", null, null), "/capas/1", Instant.parse("2026-10-20T00:00:00Z"), "resiliencia");
-		estado.atualizarVideos(List.of(v));
-		estado.atualizarVideos(List.of(v));
-
-		assertThat(eventos).containsExactly(new Eventos.VideosMudaram(List.of(), List.of(v)));
-	}
-
-	@Test
-	void avisaSoQuandoOsRepositoriosMudam() {
-		var estado = novoEstado();
-		var repo = new Repositorio("repo", "Descrição.", List.of("Java"), "https://github.com/u/repo");
-		estado.atualizarRepositorios(List.of(repo));
-		estado.atualizarRepositorios(List.of(repo));
-		var semDescricao = new Repositorio("repo", null, List.of("Java"), "https://github.com/u/repo");
-		estado.atualizarRepositorios(List.of(semDescricao));
-
-		assertThat(eventos).containsExactly(new Eventos.RepositoriosMudaram(List.of(repo)), new Eventos.RepositoriosMudaram(List.of(semDescricao)));
-	}
-
-	@Test
 	void videosFicamDoMaisNovoProMaisAntigo() {
 		var estado = novoEstado();
 		var velho = new Video("velho", "A", "https://x", new Video.Links("https://x", null, null), "/capas/a", Instant.parse("2026-01-01T00:00:00Z"), null);
@@ -70,7 +48,7 @@ class EstadoTest {
 		var v = new Video("1", "Título", "https://x", new Video.Links(null, "https://x", null), "/capas/1", Instant.parse("2026-10-20T00:00:00Z"), null);
 		estado.atualizarVideos(List.of(v));
 		estado.atualizarContagem(Contagem.automatica(Rede.YOUTUBE, 96L, true));
-		estado.atualizarRepositorios(List.of(new Repositorio("repo", null, List.of("Java"), "https://github.com/u/repo")));
+		estado.atualizarRepositorios(List.of(new Repositorio("repo", null, List.of("Java"), "https://github.com/u/repo", null, null)));
 
 		var depois = novoEstado().atual();
 

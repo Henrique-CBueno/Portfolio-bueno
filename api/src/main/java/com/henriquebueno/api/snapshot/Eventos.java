@@ -11,9 +11,4 @@ public final class Eventos {
 	public record ContagensMudaram(List<Contagem> contagens) {
 	}
 
-	public record VideosMudaram(List<Video> antes, List<Video> depois) {
-	}
-
-	public record RepositoriosMudaram(List<Repositorio> repositorios) {
-	}
 }

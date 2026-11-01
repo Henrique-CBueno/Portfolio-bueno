@@ -27,13 +27,26 @@ class Servidor implements AutoCloseable {
 			var corpo = new String(troca.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
 			pedidos.add(new Pedido(troca.getRequestMethod(), troca.getRequestURI(), troca.getRequestHeaders(), corpo));
 			var resposta = respostas.get(troca.getRequestURI().getPath());
-			var bytes = (resposta == null ? "{}" : resposta).getBytes(StandardCharsets.UTF_8);
+			var especial = especiais.get(troca.getRequestURI().getPath());
+			var bytes = (especial != null ? especial.json() : resposta == null ? "{}" : resposta).getBytes(StandardCharsets.UTF_8);
 			troca.getResponseHeaders().add("Content-Type", "application/json");
-			troca.sendResponseHeaders(resposta == null ? 404 : 200, bytes.length);
+			if (especial != null) especial.cabecalhos().forEach((k, v) -> troca.getResponseHeaders().add(k, v));
+			troca.sendResponseHeaders(especial != null ? especial.status() : resposta == null ? 404 : 200, bytes.length);
 			troca.getResponseBody().write(bytes);
 			troca.close();
 		});
 		http.start();
+	}
+
+	record Especial(int status, String json, Map<String, String> cabecalhos) {
+	}
+
+	private final Map<String, Especial> especiais = new ConcurrentHashMap<>();
+
+	/** Resposta com status e cabeçalhos próprios (ex.: o 403 de limite do GitHub). */
+	Servidor responder(String caminho, int status, String json, Map<String, String> cabecalhos) {
+		especiais.put(caminho, new Especial(status, json, cabecalhos));
+		return this;
 	}
 
 	Servidor responder(String caminho, String json) {
