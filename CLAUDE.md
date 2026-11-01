@@ -15,6 +15,8 @@ cd site
 npm run dev        # dev server on :4321 (the API's CORS allows this port), page server-rendered like the build
 npm run build      # client build + SSR build + prerender.mjs → site/dist (upload its contents, .htaccess included); URLs from .env.production
 npm run check      # type check (tsc)
+npm test           # Vitest + Testing Library (jsdom): src/**/*.test.ts(x)
+npm run test:e2e   # Playwright on the production build (vite preview :4173), system Chrome, desktop + Pixel 7; API/Keycloak mocked with page.route
 ```
 
 - Routes (React Router 7, declarative): `/` (`src/paginas/Inicio.tsx`), `/projetos/:slug` (`Projeto.tsx`, the featured projects from `src/dados/projetos.ts`; a slug is a published URL, don't change it) and anything else → `NaoEncontrada.tsx` (404). Per-route `<title>`/description live in `src/lib/cabecalho.ts`, which also lists the pages to prerender (`paginasDoBuild`).
@@ -25,6 +27,7 @@ npm run check      # type check (tsc)
 - `admin/index.html` + `src/admin/*`: the admin panel (React, keycloak-js with PKCE) calling `/admin-api` for the contact messages (`Mensagens.tsx`), the featured projects (`Destaques.tsx`; keys resolved by `src/lib/destaques.ts`, also used by the home) and the typed-in counts; client-rendered only, outside the router. When the API or Keycloak doesn't answer it shows `components/FalhaApi` (friendly message + retry); Keycloak is pinged first because keycloak-js would otherwise redirect to a dead login page.
 - Theme: dark default, light as a visitor option. Colors are tokens in `src/styles/global.css` (`:root` and `:root[data-tema="claro"]`); never hard-code a color in component CSS. `src/lib/tema.ts` + `components/TrocaTema` store the choice in `localStorage`; an inline script in `index.html`/`admin/index.html` applies it before paint. Palette and contrast rules in `DESIGN.md` (Light Theme).
 - `src/scripts/movimento.ts` holds the animations: `animarMarca` (header, once, from `App`) and `animarPagina(main)`, which each page calls through `usePaginaAnimada` so content animates after client navigation too; `cursor.ts` is started once by `App`. Hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
+- Tests: the contact rules (`lib/contato.test.ts`), the form (`components/Contato.test.tsx`), the admin login and blocking (`admin/api.test.ts`, `admin/Painel.test.tsx`) and the same flows end to end (`e2e/`). The backend side (field errors, 401/403 on `/admin-api`) is in the API's JUnit tests.
 - Env vars keep the `PUBLIC_` prefix (`envPrefix` in `vite.config.ts`). Built against the API with `API_URL=… PUBLIC_API_URL=… npm run build`.
 
 ## API (`api/`)

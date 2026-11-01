@@ -46,6 +46,19 @@ Os vídeos vêm dos Reels do Instagram (com `META_API_KEY`), lidos a cada 5 min:
 
 O Keycloak roda em modo `start-dev` (banco H2 no volume `keycloak`): serve pro começo, mas o ideal em produção é `start` com Postgres e restringir o console de administração.
 
+## Testes
+
+```sh
+cd site
+npm test             # regras e componentes (Vitest + Testing Library): validação do formulário, login e bloqueio do painel
+npm run test:e2e     # ponta a ponta no Chrome (Playwright), desktop e celular, sobre o build de produção
+cd ../api
+./mvnw test          # API: validação do /contato, bloqueio do /admin-api (401/403), fontes, mensagens, destaques
+```
+
+Os testes de ponta a ponta simulam a API e o Keycloak, então não precisam do Docker. Usam o Chrome instalado;
+numa máquina sem ele (ex.: CI), rode antes `npx playwright install chrome`.
+
 ## Deploy
 
 São duas partes: o backend na VPS (Coolify) e o site estático na Hostinger. O site chama o backend pelos domínios públicos.
