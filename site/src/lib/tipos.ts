@@ -39,6 +39,10 @@ export interface Snapshot {
 	contagens: Contagem[];
 	/** Repositórios do GitHub: os fixados (com token) ou os públicos mais recentes (sem token). */
 	repositorios?: Repositorio[];
+	/** Todos os repositórios públicos (candidatos a destaque no painel). */
+	publicos?: Repositorio[];
+	/** Seleção do painel pra "Projetos em destaque", em ordem; nulo = padrão (os curados). Ver lib/destaques.ts. */
+	destaques?: string[] | null;
 }
 
 export interface Destaque {

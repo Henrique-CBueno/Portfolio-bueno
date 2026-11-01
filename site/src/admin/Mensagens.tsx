@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { LoaderCircle, Mail, Reply, Trash2 } from 'lucide-react';
+import { CheckCheck, LoaderCircle, Mail, Reply, Trash2 } from 'lucide-react';
 import { FalhaApi } from '../components/FalhaApi';
 import { chamar } from './api';
 
@@ -12,8 +12,12 @@ interface Recebida {
 	assunto: string | null;
 	mensagem: string;
 	lida: boolean;
+	/** Marcada à mão no painel (o "responder" abre o e-mail; a API não sabe se ele saiu). */
+	respondida: boolean;
+	respondidaEm: string | null;
 }
 
+const dia = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', timeZone: 'America/Sao_Paulo' });
 const quando = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
 
 /** Só endereço com cara de e-mail vira link mailto (o que vem do formulário passa por aqui). */
@@ -37,11 +41,13 @@ export function Mensagens() {
 	const trocar = (nova: Recebida) => setMensagens((lista) => lista?.map((m) => (m.id === nova.id ? nova : m)));
 	const tirar = (id: string) => setMensagens((lista) => lista?.filter((m) => m.id !== id));
 	const novas = mensagens?.filter((m) => !m.lida).length ?? 0;
+	const semResposta = mensagens?.filter((m) => !m.respondida).length ?? 0;
 
 	return (
 		<section className="bloco">
 			<div className="cab-bloco">
 				<h2>Mensagens {novas > 0 && <em>{novas} {novas === 1 ? 'nova' : 'novas'}</em>}</h2>
+				{mensagens && mensagens.length > 0 && <small className="dica">{semResposta === 0 ? 'todas respondidas ✓' : `${semResposta} sem resposta`}</small>}
 				<small className="dica">do formulário de contato do site · também chegam por e-mail</small>
 			</div>
 			{falhou && <FalhaApi oque="as mensagens" tentarDeNovo={carregar} />}
@@ -66,7 +72,7 @@ export function Mensagens() {
 }
 
 function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTrocar: (m: Recebida) => void; aoApagar: (id: string) => void }) {
-	const [ocupado, setOcupado] = useState<'lida' | 'apagar' | null>(null);
+	const [ocupado, setOcupado] = useState<'lida' | 'respondida' | 'apagar' | null>(null);
 	const [confirmar, setConfirmar] = useState(false);
 	const [erro, setErro] = useState<string>();
 	const trava = useRef(false);
@@ -78,15 +84,16 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 		return () => clearTimeout(volta);
 	}, [confirmar]);
 
-	async function acao(qual: 'lida' | 'apagar') {
+	async function acao(qual: 'lida' | 'respondida' | 'apagar') {
 		if (trava.current) return;
 		if (qual === 'apagar' && !confirmar) { setConfirmar(true); return; }
 		trava.current = true;
 		setOcupado(qual);
 		setErro(undefined);
 		try {
-			if (qual === 'lida') {
-				const r = await chamar(`/mensagens/${m.id}/lida`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lida: !m.lida }) });
+			if (qual === 'lida' || qual === 'respondida') {
+				const corpo = qual === 'lida' ? { lida: !m.lida } : { respondida: !m.respondida };
+				const r = await chamar(`/mensagens/${m.id}/${qual}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) });
 				if (!r.ok) throw new Error();
 				aoTrocar(await r.json());
 			} else {
@@ -95,7 +102,7 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 				aoApagar(m.id);
 			}
 		} catch {
-			setErro(qual === 'lida' ? 'não deu pra marcar agora' : 'não deu pra apagar agora');
+			setErro(qual === 'apagar' ? 'não deu pra apagar agora' : 'não deu pra marcar agora');
 		} finally {
 			trava.current = false;
 			setOcupado(null);
@@ -105,7 +112,7 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 
 	const assunto = m.assunto ? `Re: ${m.assunto}` : 'Re: sua mensagem pelo site';
 	return (
-		<article className={m.lida ? 'painel mensagem' : 'painel mensagem nova'}>
+		<article className={['painel mensagem', !m.lida && 'nova', m.respondida && 'respondida'].filter(Boolean).join(' ')}>
 			<header>
 				<div>
 					<strong>{m.nome}</strong>
@@ -113,6 +120,7 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 				</div>
 				<div className="lado">
 					{!m.lida && <span className="pill amarelo">nova</span>}
+					{m.respondida && <span className="pill verde">respondida{m.respondidaEm ? ` em ${dia.format(new Date(m.respondidaEm))}` : ''}</span>}
 					<time dateTime={m.recebidaEm}>{quando.format(new Date(m.recebidaEm))}</time>
 				</div>
 			</header>
@@ -122,10 +130,16 @@ function Item({ mensagem: m, aoTrocar, aoApagar }: { mensagem: Recebida; aoTroca
 				{emailSeguro(m.email) && (
 					<a className="botao" href={`mailto:${m.email}?subject=${encodeURIComponent(assunto)}`}><Reply /> responder</a>
 				)}
+				<button className={m.respondida ? 'botao' : 'botao marcar-respondida'} type="button" disabled={ocupado !== null} onClick={() => acao('respondida')}>
+					{ocupado === 'respondida' ? <LoaderCircle className="gira" aria-hidden="true" /> : <CheckCheck />}
+					{m.respondida ? 'desfazer "respondida"' : 'marcar como respondida'}
+				</button>
+				{!m.respondida && (
 				<button className="botao" type="button" disabled={ocupado !== null} onClick={() => acao('lida')}>
 					{ocupado === 'lida' ? <LoaderCircle className="gira" aria-hidden="true" /> : <Mail />}
 					{m.lida ? 'marcar como não lida' : 'marcar como lida'}
 				</button>
+				)}
 				<button className={confirmar ? 'botao perigo' : 'botao'} type="button" disabled={ocupado !== null} onClick={() => acao('apagar')}>
 					{ocupado === 'apagar' ? <LoaderCircle className="gira" aria-hidden="true" /> : <Trash2 />}
 					{confirmar ? 'confirmar?' : 'apagar'}

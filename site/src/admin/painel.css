@@ -44,3 +44,26 @@ p.dica { font-size: 13px; line-height: 1.6; max-width: 70ch; }
 .esqueleto-mensagem .esqueleto:nth-child(1) { width: 30%; height: 16px; }
 .esqueleto-mensagem .esqueleto:nth-child(2) { width: 90%; height: 14px; }
 .esqueleto-mensagem .esqueleto:nth-child(3) { width: 60%; height: 14px; }
+
+/* destaques na home */
+.destaques-painel { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.destaques-painel .coluna { padding: 20px; display: grid; gap: 14px; }
+.destaques-painel h3 { font-size: 16px; }
+.escolhidos, .disponiveis { list-style: none; display: grid; gap: 8px; }
+.escolhidos li, .disponiveis li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--borda); border-radius: 10px; background: var(--fundo); }
+.escolhidos .ordem { font: 700 13px var(--mono); color: var(--amarelo); width: 18px; }
+.destaques-painel .nome { flex: 1; min-width: 0; display: grid; }
+.destaques-painel .nome strong { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.destaques-painel .nome small { font: 500 11.5px var(--mono); color: var(--apagado); }
+.destaques-painel .icone { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; border: 1.5px solid var(--borda); background: var(--painel); color: var(--texto); cursor: pointer; }
+.destaques-painel .icone:disabled { opacity: .35; cursor: default; }
+.destaques-painel .icone svg { width: 14px; height: 14px; }
+.disponiveis { max-height: 360px; overflow-y: auto; }
+.disponiveis .botao { padding: 6px 10px; font-size: 12px; gap: 6px; }
+.filtro { font: 500 14px var(--sans); color: var(--texto); background: var(--fundo); border: 1.5px solid var(--borda); border-radius: 10px; padding: 9px 12px; }
+.filtro:focus { outline: none; border-color: var(--amarelo); }
+.acoes-destaques { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+@media (max-width: 760px) { .destaques-painel { grid-template-columns: 1fr; } }
+
+.mensagem.respondida { opacity: .8; }
+.acoes-mensagem .marcar-respondida { border-color: color-mix(in srgb, var(--ok) 55%, var(--borda)); color: var(--ok); }

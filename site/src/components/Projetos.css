@@ -17,6 +17,21 @@
 	.barra span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 	.print { aspect-ratio: 16 / 9; overflow: hidden; background: #0E141F; }
 	.print img { width: 100%; height: 108%; object-fit: cover; object-position: center top; }
+	/* repositório do GitHub em destaque: no lugar do print, o próprio repo sobre a grade dos diagramas */
+	.capa-repo { display: grid; place-content: center; justify-items: center; gap: 12px; padding: 24px; text-align: center; background-color: #0E141F; background-image: linear-gradient(rgba(42, 53, 73, .35) 1px, transparent 1px), linear-gradient(90deg, rgba(42, 53, 73, .35) 1px, transparent 1px); background-size: 24px 24px; }
+	.capa-repo .logo { width: 28px; height: 28px; color: var(--apagado); }
+	.capa-repo strong { font: 700 clamp(20px, 2.4vw, 28px) var(--mono); letter-spacing: -.02em; word-break: break-word; }
+	.capa-repo .linguagem { display: inline-flex; align-items: center; gap: 8px; font: 500 13px var(--mono); color: var(--apagado); }
+	.capa-repo .linguagem i { width: 10px; height: 10px; border-radius: 50%; }
+	.destaque p.vazio { color: var(--apagado); font: 500 13px var(--mono); }
+	/* esqueleto no formato do card de destaque */
+	.esqueleto-destaque .print { aspect-ratio: 16 / 9; border-radius: 0; }
+	.esqueleto-destaque .corpo { gap: 12px; }
+	.esqueleto-destaque .tags-e { width: 50%; height: 22px; }
+	.esqueleto-destaque .titulo-e { width: 40%; height: 24px; }
+	.esqueleto-destaque .texto-e { width: 95%; height: 14px; }
+	.esqueleto-destaque .texto-e.curto { width: 70%; }
+	.esqueleto-destaque:hover { transform: none; border-color: var(--borda); }
 	.corpo { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
 	.tags { display: flex; gap: 6px; flex-wrap: wrap; }
 	h3 { font-size: 22px; font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
