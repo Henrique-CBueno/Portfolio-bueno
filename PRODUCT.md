@@ -8,9 +8,9 @@ web
 
 ## Stack
 
-- Site: Astro, static, with JS islands only for the live diagram. Last known numbers baked in at build; live updates over SSE. Rebuilt when the API sees a new post.
+- Site: React + Vite, prerendered to static HTML at build and hydrated in the browser (moved from Astro on 2026-11-01). Last known numbers baked in at build; live updates over SSE. Rebuilt when the API sees a new post.
 - API (`api/`): Java 25 + Quarkus, kept simple (no virtual threads, no circuit breaker). Videos and the Instagram/TikTok counts are entered in the site's `/admin` panel (decided 2026-10-22, after the Meta developer signup failed on SMS): covers go to MinIO, data to `dados/snapshot.json`, login via Keycloak (role `admin`). Scheduled reads: YouTube subscribers every 30 s, pinned repos every 10 min. Serves `GET /snapshot`, `GET /capas/<id>`, SSE `GET /stream`, `POST /contato`, and `/admin-api/*` for the panel. Every panel change asks the site builder to rebuild.
-- Hosting: the user's Hostinger VPS with Coolify, deployed from Git with Docker Compose. Three domains: site `henriquebueno.com` (static files only), API `api.henriquebueno.com`, Keycloak `auth.henriquebueno.com` (user decision: front only Astro, back only the API).
+- Hosting: the user's Hostinger VPS with Coolify, deployed from Git with Docker Compose. Three domains: site `henriquebueno.com` (static files only), API `api.henriquebueno.com`, Keycloak `auth.henriquebueno.com` (user decision: front only the static site, back only the API).
 - No Remotion in the site. Components from the video project may be copied, but nothing is ported per video.
 
 ## Users

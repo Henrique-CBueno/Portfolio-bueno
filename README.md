@@ -1,6 +1,6 @@
 # Portfólio · Henrique Bueno
 
-Site (`site/`, Astro) e API (`api/`, Quarkus) do portfólio. Decisões de produto em `PRODUCT.md`, visual em `DESIGN.md`.
+Site (`site/`, React + Vite, pré-renderizado no build) e API (`api/`, Quarkus) do portfólio. Decisões de produto em `PRODUCT.md`, visual em `DESIGN.md`.
 
 ## Rodar com Docker (na sua máquina)
 

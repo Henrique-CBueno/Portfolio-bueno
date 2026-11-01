@@ -8,20 +8,22 @@ Portfolio and video showcase for Henrique Bueno (bueno_dev). Product decisions l
 
 ## Site (`site/`)
 
-Astro (static) + Motion for animations. Needs Node ≥ 22.23.4; the system Node may be older, so use `~/.nvm/versions/node/v24.20.0/bin` (`.nvmrc` says 24).
+React 19 + Vite, prerendered to static HTML at build and hydrated in the browser; Motion for animations. Needs Node ≥ 22.23.4; the system Node may be older, so use `~/.nvm/versions/node/v24.20.0/bin` (`.nvmrc` says 24).
 
 ```sh
 cd site
-npm run dev        # dev server on :4321 (or: npx astro dev --background)
-npm run build      # static output in site/dist
-npx astro check    # type check
+npm run dev        # dev server on :4321 (the API's CORS allows this port), page server-rendered like the build
+npm run build      # client build + SSR build + prerender.mjs → static output in site/dist
+npm run check      # type check (tsc)
 ```
 
-- `src/pages/index.astro` composes the single page from `src/components/*` (one component per section).
-- `src/dados/` holds curated content; `src/lib/snapshot.ts` loads videos and follower counts from the API (`API_URL` at build) or from `src/dados/exemplo.ts`.
-- `src/pages/admin/index.astro` + `src/scripts/painel.ts`: the admin panel (keycloak-js, PKCE) calling `/admin-api`.
-- `src/scripts/movimento.ts` holds every animation; hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
-- Built against the API with `API_URL=… PUBLIC_API_URL=… npm run build`: covers are downloaded from the API at build time (`image.domains` in `astro.config.mjs`).
+- `index.html` (template with `<!--app-->`/`<!--dados-->`) → `src/main.tsx` hydrates `src/App.tsx`, which composes the page from `src/components/*` (one component + one `.css` per section, CSS nested under the section's root class).
+- `src/entry-server.tsx` renders the page; `prerender.mjs` uses it at build (and downloads each video cover from the API, converting it to WebP in `dist/capas/`), the `paginaNoDev` plugin in `vite.config.ts` uses it in dev. The snapshot travels to the browser as JSON in `<script id="dados">`.
+- `src/dados/` holds curated content; `src/lib/snapshot.ts` loads videos and follower counts from the API (`API_URL`, else `PUBLIC_API_URL`) or from `src/dados/exemplo.ts`. Local images are imported with `?w=…&format=webp&as=picture` (vite-imagetools).
+- After hydration, `Videos` re-checks `/snapshot` and swaps the list if its `assinatura` changed; `useContagensAoVivo` follows the counts over SSE.
+- `admin/index.html` + `src/admin/*`: the admin panel (React, keycloak-js with PKCE) calling `/admin-api`; client-rendered only.
+- `src/scripts/movimento.ts` holds the scroll/entrance animations and `cursor.ts` the cursor; `App` starts both once after hydration. Hidden initial states are in `src/styles/global.css` and only apply with JS and without `prefers-reduced-motion`.
+- Env vars keep the `PUBLIC_` prefix (`envPrefix` in `vite.config.ts`). Built against the API with `API_URL=… PUBLIC_API_URL=… npm run build`.
 
 ## API (`api/`)
 
@@ -41,7 +43,7 @@ cd api
 
 ## Docker
 
-`docker-compose.yml` runs `web` (Nginx serving only the static site: `site/docker/Dockerfile.web` + `site/docker/nginx.conf`), `construtor` (site builder: `site/Dockerfile` + `site/docker/construir.sh`), `api`, `minio` (Coolify's image; the official one is no longer published) and `keycloak` (`keycloak/Dockerfile` + `keycloak/realm-portfolio.json`, which uses `${SITE_URL}` for redirect URIs). Site, API and Keycloak are separate domains (`SITE_URL`, `API_URL_PUBLICA`, `KEYCLOAK_URL_PUBLICA`); Nginx proxies nothing. It is deployed on the user's VPS through Coolify, which owns the domains/HTTPS and the env vars, so the main compose file publishes no ports and reads no `.env` file; locally add `-f docker-compose.local.yml` (site :8080, API :8082, Keycloak :8180; :8081 is taken on this machine) and use `.env` (template `.env.example`, never committed). The API asks for a site rebuild by touching `/dados/rebuild-pedido`; the builder polls it, builds inside the container (Astro can't move files across volumes) and swaps the `/site/atual` symlink. Deploy steps are in `README.md`.
+`docker-compose.yml` runs `web` (Nginx serving only the static site: `site/docker/Dockerfile.web` + `site/docker/nginx.conf`), `construtor` (site builder: `site/Dockerfile` + `site/docker/construir.sh`), `api`, `minio` (Coolify's image; the official one is no longer published) and `keycloak` (`keycloak/Dockerfile` + `keycloak/realm-portfolio.json`, which uses `${SITE_URL}` for redirect URIs). Site, API and Keycloak are separate domains (`SITE_URL`, `API_URL_PUBLICA`, `KEYCLOAK_URL_PUBLICA`); Nginx proxies nothing. It is deployed on the user's VPS through Coolify, which owns the domains/HTTPS and the env vars, so the main compose file publishes no ports and reads no `.env` file; locally add `-f docker-compose.local.yml` (site :8080, API :8082, Keycloak :8180; :8081 is taken on this machine) and use `.env` (template `.env.example`, never committed). The API asks for a site rebuild by touching `/dados/rebuild-pedido`; the builder polls it, builds inside the container and swaps the `/site/atual` symlink. Deploy steps are in `README.md`.
 
 ## Prompt log
 
